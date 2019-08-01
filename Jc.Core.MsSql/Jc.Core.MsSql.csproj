@@ -15,8 +15,13 @@ author:279328316@qq.com</PackageReleaseNotes>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <DocumentationFile>bin\Debug\netstandard2.0\Jc.Core.MsSql.xml</DocumentationFile>
+    <DocumentationFile>bin\Debug\Jc.Core.MsSql.xml</DocumentationFile>
     <OutputPath>bin\Debug\</OutputPath>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <OutputPath>bin\Release</OutputPath>
+    <DocumentationFile>bin\Release\Jc.Core.MsSql.xml</DocumentationFile>
   </PropertyGroup>
 
   <ItemGroup>

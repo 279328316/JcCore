@@ -13,7 +13,12 @@ author:279328316@qq.com</PackageReleaseNotes>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
     <OutputPath>bin\Debug\</OutputPath>
-    <DocumentationFile>bin\Debug\netstandard2.0\Jc.Core.PostgreSql.xml</DocumentationFile>
+    <DocumentationFile>bin\Debug\Jc.Core.PostgreSql.xml</DocumentationFile>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <OutputPath>bin\Release</OutputPath>
+    <DocumentationFile>bin\Release\Jc.Core.PostgreSql.xml</DocumentationFile>
   </PropertyGroup>
 
   <ItemGroup>
