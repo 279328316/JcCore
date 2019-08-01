@@ -1,0 +1,22 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>netcoreapp2.2</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Jc.Core.MsSql\Jc.Core.MsSql.csproj" />
+    <ProjectReference Include="..\Jc.Core.MySql\Jc.Core.MySql.csproj" />
+    <ProjectReference Include="..\Jc.Core.PostgreSql\Jc.Core.PostgreSql.csproj" />
+    <ProjectReference Include="..\Jc.Core.Sqlite\Jc.Core.Sqlite.csproj" />
+    <ProjectReference Include="..\Jc.Core\Jc.Core.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="Test\1.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
+</Project>
