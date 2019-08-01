@@ -317,7 +317,7 @@ namespace Jc.Core
         /// <param name="order">排序方向</param>
         /// <param name="tableNamePfx">表名称参数.如果TableAttr设置Name.则根据Name格式化</param>
         /// <returns></returns>
-        public List<T> GetSortedList<T>(Expression<Func<T, bool>> where,Expression<Func<T, object>> sortExpr, Sorting order,string tableNamePfx = null) where T : class, new()
+        public List<T> GetSortList<T>(Expression<Func<T, bool>> where,Expression<Func<T, object>> sortExpr, Sorting order,string tableNamePfx = null) where T : class, new()
         {
             IQuery<T> query = IQuery<T>().Where(where).FromTable(tableNamePfx);
             if (order == Sorting.Asc)
