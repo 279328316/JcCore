@@ -69,7 +69,7 @@ namespace Jc.Core.Data.Query
             List<PiMap> piMapList = DtoMappingHelper.GetPiMapList<T>();
             foreach (PiMap piMap in piMapList)
             {
-                if (piMap.IsIgnore)
+                if (piMap.IsIgnore || piMap.Pi.SetMethod == null)
                 {
                     continue;
                 }
