@@ -424,6 +424,17 @@ namespace Jc.Core
         }
 
         /// <summary>
+        /// 查询是否存在符合条件的记录
+        /// </summary>
+        /// <param name="where">查询条件</param>
+        /// <param name="tableNamePfx">表名称参数.如果TableAttr设置Name.则根据Name格式化</param>
+        /// <returns></returns>
+        public bool Exists<T>(Expression<Func<T, bool>> where = null, string tableNamePfx = null) where T : class, new()
+        {
+            return Count(where, tableNamePfx) >0;
+        }
+
+        /// <summary>
         /// 获取对象列表
         /// </summary>
         /// <param name="sql">查询Sql</param>
