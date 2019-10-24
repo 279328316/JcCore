@@ -250,7 +250,6 @@ namespace Jc.Core
         public DbTransContext GetTransDbContext()
         {
             DbTransContext dbContext = new DbTransContext(this.connectString,this.dbType);
-            dbContext.BeginTrans();
             return dbContext;
         }
 
