@@ -319,20 +319,25 @@ namespace Jc.Core.Data.Query
                 //支持数组,List泛型 int,int?,float,float?,double,double?,
                 //long,long?,Guid,Guid?,Datetime,Datetime?,string
                 #region 处理数组类型
+                StringBuilder strBuilder = new StringBuilder();
                 if (result is IEnumerable<int>)
                 {
                     IEnumerable<int> rl = result as IEnumerable<int>;
-                    StringBuilder sbTmp = new StringBuilder();
                     foreach (int r in rl)
                     {
-                        sbTmp.Append(r.ToString() + ",");
+                        if (strBuilder.Length == 0)
+                        {
+                            strBuilder.Append(r.ToString());
+                        }
+                        else
+                        {
+                            strBuilder.Append("," + r.ToString());
+                        }
                     }
-                    return sbTmp.ToString().Substring(0, sbTmp.ToString().Length - 1);
                 }
                 else if (result is IEnumerable<int?>)
                 {
                     IEnumerable<int?> rl = result as IEnumerable<int?>;
-                    StringBuilder sbTmp = new StringBuilder();
                     foreach (int? r in rl)
                     {
                         if (r == null)
@@ -340,24 +345,34 @@ namespace Jc.Core.Data.Query
                             continue;
                             //throw new Exception("可为空查询列表中,不允许有null值.");
                         }
-                        sbTmp.Append(r.ToString() + ",");
+                        if (strBuilder.Length == 0)
+                        {
+                            strBuilder.Append(r.ToString());
+                        }
+                        else
+                        {
+                            strBuilder.Append("," + r.ToString());
+                        }
                     }
-                    return sbTmp.ToString().Substring(0, sbTmp.ToString().Length - 1);
                 }
-                if (result is IEnumerable<float>)
+                else if (result is IEnumerable<float>)
                 {
                     IEnumerable<float> rl = result as IEnumerable<float>;
-                    StringBuilder sbTmp = new StringBuilder();
                     foreach (float r in rl)
                     {
-                        sbTmp.Append(r.ToString() + ",");
+                        if (strBuilder.Length == 0)
+                        {
+                            strBuilder.Append(r.ToString());
+                        }
+                        else
+                        {
+                            strBuilder.Append("," + r.ToString());
+                        }
                     }
-                    return sbTmp.ToString().Substring(0, sbTmp.ToString().Length - 1);
                 }
                 else if (result is IEnumerable<float?>)
                 {
                     IEnumerable<float?> rl = result as IEnumerable<float?>;
-                    StringBuilder sbTmp = new StringBuilder();
                     foreach (float? r in rl)
                     {
                         if (r == null)
@@ -365,24 +380,34 @@ namespace Jc.Core.Data.Query
                             continue;
                             //throw new Exception("可为空查询列表中,不允许有null值.");
                         }
-                        sbTmp.Append(r.ToString() + ",");
+                        if (strBuilder.Length == 0)
+                        {
+                            strBuilder.Append(r.ToString());
+                        }
+                        else
+                        {
+                            strBuilder.Append("," + r.ToString());
+                        }
                     }
-                    return sbTmp.ToString().Substring(0, sbTmp.ToString().Length - 1);
                 }
-                if (result is IEnumerable<double>)
+                else if (result is IEnumerable<double>)
                 {
                     IEnumerable<double> rl = result as IEnumerable<double>;
-                    StringBuilder sbTmp = new StringBuilder();
                     foreach (double r in rl)
                     {
-                        sbTmp.Append(r.ToString() + ",");
+                        if (strBuilder.Length == 0)
+                        {
+                            strBuilder.Append(r.ToString());
+                        }
+                        else
+                        {
+                            strBuilder.Append("," + r.ToString());
+                        }
                     }
-                    return sbTmp.ToString().Substring(0, sbTmp.ToString().Length - 1);
                 }
                 else if (result is IEnumerable<double?>)
                 {
                     IEnumerable<double?> rl = result as IEnumerable<double?>;
-                    StringBuilder sbTmp = new StringBuilder();
                     foreach (double? r in rl)
                     {
                         if (r == null)
@@ -390,24 +415,34 @@ namespace Jc.Core.Data.Query
                             continue;
                             //throw new Exception("可为空查询列表中,不允许有null值.");
                         }
-                        sbTmp.Append(r.ToString() + ",");
+                        if (strBuilder.Length == 0)
+                        {
+                            strBuilder.Append(r.ToString());
+                        }
+                        else
+                        {
+                            strBuilder.Append("," + r.ToString());
+                        }
                     }
-                    return sbTmp.ToString().Substring(0, sbTmp.ToString().Length - 1);
                 }
                 else if (result is IEnumerable<long>)
                 {
                     IEnumerable<long> rl = result as IEnumerable<long>;
-                    StringBuilder sbTmp = new StringBuilder();
                     foreach (long r in rl)
                     {
-                        sbTmp.Append(r.ToString() + ",");
+                        if (strBuilder.Length == 0)
+                        {
+                            strBuilder.Append(r.ToString());
+                        }
+                        else
+                        {
+                            strBuilder.Append("," + r.ToString());
+                        }
                     }
-                    return sbTmp.ToString().Substring(0, sbTmp.ToString().Length - 1);
                 }
                 else if (result is IEnumerable<long?>)
                 {
                     IEnumerable<long?> rl = result as IEnumerable<long?>;
-                    StringBuilder sbTmp = new StringBuilder();
                     foreach (long? r in rl)
                     {
                         if (r == null)
@@ -415,24 +450,34 @@ namespace Jc.Core.Data.Query
                             continue;
                             //throw new Exception("可为空查询列表中,不允许有null值.");
                         }
-                        sbTmp.Append(r.ToString() + ",");
+                        if (strBuilder.Length == 0)
+                        {
+                            strBuilder.Append(r.ToString());
+                        }
+                        else
+                        {
+                            strBuilder.Append("," + r.ToString());
+                        }
                     }
-                    return sbTmp.ToString().Substring(0, sbTmp.ToString().Length - 1);
                 }
                 else if (result is IEnumerable<Guid>)
                 {
                     IEnumerable<Guid> rl = result as IEnumerable<Guid>;
-                    StringBuilder sbTmp = new StringBuilder();
                     foreach (Guid r in rl)
                     {
-                        sbTmp.Append(r.ToString() + ",");
+                        if (strBuilder.Length == 0)
+                        {
+                            strBuilder.Append(r.ToString());
+                        }
+                        else
+                        {
+                            strBuilder.Append("," + r.ToString());
+                        }
                     }
-                    return sbTmp.ToString().Substring(0, sbTmp.ToString().Length - 1);
                 }
                 else if (result is IEnumerable<Guid?>)
                 {
                     IEnumerable<Guid?> rl = result as IEnumerable<Guid?>;
-                    StringBuilder sbTmp = new StringBuilder();
                     foreach (Guid? r in rl)
                     {
                         if (r == null)
@@ -440,24 +485,34 @@ namespace Jc.Core.Data.Query
                             continue;
                             //throw new Exception("可为空查询列表中,不允许有null值.");
                         }
-                        sbTmp.Append(r.ToString() + ",");
+                        if (strBuilder.Length == 0)
+                        {
+                            strBuilder.Append(r.ToString());
+                        }
+                        else
+                        {
+                            strBuilder.Append("," + r.ToString());
+                        }
                     }
-                    return sbTmp.ToString().Substring(0, sbTmp.ToString().Length - 1);
                 }
                 else if (result is IEnumerable<DateTime>)
                 {
                     IEnumerable<DateTime> rl = result as IEnumerable<DateTime>;
-                    StringBuilder sbTmp = new StringBuilder();
                     foreach (DateTime r in rl)
                     {
-                        sbTmp.Append(r.ToString() + ",");
+                        if (strBuilder.Length == 0)
+                        {
+                            strBuilder.Append(r.ToString());
+                        }
+                        else
+                        {
+                            strBuilder.Append("," + r.ToString());
+                        }
                     }
-                    return sbTmp.ToString().Substring(0, sbTmp.ToString().Length - 1);
                 }
                 else if (result is IEnumerable<DateTime?>)
                 {
                     IEnumerable<DateTime?> rl = result as IEnumerable<DateTime?>;
-                    StringBuilder sbTmp = new StringBuilder();
                     foreach (DateTime? r in rl)
                     {
                         if (r == null)
@@ -465,24 +520,34 @@ namespace Jc.Core.Data.Query
                             continue;
                             //throw new Exception("可为空查询列表中,不允许有null值.");
                         }
-                        sbTmp.Append(r.ToString() + ",");
+                        if (strBuilder.Length == 0)
+                        {
+                            strBuilder.Append(r.ToString());
+                        }
+                        else
+                        {
+                            strBuilder.Append("," + r.ToString());
+                        }
                     }
-                    return sbTmp.ToString().Substring(0, sbTmp.ToString().Length - 1);
                 }
                 else if (result is IEnumerable<string>)
                 {
                     IEnumerable<string> rl = result as IEnumerable<string>;
-                    StringBuilder sbTmp = new StringBuilder();
                     foreach (string r in rl)
                     {
-                        sbTmp.Append(r.ToString() + ",");
+                        if (strBuilder.Length == 0)
+                        {
+                            strBuilder.Append(r.ToString());
+                        }
+                        else
+                        {
+                            strBuilder.Append("," + r.ToString());
+                        }
                     }
-                    return sbTmp.ToString().Substring(0, sbTmp.ToString().Length - 1);
                 }
                 else if (result is IEnumerable<object>)
                 {
                     IEnumerable<object> rl = result as IEnumerable<object>;
-                    StringBuilder sbTmp = new StringBuilder();
                     foreach (object r in rl)
                     {
                         if (r == null)
@@ -490,14 +555,21 @@ namespace Jc.Core.Data.Query
                             continue;
                             //throw new Exception("可为空查询列表中,不允许有null值.");
                         }
-                        sbTmp.Append(r.ToString() + ",");
+                        if (strBuilder.Length == 0)
+                        {
+                            strBuilder.Append(r.ToString());
+                        }
+                        else
+                        {
+                            strBuilder.Append("," + r.ToString());
+                        }
                     }
-                    return sbTmp.ToString().Substring(0, sbTmp.ToString().Length - 1);
                 }
                 else
                 {
                     throw new Exception("不支持的方法:" + exp.ToString());
                 }
+                return strBuilder.ToString();
                 #endregion
             }
         }

@@ -248,7 +248,7 @@ namespace Jc.Core.Data.Query
                     whereClause += " " + p.FieldName + " is not null";
                     break;
                 case Operand.In:        //in 需要参数格式 @p1, @p2, @p3,... 较复杂
-                    string[] inStrList = p.ParameterValue.ToString().Split(',');
+                    string[] inStrList = p.ParameterValue?.ToString().Split(',');
                     if (inStrList != null && inStrList.Length > 0)
                     {
                         p.ParameterName = "";
@@ -265,7 +265,10 @@ namespace Jc.Core.Data.Query
                             }
                         }
                     }
-                    whereClause += " " + p.FieldName + " in (" + p.ParameterName + ") ";
+                    if (!string.IsNullOrEmpty(p.ParameterName))
+                    {   //判断参数有效 此条件有效
+                        whereClause += " " + p.FieldName + " in (" + p.ParameterName + ") ";
+                    }
                     break;
                 case Operand.NotIn:
                     string[] notinStrList = p.ParameterValue.ToString().Split(',');
@@ -317,10 +320,12 @@ namespace Jc.Core.Data.Query
                 }
                 this.filterSQLString += conjuctionStr;
             }
-
-            this.filterSQLString += whereClause;
-            this.ItemList.Add(p);
-            lastIsConjuction = false;
+            if (!string.IsNullOrEmpty(whereClause))
+            {
+                this.filterSQLString += whereClause;
+                this.ItemList.Add(p);
+                lastIsConjuction = false;
+            }
         }
 
         /// <summary>
