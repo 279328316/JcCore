@@ -269,6 +269,10 @@ namespace Jc.Core.Data.Query
                     {   //判断参数有效 此条件有效
                         whereClause += " " + p.FieldName + " in (" + p.ParameterName + ") ";
                     }
+                    else
+                    {   //如果 in条件为空. 返回空列表
+                        whereClause += " 1 = 0";
+                    }
                     break;
                 case Operand.NotIn:
                     string[] notinStrList = p.ParameterValue.ToString().Split(',');
@@ -289,7 +293,13 @@ namespace Jc.Core.Data.Query
                         }
                         this.filterParameters.Add(p);
                     }
-                    whereClause += " " + p.FieldName + " not in (" + p.ParameterName + ") ";
+                    if (!string.IsNullOrEmpty(p.ParameterName))
+                    {   //判断参数有效 此条件有效
+                        whereClause += " " + p.FieldName + " not in (" + p.ParameterName + ") ";
+                    }
+                    else
+                    {   //如参数为空,忽略此参数 返回所有
+                    }
                     break;
                 case Operand.FieldEqual:
                     whereClause += " " + p.FieldName + " = " + p.ParameterValue.ToString();
