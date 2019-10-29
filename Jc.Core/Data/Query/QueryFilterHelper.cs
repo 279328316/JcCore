@@ -201,8 +201,11 @@ namespace Jc.Core.Data.Query
             ExpressionType expType = be.NodeType;
 
             bool isExpAtom = false;     //当前Expression 是否为原子表单式 原子表达式不用括号
-            isExpAtom = left is MemberExpression || left is ConstantExpression;
-            if (!(left is BinaryExpression || left is MemberExpression || left is ConstantExpression || left is MethodCallExpression))
+            isExpAtom = left is MemberExpression || left is ConstantExpression
+                        || left is UnaryExpression;
+            if (!(left is BinaryExpression || left is MemberExpression 
+                || left is ConstantExpression || left is MethodCallExpression
+                 || left is UnaryExpression))
             {
                 throw new Exception("不支持的表达式类型:" + be.ToString());
             }
@@ -301,8 +304,16 @@ namespace Jc.Core.Data.Query
                 {
                     MemberExpression me = exp as MemberExpression;
                     string memberName = me.Member.Name;
-                    string fieldName = dtoDbMapping.PiMapDic[memberName].FieldName;
-                    return fieldName;
+                    if (me.Expression.Type.IsValueType)
+                    {
+                        object value = Expression.Lambda(exp).Compile().DynamicInvoke();
+                        return value;
+                    }
+                    else
+                    {
+                        string fieldName = dtoDbMapping.PiMapDic[memberName].FieldName;
+                        return fieldName;
+                    }
                 }
                 else
                 {
@@ -696,7 +707,8 @@ namespace Jc.Core.Data.Query
         /// <returns></returns>
         private object UnaryExpressionProvider(Expression exp)
         {
-            object value = Expression.Lambda(exp).Compile().DynamicInvoke();
+            UnaryExpression unaryExp = exp as UnaryExpression;
+            object value = AtomExpressionRouter(unaryExp.Operand);
             return value;
         }
         
