@@ -57,25 +57,25 @@ namespace Jc.Core.Helper
                 case KeyValueSortingType.Key:
                     if (order == Sorting.Asc)
                     {
-                        dic = dic.Union(tempDic.OrderBy(kv => kv.Key));                        
+                        dic = tempDic.OrderBy(kv => kv.Key).ToDictionary(kv=>kv.Key,kv=>kv.Value);                        
                     }
                     else
                     {
-                        dic = dic.Union(tempDic.OrderByDescending(kv => kv.Key));
+                        dic = tempDic.OrderByDescending(kv => kv.Key).ToDictionary(kv => kv.Key, kv => kv.Value);
                     }
                     break;
                 case KeyValueSortingType.Value:
                     if (order == Sorting.Asc)
                     {
-                        dic = dic.Union(tempDic.OrderBy(kv => kv.Value));
+                        dic = tempDic.OrderBy(kv => kv.Value).ToDictionary(kv => kv.Key, kv => kv.Value);
                     }
                     else
                     {
-                        dic = dic.Union(tempDic.OrderByDescending(kv => kv.Value));
+                        dic = tempDic.OrderByDescending(kv => kv.Value).ToDictionary(kv => kv.Key, kv => kv.Value);
                     }
                     break;
                 default:
-                    dic = dic.Union(tempDic);
+                    dic = tempDic;
                     break;
             }
             #endregion
