@@ -642,6 +642,12 @@ namespace Jc.Core.Data.Query
                         value = Expression.Lambda(mce.Arguments[0]).Compile().DynamicInvoke().ToString();
                         op = Operand.Like;
                     }
+                    else if (mce.Arguments[0] is UnaryExpression)
+                    {   //如果参数0为UnaryExpression 则为 List<Guid?> permIds permIds.Contains(a.Id) 方式
+                        name = AtomExpressionRouter(mce.Arguments[0]);
+                        value = AtomExpressionRouter(mce.Object);
+                        op = Operand.In;
+                    }
                     else
                     {
                         throw new Exception("待支持的表达式:" + mce.Arguments[0].ToString());
