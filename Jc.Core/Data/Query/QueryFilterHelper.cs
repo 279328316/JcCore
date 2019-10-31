@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -297,8 +298,28 @@ namespace Jc.Core.Data.Query
             if (!exp.ToString().StartsWith("value"))
             {
                 if (exp.ToString().ToLower().EndsWith(".value"))
-                {
-                    throw new Exception("~NullAble属性,请直接使用属性名称.不要使用.Value.");
+                {   //NullAble属性  levels.Contains(a.ApiLevel.Value)
+                    //throw new Exception("~NullAble属性,请直接使用属性名称.不要使用.Value.");
+                    MemberExpression me = exp as MemberExpression;
+                    me = me.Expression as MemberExpression;
+                    if (me != null)
+                    {
+                        string memberName = me.Member.Name;
+                        if (me.Expression.Type.IsValueType)
+                        {
+                            object value = Expression.Lambda(exp).Compile().DynamicInvoke();
+                            return value;
+                        }
+                        else
+                        {
+                            string fieldName = dtoDbMapping.PiMapDic[memberName].FieldName;
+                            return fieldName;
+                        }
+                    }
+                    else
+                    {
+                        throw new Exception("不支持的方法:" + exp.ToString());
+                    }
                 }
                 else if (exp is MemberExpression)
                 {
@@ -594,8 +615,8 @@ namespace Jc.Core.Data.Query
         private QueryParameter MethodCallExpressionProvider(Expression exp)
         {
             QueryParameter qp = null;
-            object name;
-            object value;
+            object name = null;
+            object value = null;
             Operand op = Operand.Equal;
             MethodCallExpression mce = exp as MethodCallExpression;
             switch (mce.Method.Name)
@@ -607,50 +628,30 @@ namespace Jc.Core.Data.Query
                     op = Operand.Equal;                    
                     break;
                 case "Contains":
-                    if (mce.Arguments[0] is MemberExpression)
-                    {   //如果参数0为MemberExpression 则为 tList.Contains(task.AddUserName) 方式 list.contains(t.Name);
-                        if (mce.Object != null)
-                        {   //string类型 list:List<string>
-                            name = MemberExpressionProvider(mce.Arguments[0]);
-                            value = MemberExpressionProvider(mce.Object);
+                    if (mce.Object != null)
+                    {
+                        if (((MemberExpression)mce.Object).Member.MemberType == MemberTypes.Property)
+                        {   // task.Name.Contains("T1"); task.Name.Contains(keywords);
+                            name = AtomExpressionRouter(mce.Object);
+                            value = AtomExpressionRouter(mce.Arguments[0]);
+                            op = Operand.Like;
                         }
-                        else
-                        {   //int int?类型 list:List<int?>
-                            if (mce.Arguments[1] is MemberExpression)
-                            {
-                                name = MemberExpressionProvider(mce.Arguments[1]);
-                            }
-                            else
-                            {   //当List类型与属性类型不一致时.需要转换.不处理此种情况.抛出异常.
-                                //此时表达式为UnaryExpression Operand为属性MemberExpression 可读取属性名称
-                                //但不应出现此种情况.故抛出异常.
-                                throw new Exception($"不支持的方法:{mce.ToString()}");
-                            }
-                            value = MemberExpressionProvider(mce.Arguments[0]);
+                        else if (((MemberExpression)mce.Object).Member.MemberType == MemberTypes.Field)
+                        {   //permIds.Contains(a.Id)
+                            name = AtomExpressionRouter(mce.Arguments[0]);
+                            value = AtomExpressionRouter(mce.Object);
+                            op = Operand.In;
                         }
-                        op = Operand.In;
                     }
-                    else if (mce.Arguments[0] is ConstantExpression)
-                    {  //如果参数0为ConstantExpression 则为 task.AddUserName.Contains("1") 方式 t.Name.Contains("x");
-                        name = MemberExpressionProvider(mce.Object);
-                        value = ConstantExpressionProvider(mce.Arguments[0]);
-                        op = Operand.Like;
-                    }
-                    else if (mce.Arguments[0] is MethodCallExpression)
-                    {   //如果参数0为MethodCallExpression 则为 task.AddUserName.Contains(i.ToString()) 方式 t.Name.Contains(i.ToString());
-                        name = MemberExpressionProvider(mce.Object);
-                        value = Expression.Lambda(mce.Arguments[0]).Compile().DynamicInvoke().ToString();
-                        op = Operand.Like;
-                    }
-                    else if (mce.Arguments[0] is UnaryExpression)
-                    {   //如果参数0为UnaryExpression 则为 List<Guid?> permIds permIds.Contains(a.Id) 方式
-                        name = AtomExpressionRouter(mce.Arguments[0]);
-                        value = AtomExpressionRouter(mce.Object);
+                    else if (mce.Arguments.Count >= 2)
+                    {   //int与int?类型 list:List<int?>
+                        name = AtomExpressionRouter(mce.Arguments[1]);
+                        value = AtomExpressionRouter(mce.Arguments[0]);
                         op = Operand.In;
                     }
                     else
                     {
-                        throw new Exception("待支持的表达式:" + mce.Arguments[0].ToString());
+                        throw new Exception($"不支持的方法:{mce.ToString()}");
                     }
                     break;
                 case "StartsWith":

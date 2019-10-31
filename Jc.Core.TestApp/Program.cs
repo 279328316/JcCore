@@ -8,7 +8,7 @@ namespace Jc.Core.TestApp
     {
         static void Main(string[] args)
         {
-            NetShareHelperTest test = new NetShareHelperTest();
+            ApiTest test = new ApiTest();
             test.Test();
 
             Console.WriteLine("测试完成,请按任意键继续.");
