@@ -79,7 +79,7 @@ namespace Jc.Core
                         {
                             operand = Operand.Contains;
                             List<string> valueList = queryItemVal.Split(',')
-                                .Where(a=>!string.IsNullOrEmpty(a)).Select(a=>a.Trim()).ToList();
+                                .Where(a => !string.IsNullOrEmpty(a)).Select(a => a.Trim()).ToList();
                             if (valueList?.Count > 0)
                             {
                                 itemValue = valueList;
@@ -95,10 +95,18 @@ namespace Jc.Core
                             if (piMap.PropertyType == typeof(DateTime) || piMap.PropertyType == typeof(DateTime?))
                             {
                                 DateTime dt;
-                                if(DateTime.TryParse(queryItemVal,out dt))
+                                if (DateTime.TryParse(queryItemVal, out dt))
                                 {
                                     itemValue = dt.Date;
                                 }
+                                else
+                                {
+                                    throw new Exception("日期格式错误.");
+                                }
+                            }
+                            else
+                            {
+                                itemValue = queryItemVal;
                             }
                         }
                         else if (rangeMax)
@@ -111,11 +119,23 @@ namespace Jc.Core
                                 {
                                     itemValue = dt.Date.AddDays(1);
                                 }
+                                else
+                                {
+                                    throw new Exception("日期格式错误.");
+                                }
+                            }
+                            else
+                            {
+                                itemValue = queryItemVal;
                             }
                         }
                         else if (piMap.PropertyType == typeof(string))
                         {
                             operand = Operand.Like;
+                            itemValue = queryItemVal;
+                        }
+                        else
+                        {
                             itemValue = queryItemVal;
                         }
                         var queryExp = ExpressionHelper.CreateLambdaExpression<T>(operand, piMap.PiName, itemValue);
