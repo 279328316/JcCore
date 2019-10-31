@@ -66,7 +66,7 @@ namespace Jc.Core
                         #region 处理匹配到的属性
                         bool rangeMin = queryItemKey.ToLower() == ($"min{piMap.PiName}").ToLower();
                         bool rangeMax = queryItemKey.ToLower() == ($"max{piMap.PiName}").ToLower();
-                        bool isInListQuery = queryItemKey.ToLower() == ($"{piMap.PiName}s").ToLower();
+                        bool isList = queryItemKey.ToLower() == ($"{piMap.PiName}s").ToLower();
 
                         Operand operand = Operand.Equal;
 
@@ -75,7 +75,7 @@ namespace Jc.Core
                             operand = operandSettings[queryItemKey];
                             itemValue = queryItemVal;
                         }
-                        else if (isInListQuery)
+                        else if (isList)
                         {
                             operand = Operand.Contains;
                             List<string> valueList = queryItemVal.Split(',')
