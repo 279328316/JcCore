@@ -52,24 +52,42 @@ namespace Jc.Core
                 if (!string.IsNullOrEmpty(queryItemKey))
                 {
                     string queryItemVal = collection[queryItemKey];
+                    Object itemValue = null;
                     if (!string.IsNullOrEmpty(queryItemVal))
                     {
                         PiMap piMap = piMapList.Where(p => queryItemKey.ToLower() == p.PiName.ToLower()
-                                || queryItemKey.ToLower() == ("min" + p.PiName).ToLower()
-                                || queryItemKey.ToLower() == ("max" + p.PiName).ToLower()).FirstOrDefault();
+                                || queryItemKey.ToLower() == ($"min{p.PiName}").ToLower()
+                                || queryItemKey.ToLower() == ($"max{p.PiName}").ToLower()
+                                || queryItemKey.ToLower() == ($"{p.PiName}s").ToLower()).FirstOrDefault();
                         if(piMap==null)
                         {
                             continue;
                         }
                         #region 处理匹配到的属性
-                        bool rangeMin = queryItemKey.ToLower() == ("min" + piMap.PiName).ToLower();
-                        bool rangeMax = queryItemKey.ToLower() == ("max" + piMap.PiName).ToLower();
+                        bool rangeMin = queryItemKey.ToLower() == ($"min{piMap.PiName}").ToLower();
+                        bool rangeMax = queryItemKey.ToLower() == ($"max{piMap.PiName}").ToLower();
+                        bool isInListQuery = queryItemKey.ToLower() == ($"{piMap.PiName}s").ToLower();
 
                         Operand operand = Operand.Equal;
 
                         if ((operandSettings != null) && operandSettings.ContainsKey(queryItemKey))
                         {
                             operand = operandSettings[queryItemKey];
+                            itemValue = queryItemVal;
+                        }
+                        else if (isInListQuery)
+                        {
+                            operand = Operand.Contains;
+                            List<string> valueList = queryItemVal.Split(',')
+                                .Where(a=>!string.IsNullOrEmpty(a)).Select(a=>a.Trim()).ToList();
+                            if (valueList?.Count > 0)
+                            {
+                                itemValue = valueList;
+                            }
+                            else
+                            {
+                                continue;
+                            }
                         }
                         else if (rangeMin)
                         {
@@ -79,7 +97,7 @@ namespace Jc.Core
                                 DateTime dt;
                                 if(DateTime.TryParse(queryItemVal,out dt))
                                 {
-                                    queryItemVal = dt.Date.ToString();
+                                    itemValue = dt.Date;
                                 }
                             }
                         }
@@ -91,15 +109,16 @@ namespace Jc.Core
                                 DateTime dt;
                                 if (DateTime.TryParse(queryItemVal, out dt))
                                 {
-                                    queryItemVal = dt.Date.AddDays(1).ToString();
+                                    itemValue = dt.Date.AddDays(1);
                                 }
                             }
                         }
                         else if (piMap.PropertyType == typeof(string))
                         {
                             operand = Operand.Like;
+                            itemValue = queryItemVal;
                         }
-                        var queryExp = ExpressionHelper.CreateLambdaExpression<T>(operand, piMap.PiName, queryItemVal);
+                        var queryExp = ExpressionHelper.CreateLambdaExpression<T>(operand, piMap.PiName, itemValue);
                         query.And(queryExp);
                         #endregion
                     }
@@ -117,71 +136,15 @@ namespace Jc.Core
         /// <param name="operandSettings"></param>
         public IQuery<T> IQuery<T>(IEnumerable<KeyValuePair<string, StringValues>> collection, Dictionary<string, Operand> operandSettings = null) where T : class, new()
         {
-            IQuery<T> query = IQuery<T>();
-            List<PiMap> piMapList = DtoMappingHelper.GetPiMapList<T>();
+            NameValueCollection nvCollection = new NameValueCollection();
             if (collection != null)
             {
-                foreach (KeyValuePair<string, StringValues> kvPair in collection)
+                foreach(KeyValuePair<string, StringValues> kv in collection)
                 {
-                    string queryItemKey = kvPair.Key;
-                    if (!string.IsNullOrEmpty(queryItemKey))
-                    {
-                        string queryItemVal = kvPair.Value;
-                        if (!string.IsNullOrEmpty(queryItemVal))
-                        {
-                            PiMap piMap = piMapList.Where(p => queryItemKey.ToLower() == p.PiName.ToLower()
-                                    || queryItemKey.ToLower() == ("min" + p.PiName).ToLower()
-                                    || queryItemKey.ToLower() == ("max" + p.PiName).ToLower()).FirstOrDefault();
-                            if (piMap == null)
-                            {
-                                continue;
-                            }
-                            #region 处理匹配到的属性
-                            bool rangeMin = queryItemKey.ToLower() == ("min" + piMap.PiName).ToLower();
-                            bool rangeMax = queryItemKey.ToLower() == ("max" + piMap.PiName).ToLower();
-
-                            Operand operand = Operand.Equal;
-
-                            if ((operandSettings != null) && operandSettings.ContainsKey(queryItemKey))
-                            {
-                                operand = operandSettings[queryItemKey];
-                            }
-                            else if (rangeMin)
-                            {
-                                operand = Operand.GreaterThanOrEqual;
-                                if (piMap.PropertyType == typeof(DateTime) || piMap.PropertyType == typeof(DateTime?))
-                                {
-                                    DateTime dt;
-                                    if (DateTime.TryParse(queryItemVal, out dt))
-                                    {
-                                        queryItemVal = dt.Date.ToString();
-                                    }
-                                }
-                            }
-                            else if (rangeMax)
-                            {
-                                operand = Operand.LessThanOrEqual;
-                                if (piMap.PropertyType == typeof(DateTime) || piMap.PropertyType == typeof(DateTime?))
-                                {
-                                    DateTime dt;
-                                    if (DateTime.TryParse(queryItemVal, out dt))
-                                    {
-                                        queryItemVal = dt.Date.AddDays(1).ToString();
-                                    }
-                                }
-                            }
-                            else if (piMap.PropertyType == typeof(string))
-                            {
-                                operand = Operand.Like;
-                            }
-                            var queryExp = ExpressionHelper.CreateLambdaExpression<T>(operand, piMap.PiName, queryItemVal);
-                            query.And(queryExp);
-                            #endregion
-                        }
-                    }
+                    nvCollection.Add(kv.Key,kv.Value);
                 }
             }
-            return query;
+            return IQuery<T>(nvCollection,operandSettings);            
         }
 
         /// <summary>

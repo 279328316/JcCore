@@ -9,7 +9,7 @@ namespace Jc.Core.TestApp
         static void Main(string[] args)
         {
             ApiTest test = new ApiTest();
-            test.Test();
+            test.IQueryTest();
 
             Console.WriteLine("测试完成,请按任意键继续.");
             Console.ReadKey();

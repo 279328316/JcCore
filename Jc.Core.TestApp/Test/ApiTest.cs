@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.Text;
 
 namespace Jc.Core.TestApp.Test
@@ -16,6 +17,16 @@ namespace Jc.Core.TestApp.Test
             list = Dbc.Db.GetList<ApiDto>(a => levels.Contains(a.ApiLevel.Value));
             list = Dbc.Db.GetList<ApiDto>(a => ids.Contains(a.Id));
             list = Dbc.Db.GetList<ApiDto>(a => a.Name.Contains(keywords.ToString()));
+        }
+
+        public void IQueryTest()
+        {
+            NameValueCollection collection = new NameValueCollection();
+            collection.Add("Area", "Account");
+            collection.Add("ApiLevels", "1,2");
+            collection.Add("Ids", "43EB97E4-F6F2-4768-9EAD-BC977AA3A6C8,5F8AD1CD-A217-4757-8AF0-F7289DB06AD8");
+            IQuery<ApiDto> query = Dbc.Db.IQuery<ApiDto>(collection);
+            List<ApiDto> list = query.ToList();
         }
     }
 }

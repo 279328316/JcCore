@@ -8,6 +8,7 @@ using System.CodeDom.Compiler;
 using Microsoft.CSharp;
 using System.IO;
 using System.Linq.Expressions;
+using System.Collections;
 
 namespace Jc.Core
 {
@@ -82,89 +83,130 @@ namespace Jc.Core
         {
             //构建Lambda表达式
             ParameterExpression parameter = Expression.Parameter(typeof(T), "p");
-            Expression constant;
+            Expression lambdaExp;
             //表达式左侧 like: p.Name
             MemberExpression left = Expression.PropertyOrField(parameter, piName);
-            //表达式右侧，比较值， like '张三'
+            
+            //表达式右侧，(1)值， like '张三' (2)List List.Contains(a.Status);
             Expression right;
-            Type valueType = value.GetType();
-
-            if (valueType == left.Type)
-            {
-                right = Expression.Constant(value);
-            }
-            else
-            {
-                object objValue;
-                if (valueType == typeof(string))
-                {   //如果传入值为字符串类型,需要进行类型转换 调用Parse
+            if (value is List<string>)
+            {   //(1)构造List<int?> 类型 (2)创建list (3)(list as IList).Add(objValue);
+                //(4)创建lambdaExp 使用Contains方法
+                Type leftListType = Type.GetType(string.Format($"System.Collections.Generic.List`1[{left.Type}]"));
+                List<string> valueStrList = value as List<string>;
+                var list = Activator.CreateInstance(leftListType);
+                for (int i = 0; i < valueStrList.Count; i++)
+                {
+                    if (string.IsNullOrEmpty(valueStrList[i]))
+                    {
+                        continue;
+                    }
                     Type leftType = left.Type;
                     if (leftType.GenericTypeArguments != null && leftType.GenericTypeArguments.Length > 0)
                     {
                         leftType = leftType.GenericTypeArguments[0];
                     }
-                    ParameterExpression pExp = Expression.Parameter(typeof(string), "p");
-                    MethodInfo miParse = leftType.GetMethod("Parse", new Type[] { typeof(string) });
-                    objValue = miParse.Invoke(null, new object[] { value });
+                    if (leftType == typeof(string))
+                    {   // 如果为string类型.不需要转换
+                        (list as IList).Add(valueStrList[i]);
+                    }
+                    else
+                    {   //如果非string类型.调用Parse方法.
+                        MethodInfo miParse = leftType.GetMethod("Parse", new Type[] { typeof(string) });
+                        var objValue = miParse.Invoke(null, new object[] { valueStrList[i] });
+                        (list as IList).Add(objValue);
+                    }
+                }
+                right = Expression.Constant(list);
+                List<MethodInfo> methodList = leftListType.GetMethods().ToList();
+                MethodInfo method = methodList.Where(m => m.Name == "Contains").FirstOrDefault(); 
+                lambdaExp = Expression.Call(right, method, left);
+            }
+            else
+            {
+                Type valueType = value.GetType();
+                if (valueType == left.Type)
+                {
+                    right = Expression.Constant(value);
                 }
                 else
                 {
-                    objValue = value;
-                }
+                    object objValue;
+                    if (valueType == typeof(string))
+                    {   //如果传入值为字符串类型,需要进行类型转换 调用Parse
+                        Type leftType = left.Type;
+                        if (leftType.GenericTypeArguments != null && leftType.GenericTypeArguments.Length > 0)
+                        {
+                            leftType = leftType.GenericTypeArguments[0];
+                        }
+                        MethodInfo miParse = leftType.GetMethod("Parse", new Type[] { typeof(string) });
+                        objValue = miParse.Invoke(null, new object[] { value });
+                    }
+                    else
+                    {
+                        objValue = value;
+                    }
 
-                if (objValue.GetType() == left.Type)
-                {   //如果 转换后ObjValue类型与需要类型一致
-                    right = Expression.Constant(objValue);
+                    if (objValue.GetType() == left.Type)
+                    {   //如果 转换后ObjValue类型与需要类型一致
+                        right = Expression.Constant(objValue);
+                    }
+                    else
+                    {   //如果不一致,进行类型转换 调用Convert方法
+                        right = Expression.Convert(Expression.Constant(objValue), left.Type);
+                    }
                 }
-                else
-                {   //如果不一致,进行类型转换 调用Convert方法
-                    right = Expression.Convert(Expression.Constant(objValue), left.Type);
+                //比较表达式
+                switch (operand)
+                {
+                    case Operand.GreaterThan:
+                        lambdaExp = Expression.GreaterThan(left, right);
+                        break;
+                    case Operand.GreaterThanOrEqual:
+                        lambdaExp = Expression.GreaterThanOrEqual(left, right);
+                        break;
+                    case Operand.LessThan:
+                        lambdaExp = Expression.LessThan(left, right);
+                        break;
+                    case Operand.LessThanOrEqual:
+                        lambdaExp = Expression.LessThanOrEqual(left, right);
+                        break;
+                    case Operand.LeftLike:
+                        //like 查询，需要调用外部int或string的Contains方法
+                        List<MethodInfo> methodList1 = typeof(string).GetMethods().ToList();
+                        MethodInfo method1 = methodList1.Where(m => m.Name == "StartsWith").FirstOrDefault();
+                        lambdaExp = Expression.Call(left, method1, right);
+                        break;
+                    case Operand.RightLike:
+                        //like 查询，需要调用外部int或string的Contains方法
+                        List<MethodInfo> methodList2 = typeof(string).GetMethods().ToList();
+                        MethodInfo method2 = methodList2.Where(m => m.Name == "EndsWith").FirstOrDefault();
+                        lambdaExp = Expression.Call(left, method2, right);
+                        break;
+                    case Operand.Like:
+                        //like
+                        List<MethodInfo> methodList3 = typeof(string).GetMethods().ToList();
+                        MethodInfo method3 = methodList3.Where(m => m.Name == "Contains").FirstOrDefault();
+                        lambdaExp = Expression.Call(left, method3, right);
+                        break;
+                    case Operand.Contains:
+                        //Contains
+                        List<MethodInfo> methodList4 = typeof(IEnumerable).GetMethods().ToList();
+                        MethodInfo method4 = methodList4.Where(m => m.Name == "Contains").FirstOrDefault();
+                        lambdaExp = Expression.Call(left, method4, right);
+                        break;
+                    case Operand.Equal:
+                        lambdaExp = Expression.Equal(left, right);
+                        break;
+                    case Operand.NotEqual:
+                        lambdaExp = Expression.NotEqual(left, right);
+                        break;
+                    default:
+                        throw new System.Exception("暂不支持的Operand方式" + operand.ToString());
+                        //break;
                 }
             }
-            //比较表达式
-            switch (operand)
-            {
-                case Operand.GreaterThan:
-                    constant = Expression.GreaterThan(left, right);
-                    break;
-                case Operand.GreaterThanOrEqual:
-                    constant = Expression.GreaterThanOrEqual(left, right);
-                    break;
-                case Operand.LessThan:
-                    constant = Expression.LessThan(left, right);
-                    break;
-                case Operand.LessThanOrEqual:
-                    constant = Expression.LessThanOrEqual(left, right);
-                    break;
-                case Operand.LeftLike:
-                    //like 查询，需要调用外部int或string的Contains方法
-                    List<MethodInfo> methodList1 = typeof(string).GetMethods().ToList();
-                    MethodInfo method1 = methodList1.Where(m => m.Name == "StartsWith").FirstOrDefault();
-                    constant = Expression.Call(left, method1, right);
-                    break;
-                case Operand.RightLike:
-                    //like 查询，需要调用外部int或string的Contains方法
-                    List<MethodInfo> methodList2 = typeof(string).GetMethods().ToList();
-                    MethodInfo method2 = methodList2.Where(m=>m.Name=="EndsWith").FirstOrDefault();
-                    constant = Expression.Call(left, method2, right);
-                    break;
-                case Operand.Like:
-                    //like
-                    List<MethodInfo> methodList3 = typeof(string).GetMethods().ToList();
-                    MethodInfo method3 = methodList3.Where(m => m.Name == "Contains").FirstOrDefault();
-                    constant = Expression.Call(left, method3, right);
-                    break;
-                case Operand.Equal:
-                    constant = Expression.Equal(left, right);
-                    break;
-                case Operand.NotEqual:
-                    constant = Expression.NotEqual(left, right);
-                    break;
-                default:
-                    throw new System.Exception("暂不支持的Operand方式" +  operand.ToString());
-                    //break;
-            }
-            Expression<Func<T, bool>> lambda = Expression.Lambda<Func<T, bool>>(constant, parameter);
+            Expression<Func<T, bool>> lambda = Expression.Lambda<Func<T, bool>>(lambdaExp, parameter);
             return lambda;
         }
 
