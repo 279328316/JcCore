@@ -630,13 +630,19 @@ namespace Jc.Core.Data.Query
                 case "Contains":
                     if (mce.Object != null)
                     {
-                        if (((MemberExpression)mce.Object).Member.MemberType == MemberTypes.Property)
+                        if (mce.Object is MemberExpression && ((MemberExpression)mce.Object).Member.MemberType == MemberTypes.Property)
                         {   // task.Name.Contains("T1"); task.Name.Contains(keywords);
                             name = AtomExpressionRouter(mce.Object);
                             value = AtomExpressionRouter(mce.Arguments[0]);
                             op = Operand.Like;
                         }
-                        else if (((MemberExpression)mce.Object).Member.MemberType == MemberTypes.Field)
+                        //else if (((MemberExpression)mce.Object).Member.MemberType == MemberTypes.Field)
+                        //{   //permIds.Contains(a.Id)
+                        //    name = AtomExpressionRouter(mce.Arguments[0]);
+                        //    value = AtomExpressionRouter(mce.Object);
+                        //    op = Operand.In;
+                        //}
+                        else
                         {   //permIds.Contains(a.Id)
                             name = AtomExpressionRouter(mce.Arguments[0]);
                             value = AtomExpressionRouter(mce.Object);
