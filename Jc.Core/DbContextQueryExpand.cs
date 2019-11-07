@@ -78,8 +78,16 @@ namespace Jc.Core
                         else if (isList)
                         {
                             operand = Operand.Contains;
-                            List<string> valueList = queryItemVal.Split(',')
-                                .Where(a => !string.IsNullOrEmpty(a)).Select(a => a.Trim()).ToList();
+                            List<string> valueList;
+                            if (queryItemVal.StartsWith("[") && queryItemVal.EndsWith("]"))
+                            {
+                                valueList = JsonHelper.DeserializeObject<List<string>>(queryItemVal);
+                            }
+                            else
+                            {
+                                valueList = queryItemVal.Split(',')
+                                    .Where(a => !string.IsNullOrEmpty(a)).Select(a => a.Trim()).ToList();
+                            }
                             if (valueList?.Count > 0)
                             {
                                 itemValue = valueList;

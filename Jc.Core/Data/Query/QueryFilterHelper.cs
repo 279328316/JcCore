@@ -275,7 +275,8 @@ namespace Jc.Core.Data.Query
         private object ConstantExpressionProvider(Expression exp)
         {
             ConstantExpression ce = exp as ConstantExpression;
-            return ce.Value;
+            object result = ce.Value;
+            return ConvertValue(result);
         }
         /// <summary>
         /// lambda 表达式
@@ -344,268 +345,279 @@ namespace Jc.Core.Data.Query
             else
             {   //list.contais(student.Name) 类型
                 object result = Expression.Lambda(exp).Compile().DynamicInvoke();
-                if (result == null || result is ValueType || result is string || result is DateTime || result is char)
-                {
-                    return result;
-                }
-                //支持数组,List泛型 int,int?,float,float?,double,double?,
-                //long,long?,Guid,Guid?,Datetime,Datetime?,string
-                #region 处理数组类型
-                StringBuilder strBuilder = new StringBuilder();
-                if (result is IEnumerable<int>)
-                {
-                    IEnumerable<int> rl = result as IEnumerable<int>;
-                    foreach (int r in rl)
-                    {
-                        if (strBuilder.Length == 0)
-                        {
-                            strBuilder.Append(r.ToString());
-                        }
-                        else
-                        {
-                            strBuilder.Append("," + r.ToString());
-                        }
-                    }
-                }
-                else if (result is IEnumerable<int?>)
-                {
-                    IEnumerable<int?> rl = result as IEnumerable<int?>;
-                    foreach (int? r in rl)
-                    {
-                        if (r == null)
-                        {
-                            continue;
-                            //throw new Exception("可为空查询列表中,不允许有null值.");
-                        }
-                        if (strBuilder.Length == 0)
-                        {
-                            strBuilder.Append(r.ToString());
-                        }
-                        else
-                        {
-                            strBuilder.Append("," + r.ToString());
-                        }
-                    }
-                }
-                else if (result is IEnumerable<float>)
-                {
-                    IEnumerable<float> rl = result as IEnumerable<float>;
-                    foreach (float r in rl)
-                    {
-                        if (strBuilder.Length == 0)
-                        {
-                            strBuilder.Append(r.ToString());
-                        }
-                        else
-                        {
-                            strBuilder.Append("," + r.ToString());
-                        }
-                    }
-                }
-                else if (result is IEnumerable<float?>)
-                {
-                    IEnumerable<float?> rl = result as IEnumerable<float?>;
-                    foreach (float? r in rl)
-                    {
-                        if (r == null)
-                        {
-                            continue;
-                            //throw new Exception("可为空查询列表中,不允许有null值.");
-                        }
-                        if (strBuilder.Length == 0)
-                        {
-                            strBuilder.Append(r.ToString());
-                        }
-                        else
-                        {
-                            strBuilder.Append("," + r.ToString());
-                        }
-                    }
-                }
-                else if (result is IEnumerable<double>)
-                {
-                    IEnumerable<double> rl = result as IEnumerable<double>;
-                    foreach (double r in rl)
-                    {
-                        if (strBuilder.Length == 0)
-                        {
-                            strBuilder.Append(r.ToString());
-                        }
-                        else
-                        {
-                            strBuilder.Append("," + r.ToString());
-                        }
-                    }
-                }
-                else if (result is IEnumerable<double?>)
-                {
-                    IEnumerable<double?> rl = result as IEnumerable<double?>;
-                    foreach (double? r in rl)
-                    {
-                        if (r == null)
-                        {
-                            continue;
-                            //throw new Exception("可为空查询列表中,不允许有null值.");
-                        }
-                        if (strBuilder.Length == 0)
-                        {
-                            strBuilder.Append(r.ToString());
-                        }
-                        else
-                        {
-                            strBuilder.Append("," + r.ToString());
-                        }
-                    }
-                }
-                else if (result is IEnumerable<long>)
-                {
-                    IEnumerable<long> rl = result as IEnumerable<long>;
-                    foreach (long r in rl)
-                    {
-                        if (strBuilder.Length == 0)
-                        {
-                            strBuilder.Append(r.ToString());
-                        }
-                        else
-                        {
-                            strBuilder.Append("," + r.ToString());
-                        }
-                    }
-                }
-                else if (result is IEnumerable<long?>)
-                {
-                    IEnumerable<long?> rl = result as IEnumerable<long?>;
-                    foreach (long? r in rl)
-                    {
-                        if (r == null)
-                        {
-                            continue;
-                            //throw new Exception("可为空查询列表中,不允许有null值.");
-                        }
-                        if (strBuilder.Length == 0)
-                        {
-                            strBuilder.Append(r.ToString());
-                        }
-                        else
-                        {
-                            strBuilder.Append("," + r.ToString());
-                        }
-                    }
-                }
-                else if (result is IEnumerable<Guid>)
-                {
-                    IEnumerable<Guid> rl = result as IEnumerable<Guid>;
-                    foreach (Guid r in rl)
-                    {
-                        if (strBuilder.Length == 0)
-                        {
-                            strBuilder.Append(r.ToString());
-                        }
-                        else
-                        {
-                            strBuilder.Append("," + r.ToString());
-                        }
-                    }
-                }
-                else if (result is IEnumerable<Guid?>)
-                {
-                    IEnumerable<Guid?> rl = result as IEnumerable<Guid?>;
-                    foreach (Guid? r in rl)
-                    {
-                        if (r == null)
-                        {
-                            continue;
-                            //throw new Exception("可为空查询列表中,不允许有null值.");
-                        }
-                        if (strBuilder.Length == 0)
-                        {
-                            strBuilder.Append(r.ToString());
-                        }
-                        else
-                        {
-                            strBuilder.Append("," + r.ToString());
-                        }
-                    }
-                }
-                else if (result is IEnumerable<DateTime>)
-                {
-                    IEnumerable<DateTime> rl = result as IEnumerable<DateTime>;
-                    foreach (DateTime r in rl)
-                    {
-                        if (strBuilder.Length == 0)
-                        {
-                            strBuilder.Append(r.ToString());
-                        }
-                        else
-                        {
-                            strBuilder.Append("," + r.ToString());
-                        }
-                    }
-                }
-                else if (result is IEnumerable<DateTime?>)
-                {
-                    IEnumerable<DateTime?> rl = result as IEnumerable<DateTime?>;
-                    foreach (DateTime? r in rl)
-                    {
-                        if (r == null)
-                        {
-                            continue;
-                            //throw new Exception("可为空查询列表中,不允许有null值.");
-                        }
-                        if (strBuilder.Length == 0)
-                        {
-                            strBuilder.Append(r.ToString());
-                        }
-                        else
-                        {
-                            strBuilder.Append("," + r.ToString());
-                        }
-                    }
-                }
-                else if (result is IEnumerable<string>)
-                {
-                    IEnumerable<string> rl = result as IEnumerable<string>;
-                    foreach (string r in rl)
-                    {
-                        if (strBuilder.Length == 0)
-                        {
-                            strBuilder.Append(r.ToString());
-                        }
-                        else
-                        {
-                            strBuilder.Append("," + r.ToString());
-                        }
-                    }
-                }
-                else if (result is IEnumerable<object>)
-                {
-                    IEnumerable<object> rl = result as IEnumerable<object>;
-                    foreach (object r in rl)
-                    {
-                        if (r == null)
-                        {
-                            continue;
-                            //throw new Exception("可为空查询列表中,不允许有null值.");
-                        }
-                        if (strBuilder.Length == 0)
-                        {
-                            strBuilder.Append(r.ToString());
-                        }
-                        else
-                        {
-                            strBuilder.Append("," + r.ToString());
-                        }
-                    }
-                }
-                else
-                {
-                    throw new Exception("不支持的方法:" + exp.ToString());
-                }
-                return strBuilder.ToString();
-                #endregion
+                return ConvertValue(result);
             }
         }
-        
+
+        /// <summary>
+        /// 转换值
+        /// 处理数组类型
+        /// </summary>
+        /// <param name="result"></param>
+        /// <returns></returns>
+        private object ConvertValue(object result)
+        {
+            if (result == null || result is ValueType || result is string 
+                || result is DateTime || result is char)
+            {
+                return result;
+            }
+            //支持数组,List泛型 int,int?,float,float?,double,double?,
+            //long,long?,Guid,Guid?,Datetime,Datetime?,string
+            #region 处理数组类型
+            StringBuilder strBuilder = new StringBuilder();
+            if (result is IEnumerable<int>)
+            {
+                IEnumerable<int> rl = result as IEnumerable<int>;
+                foreach (int r in rl)
+                {
+                    if (strBuilder.Length == 0)
+                    {
+                        strBuilder.Append(r.ToString());
+                    }
+                    else
+                    {
+                        strBuilder.Append("," + r.ToString());
+                    }
+                }
+            }
+            else if (result is IEnumerable<int?>)
+            {
+                IEnumerable<int?> rl = result as IEnumerable<int?>;
+                foreach (int? r in rl)
+                {
+                    if (r == null)
+                    {
+                        continue;
+                        //throw new Exception("可为空查询列表中,不允许有null值.");
+                    }
+                    if (strBuilder.Length == 0)
+                    {
+                        strBuilder.Append(r.ToString());
+                    }
+                    else
+                    {
+                        strBuilder.Append("," + r.ToString());
+                    }
+                }
+            }
+            else if (result is IEnumerable<float>)
+            {
+                IEnumerable<float> rl = result as IEnumerable<float>;
+                foreach (float r in rl)
+                {
+                    if (strBuilder.Length == 0)
+                    {
+                        strBuilder.Append(r.ToString());
+                    }
+                    else
+                    {
+                        strBuilder.Append("," + r.ToString());
+                    }
+                }
+            }
+            else if (result is IEnumerable<float?>)
+            {
+                IEnumerable<float?> rl = result as IEnumerable<float?>;
+                foreach (float? r in rl)
+                {
+                    if (r == null)
+                    {
+                        continue;
+                        //throw new Exception("可为空查询列表中,不允许有null值.");
+                    }
+                    if (strBuilder.Length == 0)
+                    {
+                        strBuilder.Append(r.ToString());
+                    }
+                    else
+                    {
+                        strBuilder.Append("," + r.ToString());
+                    }
+                }
+            }
+            else if (result is IEnumerable<double>)
+            {
+                IEnumerable<double> rl = result as IEnumerable<double>;
+                foreach (double r in rl)
+                {
+                    if (strBuilder.Length == 0)
+                    {
+                        strBuilder.Append(r.ToString());
+                    }
+                    else
+                    {
+                        strBuilder.Append("," + r.ToString());
+                    }
+                }
+            }
+            else if (result is IEnumerable<double?>)
+            {
+                IEnumerable<double?> rl = result as IEnumerable<double?>;
+                foreach (double? r in rl)
+                {
+                    if (r == null)
+                    {
+                        continue;
+                        //throw new Exception("可为空查询列表中,不允许有null值.");
+                    }
+                    if (strBuilder.Length == 0)
+                    {
+                        strBuilder.Append(r.ToString());
+                    }
+                    else
+                    {
+                        strBuilder.Append("," + r.ToString());
+                    }
+                }
+            }
+            else if (result is IEnumerable<long>)
+            {
+                IEnumerable<long> rl = result as IEnumerable<long>;
+                foreach (long r in rl)
+                {
+                    if (strBuilder.Length == 0)
+                    {
+                        strBuilder.Append(r.ToString());
+                    }
+                    else
+                    {
+                        strBuilder.Append("," + r.ToString());
+                    }
+                }
+            }
+            else if (result is IEnumerable<long?>)
+            {
+                IEnumerable<long?> rl = result as IEnumerable<long?>;
+                foreach (long? r in rl)
+                {
+                    if (r == null)
+                    {
+                        continue;
+                        //throw new Exception("可为空查询列表中,不允许有null值.");
+                    }
+                    if (strBuilder.Length == 0)
+                    {
+                        strBuilder.Append(r.ToString());
+                    }
+                    else
+                    {
+                        strBuilder.Append("," + r.ToString());
+                    }
+                }
+            }
+            else if (result is IEnumerable<Guid>)
+            {
+                IEnumerable<Guid> rl = result as IEnumerable<Guid>;
+                foreach (Guid r in rl)
+                {
+                    if (strBuilder.Length == 0)
+                    {
+                        strBuilder.Append(r.ToString());
+                    }
+                    else
+                    {
+                        strBuilder.Append("," + r.ToString());
+                    }
+                }
+            }
+            else if (result is IEnumerable<Guid?>)
+            {
+                IEnumerable<Guid?> rl = result as IEnumerable<Guid?>;
+                foreach (Guid? r in rl)
+                {
+                    if (r == null)
+                    {
+                        continue;
+                        //throw new Exception("可为空查询列表中,不允许有null值.");
+                    }
+                    if (strBuilder.Length == 0)
+                    {
+                        strBuilder.Append(r.ToString());
+                    }
+                    else
+                    {
+                        strBuilder.Append("," + r.ToString());
+                    }
+                }
+            }
+            else if (result is IEnumerable<DateTime>)
+            {
+                IEnumerable<DateTime> rl = result as IEnumerable<DateTime>;
+                foreach (DateTime r in rl)
+                {
+                    if (strBuilder.Length == 0)
+                    {
+                        strBuilder.Append(r.ToString());
+                    }
+                    else
+                    {
+                        strBuilder.Append("," + r.ToString());
+                    }
+                }
+            }
+            else if (result is IEnumerable<DateTime?>)
+            {
+                IEnumerable<DateTime?> rl = result as IEnumerable<DateTime?>;
+                foreach (DateTime? r in rl)
+                {
+                    if (r == null)
+                    {
+                        continue;
+                        //throw new Exception("可为空查询列表中,不允许有null值.");
+                    }
+                    if (strBuilder.Length == 0)
+                    {
+                        strBuilder.Append(r.ToString());
+                    }
+                    else
+                    {
+                        strBuilder.Append("," + r.ToString());
+                    }
+                }
+            }
+            else if (result is IEnumerable<string>)
+            {
+                IEnumerable<string> rl = result as IEnumerable<string>;
+                foreach (string r in rl)
+                {
+                    if (strBuilder.Length == 0)
+                    {
+                        strBuilder.Append(r.ToString());
+                    }
+                    else
+                    {
+                        strBuilder.Append("," + r.ToString());
+                    }
+                }
+            }
+            else if (result is IEnumerable<object>)
+            {
+                IEnumerable<object> rl = result as IEnumerable<object>;
+                foreach (object r in rl)
+                {
+                    if (r == null)
+                    {
+                        continue;
+                        //throw new Exception("可为空查询列表中,不允许有null值.");
+                    }
+                    if (strBuilder.Length == 0)
+                    {
+                        strBuilder.Append(r.ToString());
+                    }
+                    else
+                    {
+                        strBuilder.Append("," + r.ToString());
+                    }
+                }
+            }
+            else
+            {
+                return result;
+            }
+            return strBuilder.ToString();
+            #endregion
+        }
 
         /// <summary>
         /// 对静态方法或实例方法的调用
