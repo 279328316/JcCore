@@ -15,7 +15,7 @@ namespace Jc.Core.TestApp.Test
 
             Stopwatch sw = new Stopwatch();
             sw.Start();
-            for (int i = 0; i < 100000; i++)
+            for (int i = 0; i < 1000000; i++)
             {
                 users.Add(new UserDto()
                 {
