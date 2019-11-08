@@ -12,7 +12,17 @@ namespace Jc.Core.TestApp
         /// <summary>
         /// Db
         /// </summary>
-        public static DbContext Db = DbContext.CreateDbContext("SinoCloud",DatabaseType.MySql);
+        public static DbContext Db = DbContext.CreateDbContext("SinoCloud", DatabaseType.MySql);
+
+        /// <summary>
+        /// Db
+        /// </summary>
+        public static DbContext NiceDb = DbContext.CreateDbContext("Nice", DatabaseType.MsSql);
+
+        /// <summary>
+        /// Db
+        /// </summary>
+        public static DbContext StockDb = DbContext.CreateDbContext("Stock", DatabaseType.MsSql);
 
         /// <summary>
         /// 获取DbIQuery

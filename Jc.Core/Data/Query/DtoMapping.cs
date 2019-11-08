@@ -73,6 +73,30 @@ namespace Jc.Core.Data.Query
                 return pkMap;
             }
         }
+
+        /// <summary>
+        /// 主键字段映射Map
+        /// </summary>
+        public bool IsAutoIncrementPk
+        {
+            get
+            {
+                bool result = false;
+                if (PkMap != null)
+                {
+                    if (PkMap.PropertyType == typeof(int) || PkMap.PropertyType == typeof(int?))
+                    {   //自增Id
+                        result = true;
+                    }
+                    else if (PkMap.PropertyType == typeof(long) || PkMap.PropertyType == typeof(long?))
+                    {
+                        result = true;
+                    }
+                }
+                return result;
+            }
+        }
+
         /// <summary>
         /// 表属性
         /// </summary>

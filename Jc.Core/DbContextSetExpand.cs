@@ -90,7 +90,82 @@ namespace Jc.Core
             }
             return rowCount;
         }
-        
+
+
+        /// <summary>
+        /// 保存or更新数据对象
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="list">实体对象</param>
+        /// <param name="select">查询属性</param>
+        /// <param name="tableNamePfx">表名称参数.如果TableAttr设置Name.则根据Name格式化</param>
+        public int SetList<T>(List<T> list, Expression<Func<T, object>> select = null, string tableNamePfx = null) where T : class, new()
+        {
+            ExHelper.ThrowIfNull(list, "操作对象不能为空.");
+            int rowCount = 0;
+            DtoMapping dtoDbMapping = DtoMappingHelper.GetDtoMapping<T>();
+            List<T> addList = new List<T>();
+            List<T> updateList = new List<T>();
+
+            #region 拆分新增或更新对象List
+            for (int i = 0; i < list.Count; i++)
+            {
+                object pkValue = dtoDbMapping.PkMap.Pi.GetValue(list);
+                if (pkValue == null)
+                {
+                    addList.Add(list[i]);
+                }
+                else if (dtoDbMapping.PkMap.PropertyType == typeof(int) || dtoDbMapping.PkMap.PropertyType == typeof(int?))
+                {   //自增Id int
+                    if ((int)pkValue == 0)
+                    {
+                        addList.Add(list[i]);
+                    }
+                    else
+                    {
+                        updateList.Add(list[i]);
+                    }
+                }
+                else if (dtoDbMapping.PkMap.PropertyType == typeof(long) || dtoDbMapping.PkMap.PropertyType == typeof(long?))
+                {   //自增Id long
+                    if ((long)pkValue == 0)
+                    {
+                        addList.Add(list[i]);
+                    }
+                    else
+                    {
+                        updateList.Add(list[i]);
+                    }
+                }
+                else if (dtoDbMapping.PkMap.PropertyType == typeof(Guid) || dtoDbMapping.PkMap.PropertyType == typeof(Guid?))
+                {   //Guid Id
+                    if ((Guid)pkValue == Guid.Empty)
+                    {
+                        addList.Add(list[i]);
+                    }
+                    else
+                    {
+                        updateList.Add(list[i]);
+                    }
+                }
+                else
+                {
+                    updateList.Add(list[i]);
+                }
+            }
+            #endregion
+
+            if (addList.Count > 0)
+            {
+                AddList(addList, select, tableNamePfx);
+            }
+            if (updateList.Count > 0)
+            {
+                UpdateList(updateList, select, tableNamePfx);
+            }
+            return rowCount;
+        }
+
         /// <summary>
         /// 保存数据对象
         /// </summary>
@@ -124,20 +199,17 @@ namespace Jc.Core
                 }
             }
             object pkValue = dtoDbMapping.PkMap.Pi.GetValue(dto);
-            if (dtoDbMapping.PkMap.PropertyType == typeof(int) || dtoDbMapping.PkMap.PropertyType == typeof(int?))
-            {   //自增Id
-            }
-            else if (dtoDbMapping.PkMap.PropertyType == typeof(long) || dtoDbMapping.PkMap.PropertyType == typeof(long?))
-            {
-            }
-            else if (dtoDbMapping.PkMap.PropertyType == typeof(Guid) || dtoDbMapping.PkMap.PropertyType == typeof(Guid?))
+            if (!dtoDbMapping.IsAutoIncrementPk)
             {   //Guid Id
                 if (pkValue == null || (Guid)pkValue == Guid.Empty)
                 {   //生成Guid
                     dtoDbMapping.PkMap.Pi.SetValue(dto, Guid.NewGuid());
                 }
+                if (!piMapList.Contains(dtoDbMapping.PkMap))
+                {
+                    piMapList.Insert(0, dtoDbMapping.PkMap);
+                }
             }
-
             using (DbCommand dbCommand = dbProvider.GetInsertDbCmd(dto, piMapList, tableNamePfx))
             {
                 try
@@ -186,7 +258,91 @@ namespace Jc.Core
             }
             return rowCount;
         }
-        
+
+
+        /// <summary>
+        /// 批量添加数据
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="list">实体对象 List</param>
+        /// <param name="select">查询属性</param>
+        /// <param name="tableNamePfx">表名称参数.如果TableAttr设置Name.则根据Name格式化</param>
+        public int AddList<T>(List<T> list, Expression<Func<T, object>> select = null, string tableNamePfx = null) where T : class, new()
+        {
+            if (list == null || list.Count <= 0)
+            {
+                return 0;
+            }
+            int rowCount = 0;
+            DtoMapping dtoDbMapping = DtoMappingHelper.GetDtoMapping<T>();
+            List<PiMap> piMapList = DtoMappingHelper.GetPiMapList<T>(select);
+            if (!dtoDbMapping.IsAutoIncrementPk && !piMapList.Contains(dtoDbMapping.PkMap))
+            {
+                piMapList.Insert(0,dtoDbMapping.PkMap);
+            }
+            if (dtoDbMapping.TableAttr.AutoCreate)
+            {   //如果是自动建表
+                if (!CheckTableExists<T>())
+                {
+                    CreateTable<T>();
+                }
+            }
+            //因为参数有2100的限制
+            int perOpAmount = 2000/ piMapList.Count; //每次添加Amount
+            using (DbConnection dbConnection = GetDbConnection())
+            {
+                DbTransaction transaction = dbConnection.BeginTransaction();
+                int i = 0;
+                T curItem;
+                try
+                {
+                    List<T> curOpList = new List<T>();
+                    for ( i = 0; i < list.Count; i++)
+                    {
+                        #region 设置Id
+                        curItem = list[i];
+                        object pkValue = dtoDbMapping.PkMap.Pi.GetValue(list[i]);
+                        if (dtoDbMapping.PkMap.PropertyType == typeof(int) || dtoDbMapping.PkMap.PropertyType == typeof(int?))
+                        {   //自增Id
+                        }
+                        else if (dtoDbMapping.PkMap.PropertyType == typeof(long) || dtoDbMapping.PkMap.PropertyType == typeof(long?))
+                        {
+                        }
+                        else if (dtoDbMapping.PkMap.PropertyType == typeof(Guid) || dtoDbMapping.PkMap.PropertyType == typeof(Guid?))
+                        {   //Guid Id
+                            if (pkValue == null || (Guid)pkValue == Guid.Empty)
+                            {   //生成Guid
+                                dtoDbMapping.PkMap.Pi.SetValue(list[i], Guid.NewGuid());
+                            }
+                        }
+                        #endregion
+
+                        curOpList.Add(list[i]);
+                        if ( (i + 1) % perOpAmount == 0 || i == list.Count - 1)
+                        {
+                            using (DbCommand dbCommand = dbProvider.GetInsertDbCmd(curOpList, piMapList, tableNamePfx))
+                            {
+                                dbCommand.Connection = dbConnection;
+                                dbCommand.Transaction = transaction;
+
+                                rowCount = dbCommand.ExecuteNonQuery();
+                                transaction.Commit();
+                                transaction = dbConnection.BeginTransaction();
+                            }
+                            curOpList.Clear();
+                        }
+                    }
+                    CloseDbConnection(dbConnection);
+                }
+                catch (Exception ex)
+                {
+                    CloseDbConnection(dbConnection);
+                    throw ex;
+                }
+            }
+            return rowCount;
+        }
+
         /// <summary>
         /// 更新数据对象
         /// </summary>
@@ -209,7 +365,16 @@ namespace Jc.Core
         {
             ExHelper.ThrowIfNull(dto, "操作对象不能为空.");
             int rowCount = 0;
+
+            DtoMapping dtoDbMapping = DtoMappingHelper.GetDtoMapping<T>();
             List<PiMap> piMapList = DtoMappingHelper.GetPiMapList<T>(select);
+            if (dtoDbMapping.IsAutoIncrementPk)
+            {
+                if (piMapList.Contains(dtoDbMapping.PkMap))
+                {
+                    piMapList.Remove(dtoDbMapping.PkMap);
+                }
+            }
             using (DbCommand dbCommand = dbProvider.GetUpdateDbCmd(dto, piMapList, tableNamePfx))
             {
                 try
@@ -225,6 +390,66 @@ namespace Jc.Core
                 catch (Exception ex)
                 {
                     CloseDbConnection(dbCommand);
+                    throw ex;
+                }
+            }
+            return rowCount;
+        }
+
+
+        /// <summary>
+        /// 更新数据对象
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="list">实体对象</param>
+        /// <param name="select">更新属性</param>
+        /// <param name="tableNamePfx">表名称参数.如果TableAttr设置Name.则根据Name格式化</param>
+        public int UpdateList<T>(List<T> list, Expression<Func<T, object>> select = null, string tableNamePfx = null) where T : class, new()
+        {
+            if (list == null || list.Count <= 0)
+            {
+                return 0;
+            }
+            int rowCount = 0;
+
+            DtoMapping dtoDbMapping = DtoMappingHelper.GetDtoMapping<T>();
+            List<PiMap> piMapList = DtoMappingHelper.GetPiMapList<T>(select);
+            if (dtoDbMapping.IsAutoIncrementPk)
+            {
+                if (piMapList.Contains(dtoDbMapping.PkMap))
+                {
+                    piMapList.Remove(dtoDbMapping.PkMap);
+                }
+            }
+            //因为参数有2100的限制 待更新字段 + 主键
+            int perOpAmount = 2000 / (piMapList.Count + 1); //每次更新Amount
+            using (DbConnection dbConnection = GetDbConnection())
+            {
+                DbTransaction transaction = dbConnection.BeginTransaction();
+                try
+                {
+                    List<T> curOpList = new List<T>();
+                    for (int i = 0; i < list.Count; i++)
+                    {
+                        curOpList.Add(list[i]);
+                        if ((i + 1) % perOpAmount == 0 || i == list.Count - 1)
+                        {
+                            using (DbCommand dbCommand = dbProvider.GetUpdateDbCmd(curOpList, piMapList, tableNamePfx))
+                            {
+                                dbCommand.Connection = dbConnection;
+                                dbCommand.Transaction = transaction;
+                                rowCount = dbCommand.ExecuteNonQuery();
+                                transaction.Commit();
+                                transaction = dbConnection.BeginTransaction();
+                            }
+                            curOpList.Clear();
+                        }
+                    }
+                    CloseDbConnection(dbConnection);
+                }
+                catch (Exception ex)
+                {
+                    CloseDbConnection(dbConnection);
                     throw ex;
                 }
             }

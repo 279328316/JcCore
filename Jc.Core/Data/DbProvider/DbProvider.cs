@@ -230,6 +230,79 @@ namespace Jc.Core.Data
             return dbCommand;
         }
 
+
+        /// <summary>
+        /// 获取插入DbCmd
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="list"></param>
+        /// <param name="piMapList">查询属性MapList</param>
+        /// <param name="tableNamePfx">表名称参数.如果TableAttr设置Name.则根据Name格式化</param>
+        /// <returns></returns>
+        internal DbCommand GetInsertDbCmd<T>(List<T> list, List<PiMap> piMapList, string tableNamePfx = null) where T : class, new()
+        {
+            DbCommand dbCommand = CreateDbCommand();
+            DtoMapping dtoDbMapping = DtoMappingHelper.GetDtoMapping<T>();
+            #region 设置DbCommand
+            string sqlStr = "Insert into {0} ({1}) values{2}";
+            string fieldParams = null;
+            string valueParams = null;
+
+            foreach (PiMap piMap in piMapList)
+            {
+                PropertyInfo pi = piMap.Pi;
+                if (piMap.FieldAttr.ReadOnly) continue;  //跳过只读字段
+                if (piMap.FieldAttr.IsPk)
+                {   //如果是自动设置Id 主键是int or long 自增Id 为null or 0 跳过插入
+                    if (pi.PropertyType == typeof(int) || pi.PropertyType == typeof(int?))
+                    {
+                        continue;
+                    }
+                    else if (pi.PropertyType == typeof(long) || pi.PropertyType == typeof(long?))
+                    {
+                        continue;
+                    }
+                }
+                fieldParams = string.IsNullOrEmpty(fieldParams) ? piMap.FieldName : fieldParams + "," + piMap.FieldName;
+            }
+            StringBuilder strBuilder = new StringBuilder();
+            for (int i = 0; i < list.Count; i++)
+            {
+                strBuilder.Append("(");
+                StringBuilder itemBuilder = new StringBuilder();
+                foreach (PiMap piMap in piMapList)
+                {
+                    PropertyInfo pi = piMap.Pi;
+                    if (piMap.FieldAttr.ReadOnly) continue;  //跳过只读字段
+                    if (piMap.FieldAttr.IsPk)
+                    {   //如果是自动设置Id 主键是int or long 自增Id 为null or 0 跳过插入
+                        object pkValue = pi.GetValue(list[i]);
+                        if (pi.PropertyType == typeof(int) || pi.PropertyType == typeof(int?))
+                        {
+                            continue;                            
+                        }
+                        else if (pi.PropertyType == typeof(long) || pi.PropertyType == typeof(long?))
+                        {
+                            continue;                            
+                        }
+                    }
+                    itemBuilder.Append($"@{piMap.FieldName}{i},");
+                    DbParameter dbParameter = dbCommand.CreateParameter();
+                    dbParameter.Direction = ParameterDirection.Input;
+                    dbParameter.ParameterName = $"@{piMap.FieldName}{i}";
+                    dbParameter.Value = pi.GetValue(list[i]) ?? DBNull.Value;
+                    dbParameter.DbType = DbTypeConvertor.TypeToDbType(piMap.PropertyType);
+                    dbCommand.Parameters.Add(dbParameter);
+                }
+                strBuilder.Append(itemBuilder.ToString().TrimEnd(','));
+                strBuilder.Append("),");
+            }
+            valueParams = strBuilder.ToString().TrimEnd(',');
+            dbCommand.CommandText = string.Format(sqlStr, dtoDbMapping.GetTableName<T>(tableNamePfx), fieldParams, valueParams);
+            #endregion
+            return dbCommand;
+        }
+
         /// <summary>
         /// 获取导入DbCmd 导入时,自带Id
         /// </summary>

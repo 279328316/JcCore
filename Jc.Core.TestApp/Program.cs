@@ -8,8 +8,8 @@ namespace Jc.Core.TestApp
     {
         static void Main(string[] args)
         {
-            ApiTest test = new ApiTest();
-            test.IQueryTest();
+            ListAddTest test = new ListAddTest();
+            test.Test();
 
             Console.WriteLine("测试完成,请按任意键继续.");
             Console.ReadKey();
