@@ -102,7 +102,10 @@ namespace Jc.Core
         /// <param name="tableNamePfx">表名称参数.如果TableAttr设置Name.则根据Name格式化</param>
         public int SetList<T>(List<T> list, Expression<Func<T, object>> select = null, IProgress<double> progress = null,string tableNamePfx = null) where T : class, new()
         {
-            ExHelper.ThrowIfNull(list, "操作对象不能为空.");
+            if(list==null || list.Count<=0)
+            {
+                return 0;
+            }
             int rowCount = 0;
             DtoMapping dtoDbMapping = DtoMappingHelper.GetDtoMapping<T>();
             List<T> addList = new List<T>();
