@@ -89,10 +89,6 @@ namespace Jc.Core
             else if (isStrict)
             {
                 Type type = obj.GetType();
-                if(type.GenericTypeArguments.Length>0)
-                {
-                    type = type.GenericTypeArguments[0];
-                }
                 if (type == typeof(string))
                 {
                     if (string.IsNullOrEmpty(obj.ToString()))
@@ -100,21 +96,21 @@ namespace Jc.Core
                         result = true;
                     }
                 }
-                else if (type == typeof(Guid))
+                else if (type == typeof(Guid) || type == typeof(Guid?))
                 {
                     if (((Guid)obj) == Guid.Empty)
                     {
                         result = true;
                     }
                 }
-                else if (type == typeof(int))
+                else if (type == typeof(int) || type == typeof(int?))
                 {
                     if (((int)obj) == 0)
                     {
                         result = true;
                     }
                 }
-                else if (type == typeof(long))
+                else if (type == typeof(long) || type == typeof(long?))
                 {
                     if (((long)obj) == 0)
                     {

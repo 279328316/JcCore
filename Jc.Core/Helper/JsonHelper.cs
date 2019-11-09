@@ -12,7 +12,7 @@ using Newtonsoft.Json.Linq;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 
-namespace Jc.Core.Helper
+namespace Jc.Core
 {
     /// <summary>
     /// Json操作类
