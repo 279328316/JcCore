@@ -27,7 +27,7 @@ namespace Jc.Core
         /// 执行After
         /// </summary>
         /// <param name="result"></param>
-        internal void DoAfter(T result)
+        public void DoAfter(T result)
         {
             After?.Invoke(result);
         }

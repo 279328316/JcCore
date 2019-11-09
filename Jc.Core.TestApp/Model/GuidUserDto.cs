@@ -6,15 +6,15 @@ namespace Jc.Core.TestApp
     /// <summary>
     /// User Dto
     /// </summary>
-    [Table(Name = "t_User", DisplayText = "",AutoCreate = true)]
-    public class UserDto
+    [Table(Name = "t_GUser", DisplayText = "",AutoCreate = true)]
+    public class GUserDto
     {
         #region Properties
         /// <summary>
         /// Id
         /// </summary>
-        [Field(DisplayText = "Id", IsPk = true, Required = true, FieldType = "int")]
-        public int? Id { get; set; }
+        [Field(DisplayText = "Id", IsPk = true, Required = true, FieldType = "uniqueidentifier")]
+        public Guid Id { get; set; }
 
         /// <summary>
         /// 用户名

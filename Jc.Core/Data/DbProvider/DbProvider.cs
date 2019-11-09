@@ -252,16 +252,9 @@ namespace Jc.Core.Data
             {
                 PropertyInfo pi = piMap.Pi;
                 if (piMap.FieldAttr.ReadOnly) continue;  //跳过只读字段
-                if (piMap.FieldAttr.IsPk)
-                {   //如果是自动设置Id 主键是int or long 自增Id 为null or 0 跳过插入
-                    if (pi.PropertyType == typeof(int) || pi.PropertyType == typeof(int?))
-                    {
-                        continue;
-                    }
-                    else if (pi.PropertyType == typeof(long) || pi.PropertyType == typeof(long?))
-                    {
-                        continue;
-                    }
+                if(piMap == dtoDbMapping.PkMap && dtoDbMapping.IsAutoIncrementPk)
+                {   //如果是自增主键 跳过插入
+                    continue;
                 }
                 fieldParams = string.IsNullOrEmpty(fieldParams) ? piMap.FieldName : fieldParams + "," + piMap.FieldName;
             }
@@ -274,17 +267,9 @@ namespace Jc.Core.Data
                 {
                     PropertyInfo pi = piMap.Pi;
                     if (piMap.FieldAttr.ReadOnly) continue;  //跳过只读字段
-                    if (piMap.FieldAttr.IsPk)
-                    {   //如果是自动设置Id 主键是int or long 自增Id 为null or 0 跳过插入
-                        object pkValue = pi.GetValue(list[i]);
-                        if (pi.PropertyType == typeof(int) || pi.PropertyType == typeof(int?))
-                        {
-                            continue;                            
-                        }
-                        else if (pi.PropertyType == typeof(long) || pi.PropertyType == typeof(long?))
-                        {
-                            continue;                            
-                        }
+                    if (piMap == dtoDbMapping.PkMap && dtoDbMapping.IsAutoIncrementPk)
+                    {   //如果是自增主键 跳过插入
+                        continue;
                     }
                     itemBuilder.Append($"@{piMap.FieldName}{i},");
                     DbParameter dbParameter = dbCommand.CreateParameter();
@@ -351,34 +336,97 @@ namespace Jc.Core.Data
             DbCommand dbCommand = CreateDbCommand();
             DtoMapping dtoDbMapping = DtoMappingHelper.GetDtoMapping<T>();
             #region 设置DbCommand
-
-            string sqlStr = "Update {0} set {1} where {2}";
+            string sqlStr = "Update {0} set {1} where {2};";
             string setParams = null;
             string whereParams = null;
             foreach (PiMap piMap in piMapList)
             {
+                if (piMap == dtoDbMapping.PkMap && dtoDbMapping.IsAutoIncrementPk)
+                {   //如果是自增主键 跳过更新
+                    continue;
+                }
                 DbParameter dbParameter = dbCommand.CreateParameter();
                 dbParameter.Direction = ParameterDirection.Input;
-                dbParameter.ParameterName = "@" + piMap.FieldName;
+                dbParameter.ParameterName = $"@{piMap.FieldName}";
                 object value = piMap.Pi.GetValue(dto);
                 dbParameter.Value = value != null ? value : DBNull.Value;
                 dbParameter.DbType = DbTypeConvertor.TypeToDbType(piMap.PropertyType);
                 dbCommand.Parameters.Add(dbParameter);
-                setParams = string.IsNullOrEmpty(setParams) ? piMap.FieldName + "=@" + piMap.FieldName : setParams + "," + piMap.FieldName + "=@" + piMap.FieldName;
+                
+                if (!string.IsNullOrEmpty(setParams))
+                {
+                    setParams += ",";
+                }
+                setParams += $"{piMap.FieldName}={dbParameter.ParameterName}";
             }
-            if (!piMapList.Contains(dtoDbMapping.PkMap))
-            {   //如果更新列表没有包含主键参数,需要添加根据主键更新
-                DbParameter dbPkParameter = dbCommand.CreateParameter();
-                dbPkParameter.Direction = ParameterDirection.Input;
-                dbPkParameter.ParameterName = "@" + dtoDbMapping.PkMap.FieldName;
-                object pkValue = dtoDbMapping.PkMap.Pi.GetValue(dto);
-                dbPkParameter.Value = pkValue != null ? pkValue : DBNull.Value;
-                dbCommand.Parameters.Add(dbPkParameter);
-            }
-
-            whereParams = dtoDbMapping.PkMap.FieldName + "=@" + dtoDbMapping.PkMap.FieldName;
             
+            DbParameter whereParameter = dbCommand.CreateParameter();
+            whereParameter.Direction = ParameterDirection.Input;
+            whereParameter.ParameterName = $"@where{dtoDbMapping.PkMap.FieldName}";
+            object pkValue = dtoDbMapping.PkMap.Pi.GetValue(dto);
+            whereParameter.Value = pkValue != null ? pkValue : DBNull.Value;
+            dbCommand.Parameters.Add(whereParameter);
+            whereParams = $"{dtoDbMapping.PkMap.FieldName}={whereParameter.ParameterName}";
+
             dbCommand.CommandText = string.Format(sqlStr, dtoDbMapping.GetTableName<T>(tableNamePfx), setParams, whereParams);
+            #endregion
+
+            return dbCommand;
+        }
+
+        /// <summary>
+        /// 获取更新DbCmd
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="list"></param>
+        /// <param name="piMapList">查询属性MapList</param>
+        /// <param name="tableNamePfx">表名称参数.如果TableAttr设置Name.则根据Name格式化</param>
+        /// <returns></returns>
+        internal DbCommand GetUpdateDbCmd<T>(List<T> list, List<PiMap> piMapList, string tableNamePfx = null)
+        {
+            DbCommand dbCommand = CreateDbCommand();
+            DtoMapping dtoDbMapping = DtoMappingHelper.GetDtoMapping<T>();
+            #region 设置DbCommand
+
+            StringBuilder strBuilder = new StringBuilder();
+            string sqlStr = "Update {0} set {1} where {2};";
+            for (int i = 0; i < list.Count; i++)
+            {
+                string setParams = null;
+                string whereParams = null;
+                T dto = list[i];
+                foreach (PiMap piMap in piMapList)
+                {
+                    if (piMap == dtoDbMapping.PkMap && dtoDbMapping.IsAutoIncrementPk)
+                    {   //如果是自增主键 跳过更新
+                        continue;
+                    }
+                    DbParameter dbParameter = dbCommand.CreateParameter();
+                    dbParameter.Direction = ParameterDirection.Input;
+                    dbParameter.ParameterName = $"@{piMap.FieldName}{i}";
+                    object value = piMap.Pi.GetValue(dto);
+                    dbParameter.Value = value != null ? value : DBNull.Value;
+                    dbParameter.DbType = DbTypeConvertor.TypeToDbType(piMap.PropertyType);
+                    dbCommand.Parameters.Add(dbParameter);
+
+                    if (!string.IsNullOrEmpty(setParams))
+                    {
+                        setParams += ",";
+                    }
+                    setParams += $"{piMap.FieldName}={dbParameter.ParameterName}";
+                }
+                DbParameter whereParameter = dbCommand.CreateParameter();
+                whereParameter.Direction = ParameterDirection.Input;
+                whereParameter.ParameterName = $"@where{dtoDbMapping.PkMap.FieldName}{i}";
+                object pkValue = dtoDbMapping.PkMap.Pi.GetValue(dto);
+                whereParameter.Value = pkValue != null ? pkValue : DBNull.Value;
+                dbCommand.Parameters.Add(whereParameter);
+                whereParams = $"{dtoDbMapping.PkMap.FieldName}={whereParameter.ParameterName}";
+                
+                string updateStr = string.Format(sqlStr, dtoDbMapping.GetTableName<T>(tableNamePfx), setParams, whereParams);
+                strBuilder.Append(updateStr);
+            }
+            dbCommand.CommandText = strBuilder.ToString();
             #endregion
 
             return dbCommand;

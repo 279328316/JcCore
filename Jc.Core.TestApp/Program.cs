@@ -8,6 +8,8 @@ namespace Jc.Core.TestApp
     {
         static void Main(string[] args)
         {
+            Console.WriteLine("测试即将开始,请按任意键继续.");
+            Console.ReadKey();
             ListAddTest test = new ListAddTest();
             test.Test();
 

@@ -89,6 +89,10 @@ namespace Jc.Core
             else if (isStrict)
             {
                 Type type = obj.GetType();
+                if(type.GenericTypeArguments.Length>0)
+                {
+                    type = type.GenericTypeArguments[0];
+                }
                 if (type == typeof(string))
                 {
                     if (string.IsNullOrEmpty(obj.ToString()))
@@ -106,6 +110,13 @@ namespace Jc.Core
                 else if (type == typeof(int))
                 {
                     if (((int)obj) == 0)
+                    {
+                        result = true;
+                    }
+                }
+                else if (type == typeof(long))
+                {
+                    if (((long)obj) == 0)
                     {
                         result = true;
                     }

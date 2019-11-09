@@ -12,6 +12,7 @@ using Jc.Core.Helper;
 using System.Collections.Specialized;
 using Jc.Core.Data.Model;
 using Jc.Core.Data.Query;
+using System.Threading.Tasks;
 
 namespace Jc.Core
 {
@@ -91,15 +92,15 @@ namespace Jc.Core
             return rowCount;
         }
 
-
         /// <summary>
-        /// 保存or更新数据对象
+        /// 批量保存数据
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="list">实体对象</param>
         /// <param name="select">查询属性</param>
+        /// <param name="progress">保存进度</param>
         /// <param name="tableNamePfx">表名称参数.如果TableAttr设置Name.则根据Name格式化</param>
-        public int SetList<T>(List<T> list, Expression<Func<T, object>> select = null, string tableNamePfx = null) where T : class, new()
+        public int SetList<T>(List<T> list, Expression<Func<T, object>> select = null, IProgress<double> progress = null,string tableNamePfx = null) where T : class, new()
         {
             ExHelper.ThrowIfNull(list, "操作对象不能为空.");
             int rowCount = 0;
@@ -157,13 +158,32 @@ namespace Jc.Core
 
             if (addList.Count > 0)
             {
-                AddList(addList, select, tableNamePfx);
+                rowCount += AddList(addList, select, progress, tableNamePfx);
             }
             if (updateList.Count > 0)
             {
-                UpdateList(updateList, select, tableNamePfx);
+                rowCount += UpdateList(updateList, select, progress, tableNamePfx);
             }
             return rowCount;
+        }
+
+        /// <summary>
+        /// 异步批量保存数据
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="list">实体对象 List</param>
+        /// <param name="select">查询属性</param>
+        /// <param name="progress">进度通知</param>
+        /// <param name="tableNamePfx">表名称参数.如果TableAttr设置Name.则根据Name格式化</param>
+        public AfterDto<int> SetListSync<T>(List<T> list, Expression<Func<T, object>> select = null, IProgress<double> progress = null, string tableNamePfx = null) where T : class, new()
+        {
+            AfterDto<int> after = new AfterDto<int>();
+            Task t = new Task(() => {
+                int rowCount = SetList(list, select, progress, tableNamePfx);
+                after.DoAfter(rowCount);
+            });
+            t.Start();
+            return after;
         }
 
         /// <summary>
@@ -266,8 +286,9 @@ namespace Jc.Core
         /// <typeparam name="T"></typeparam>
         /// <param name="list">实体对象 List</param>
         /// <param name="select">查询属性</param>
+        /// <param name="progress">进度通知</param>
         /// <param name="tableNamePfx">表名称参数.如果TableAttr设置Name.则根据Name格式化</param>
-        public int AddList<T>(List<T> list, Expression<Func<T, object>> select = null, string tableNamePfx = null) where T : class, new()
+        public int AddList<T>(List<T> list, Expression<Func<T, object>> select = null, IProgress<double> progress = null, string tableNamePfx = null) where T : class, new()
         {
             if (list == null || list.Count <= 0)
             {
@@ -325,11 +346,15 @@ namespace Jc.Core
                                 dbCommand.Connection = dbConnection;
                                 dbCommand.Transaction = transaction;
 
-                                rowCount = dbCommand.ExecuteNonQuery();
+                                rowCount += dbCommand.ExecuteNonQuery();
                                 transaction.Commit();
                                 transaction = dbConnection.BeginTransaction();
                             }
                             curOpList.Clear();
+                            if(progress!=null)
+                            {
+                                progress.Report((i+1)*1.0/list.Count);
+                            }
                         }
                     }
                     CloseDbConnection(dbConnection);
@@ -341,6 +366,25 @@ namespace Jc.Core
                 }
             }
             return rowCount;
+        }
+
+        /// <summary>
+        /// 异步批量添加数据
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="list">实体对象 List</param>
+        /// <param name="select">查询属性</param>
+        /// <param name="progress">进度通知</param>
+        /// <param name="tableNamePfx">表名称参数.如果TableAttr设置Name.则根据Name格式化</param>
+        public AfterDto<int> AddListSync<T>(List<T> list, Expression<Func<T, object>> select = null,IProgress<double> progress = null, string tableNamePfx = null) where T : class, new()
+        {
+            AfterDto<int> after = new AfterDto<int>();
+            Task t = new Task(()=> {
+                int rowCount = AddList(list,select,progress,tableNamePfx);
+                after.DoAfter(rowCount);
+            });
+            t.Start();
+            return after;
         }
 
         /// <summary>
@@ -368,13 +412,6 @@ namespace Jc.Core
 
             DtoMapping dtoDbMapping = DtoMappingHelper.GetDtoMapping<T>();
             List<PiMap> piMapList = DtoMappingHelper.GetPiMapList<T>(select);
-            if (dtoDbMapping.IsAutoIncrementPk)
-            {
-                if (piMapList.Contains(dtoDbMapping.PkMap))
-                {
-                    piMapList.Remove(dtoDbMapping.PkMap);
-                }
-            }
             using (DbCommand dbCommand = dbProvider.GetUpdateDbCmd(dto, piMapList, tableNamePfx))
             {
                 try
@@ -395,27 +432,26 @@ namespace Jc.Core
             }
             return rowCount;
         }
-
-
+        
         /// <summary>
         /// 更新数据对象
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="list">实体对象</param>
         /// <param name="select">更新属性</param>
+        /// <param name="progress">进度通知</param>
         /// <param name="tableNamePfx">表名称参数.如果TableAttr设置Name.则根据Name格式化</param>
-        public int UpdateList<T>(List<T> list, Expression<Func<T, object>> select = null, string tableNamePfx = null) where T : class, new()
+        public int UpdateList<T>(List<T> list, Expression<Func<T, object>> select = null, IProgress<double> progress = null, string tableNamePfx = null) where T : class, new()
         {
             if (list == null || list.Count <= 0)
             {
                 return 0;
             }
-            int rowCount = 0;
-
+            int rowCount = 0;             
             DtoMapping dtoDbMapping = DtoMappingHelper.GetDtoMapping<T>();
             List<PiMap> piMapList = DtoMappingHelper.GetPiMapList<T>(select);
             if (dtoDbMapping.IsAutoIncrementPk)
-            {
+            {   //自增列Id不允许更新
                 if (piMapList.Contains(dtoDbMapping.PkMap))
                 {
                     piMapList.Remove(dtoDbMapping.PkMap);
@@ -438,11 +474,15 @@ namespace Jc.Core
                             {
                                 dbCommand.Connection = dbConnection;
                                 dbCommand.Transaction = transaction;
-                                rowCount = dbCommand.ExecuteNonQuery();
+                                rowCount += dbCommand.ExecuteNonQuery();
                                 transaction.Commit();
                                 transaction = dbConnection.BeginTransaction();
                             }
                             curOpList.Clear();
+                            if (progress != null)
+                            {
+                                progress.Report((i + 1) * 1.0 / list.Count);
+                            }
                         }
                     }
                     CloseDbConnection(dbConnection);
@@ -454,6 +494,25 @@ namespace Jc.Core
                 }
             }
             return rowCount;
+        }
+
+        /// <summary>
+        /// 异步批量更新数据
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="list">实体对象 List</param>
+        /// <param name="select">查询属性</param>
+        /// <param name="progress">进度通知</param>
+        /// <param name="tableNamePfx">表名称参数.如果TableAttr设置Name.则根据Name格式化</param>
+        public AfterDto<int> UpdateListSync<T>(List<T> list, Expression<Func<T, object>> select = null, IProgress<double> progress = null, string tableNamePfx = null) where T : class, new()
+        {
+            AfterDto<int> after = new AfterDto<int>();
+            Task t = new Task(() => {
+                int rowCount = UpdateList(list, select, progress, tableNamePfx);
+                after.DoAfter(rowCount);
+            });
+            t.Start();
+            return after;
         }
 
         /// <summary>
