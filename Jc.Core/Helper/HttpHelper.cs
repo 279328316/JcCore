@@ -15,6 +15,8 @@ namespace Jc.Core.Helper
 {
     /// <summary>
     /// 有关HTTP请求的辅助类
+    /// 如果需要解析中文GBK请在程序启动时注册Encoding 
+    /// 调用静态方法RegisterEncodingProvider
     /// </summary>
     public class HttpHelper
     {
@@ -53,7 +55,9 @@ namespace Jc.Core.Helper
         #region SetMethods
 
         /// <summary>
-        /// Ctor
+        /// 构造方法
+        /// 如果需要解析中文GBK请在程序启动时注册Encoding 
+        /// 调用静态方法RegisterEncodingProvider
         /// </summary>
         public HttpHelper()
         {
