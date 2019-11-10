@@ -9,7 +9,7 @@ namespace Jc.Core.TestApp.Test
         public void Test()
         {
             List<string> list = new List<string>() { null,"1",null,"Test"};
-            string str = list.ToString(",");
+            string str = list.ToString(",");            
         }
     }
 }

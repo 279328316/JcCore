@@ -22,7 +22,7 @@ namespace Jc.Core
         /// <returns></returns>
         public static string ToString(this IEnumerable enumAble,string splitStr,bool ignoreNull = true)
         {
-            string result = null;
+            string result = "";
             if(enumAble!=null)
             {
                 StringBuilder strBuilder = new StringBuilder();
@@ -44,15 +44,6 @@ namespace Jc.Core
                 result = strBuilder.ToString();
             }
             return result;
-        }
-        /// <summary>
-        /// Enum 枚举值 Name
-        /// </summary>
-        /// <param name="expr"></param>
-        /// <returns></returns>
-        public static string Name(this Enum enumValue)
-        {
-            return enumValue.ToString();
         }
     }
 }
