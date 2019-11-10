@@ -25,6 +25,7 @@ namespace Jc.Core
         /// <param name="obj">对象</param>
         /// <param name="setting">序列化设置 默认</param>
         /// <returns></returns>
+        [Obsolete("方法同SerializeObject")]
         public static string ObjToJson(object obj, JsonSerializerSettings setting = null)
         {
             return SerializeObject(obj, setting);
