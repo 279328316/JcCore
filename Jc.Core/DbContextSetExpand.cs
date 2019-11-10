@@ -216,9 +216,9 @@ namespace Jc.Core
             List<PiMap> piMapList = DtoMappingHelper.GetPiMapList<T>(select);
             if (dtoDbMapping.TableAttr.AutoCreate)
             {   //如果是自动建表
-                if (!CheckTableExists<T>())
+                if (!CheckTableExists<T>(tableNamePfx))
                 {
-                    CreateTable<T>();
+                    CreateTable<T>(tableNamePfx);
                 }
             }
             object pkValue = dtoDbMapping.PkMap.Pi.GetValue(dto);
@@ -306,9 +306,9 @@ namespace Jc.Core
             }
             if (dtoDbMapping.TableAttr.AutoCreate)
             {   //如果是自动建表
-                if (!CheckTableExists<T>())
+                if (!CheckTableExists<T>(tableNamePfx))
                 {
-                    CreateTable<T>();
+                    CreateTable<T>(tableNamePfx);
                 }
             }
             //因为参数有2100的限制

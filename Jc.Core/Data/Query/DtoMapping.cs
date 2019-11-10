@@ -31,7 +31,7 @@ namespace Jc.Core.Data.Query
         /// </summary>
         private string TableName
         {
-            get { return TableAttr.Name; }
+            get { return TableAttr?.Name; }
         }
 
         /// <summary>
@@ -62,12 +62,12 @@ namespace Jc.Core.Data.Query
                     }
                     if (pkFieldPair.Key == null)
                     {
-                        throw new Exception("未为表" + TableName + "设置主键.");
+                        throw new Exception($"未为表{TableName}设置主键.");
                     }
                     pkMap = piMapDic[pkFieldPair.Key];
                     if (pkMap == null)
                     {
-                        throw new Exception("未为表" + TableName + "设置主键.");
+                        throw new Exception($"未为表{TableName}设置主键.");
                     }
                 }
                 return pkMap;
@@ -114,24 +114,28 @@ namespace Jc.Core.Data.Query
         /// <returns></returns>
         public string GetTableName<T>(string tableNamePfx = null)
         {
-            string tableName = TableAttr.Name;
-            if (TableAttr.Variable)
+            string tableName = TableAttr?.Name;
+            if (!string.IsNullOrEmpty(tableName) && tableName.Contains("{0}"))
             {
                 ExHelper.ThrowIfNull(tableNamePfx, $"可变表名称,对象{typeof(T).Name}传入动态参数不能为空.");
-                if (string.IsNullOrEmpty(tableName) && !tableName.Contains("{0}"))
-                {   //如果表名称为空或未设置填充参数{0},则直接使用传入参数tableNamePfx作为表名
+                tableName = string.Format(tableName, tableNamePfx);
+            }
+            else if (!string.IsNullOrEmpty(tableName) && !tableName.Contains("{0}"))
+            {   //不可变表名称 如果传入参数不为空,以传入参数作为表名称
+                if(!string.IsNullOrEmpty(tableNamePfx))
+                {
                     tableName = tableNamePfx;
                 }
-                else
-                {
-                    tableName = string.Format(tableName, tableNamePfx);
-                }
             }
-            else
-            {   //如果不可变表名称,传入tableNamePfx,则使用用户定义表名称
+            else if(string.IsNullOrEmpty(tableName))
+            {   //未设置表名称 如果传入参数不为空,以传入参数作为表名称
                 if (!string.IsNullOrEmpty(tableNamePfx))
                 {
                     tableName = tableNamePfx;
+                }
+                else
+                {   //未设置表名称,且传入参数为空.则以类名称作为表名称
+                    tableName = typeof(T).Name;
                 }
             }
             return tableName;
