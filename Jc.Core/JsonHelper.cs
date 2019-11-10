@@ -20,7 +20,7 @@ namespace Jc.Core
     public class JsonHelper
     {
         /// <summary>
-        /// 序列化方法
+        /// 序列化方法 同SerializeObject
         /// </summary>
         /// <param name="obj">对象</param>
         /// <param name="setting">序列化设置 默认</param>
@@ -88,7 +88,7 @@ namespace Jc.Core
         /// <param name="filePath">文件路径</param>
         /// <param name="setting">序列化设置 默认</param>
         /// <returns></returns>
-        public static string SerializeToFile(object obj,string filePath, JsonSerializerSettings setting = null)
+        public static string SerializeObjectToFile(object obj,string filePath, JsonSerializerSettings setting = null)
         {
             string result = "";
             try
@@ -124,7 +124,7 @@ namespace Jc.Core
         /// <typeparam name="T"></typeparam>
         /// <param name="filePath">文件路径</param>
         /// <returns></returns>
-        public static T DeserializeFromFile<T>(string filePath)
+        public static T DeserializeObjectFromFile<T>(string filePath)
         {
             T obj = default(T);
             try
