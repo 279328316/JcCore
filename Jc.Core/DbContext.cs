@@ -28,15 +28,39 @@ namespace Jc.Core
         private string connectString;
         private DatabaseType dbType;
         private DbProvider dbProvider;    //DbProvider
-        internal DbConnection dbConnection;  //dbConnection 
-        internal bool isTransaction = false; //是否为事务
-        
+
+        internal string subTablePfx = null;  //分表TableName后缀
+        internal Type subTableType = null;   //分表操作类型
+
         /// <summary>
         /// Ctor
         /// <param name="connectString">数据库连接串或数据库名称</param>
         /// <param name="dbType">数据库类型</param>
         /// </summary>
         internal DbContext(string connectString, DatabaseType dbType = DatabaseType.MsSql)
+        {
+            InitDbContext(connectString, dbType);
+        }
+
+
+        /// <summary>
+        /// 分表操作使用Ctor
+        /// <param name="connectString">数据库连接串或数据库名称</param>
+        /// <param name="dbType">数据库类型</param>
+        /// <param name="subTablePfx">分表参数</param>
+        /// <param name="type">分表操作对象类型</param>
+        /// </summary>
+        internal DbContext(string connectString, DatabaseType dbType = DatabaseType.MsSql,string subTablePfx = null,Type type = null)
+        {
+            InitDbContext(connectString, dbType);
+        }
+
+        /// <summary>
+        /// 初始化DbContext
+        /// </summary>
+        /// <param name="connectString"></param>
+        /// <param name="dbType"></param>
+        private void InitDbContext(string connectString, DatabaseType dbType = DatabaseType.MsSql)
         {
             this.connectString = connectString;
             this.dbType = dbType;
@@ -66,18 +90,7 @@ namespace Jc.Core
                 }
             }
         }
-
-        /// <summary>
-        /// 关闭连接
-        /// </summary>
-        ~DbContext()
-        {
-            if (isTransaction)
-            {
-                throw new Exception("未正确提交的事务,请检查.");
-            }
-        }
-
+        
         /// <summary>
         /// 创建DbContext
         /// </summary>
@@ -155,16 +168,9 @@ namespace Jc.Core
         /// 获取DbConnection
         /// </summary>
         /// <returns></returns>
-        internal DbConnection GetDbConnection()
+        internal virtual DbConnection GetDbConnection()
         {
-            if (isTransaction)
-            {
-                return dbConnection;
-            }
-            else
-            {
-                return dbProvider.CreateDbConnection(connectString);
-            }
+            return dbProvider.CreateDbConnection(connectString);            
         }
         
         /// <summary>
@@ -249,8 +255,29 @@ namespace Jc.Core
         /// <returns></returns>
         public DbTransContext GetTransDbContext()
         {
-            DbTransContext dbContext = new DbTransContext(this.connectString,this.dbType);
+            DbTransContext dbContext = new DbTransContext(this.connectString,this.dbType,this.subTablePfx,this.subTableType);
             return dbContext;
+        }
+
+        /// <summary>
+        /// 设置分表dbContext
+        /// 设置的DbContext只能用于本次指定分表操作.
+        /// 需要为操作对象设置可变表名称.
+        /// 如TableAttr的Name为Data{0}.tablePfx参数为2018.则表名称为Data2018
+        /// </summary>
+        /// <typeparam name="T">操作对象泛型</typeparam>
+        /// <param name="subTablePfx">分表参数</param>
+        /// <returns>返回subTableDbContext.只能用于指定分表操作.</returns>
+        public DbContext SetSubTable<T>(string subTablePfx)
+        {
+            DtoMapping dtoDbMapping = DtoMappingHelper.GetDtoMapping<T>();
+            string tableName = dtoDbMapping.TableAttr.Name;
+            if (string.IsNullOrEmpty(tableName) || tableName.Contains("{0}"))
+            {
+                throw new Exception("必须为分表对象指定包含{0}参数的TableName属性");
+            }
+            DbContext subTableDbContext = new DbContext(this.connectString, this.dbType, subTablePfx,typeof(T));
+            return subTableDbContext;
         }
 
         /// <summary>
@@ -258,7 +285,6 @@ namespace Jc.Core
         /// </summary>
         internal void CloseDbConnection(DbConnection connection)
         {
-            if (isTransaction) return;  //如果开启了事务,不关闭连接
             if (connection != null) { try { connection.Close(); connection.Dispose(); } catch { } }
         }
 

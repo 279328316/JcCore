@@ -120,23 +120,9 @@ namespace Jc.Core.Data.Query
                 ExHelper.ThrowIfNull(tableNamePfx, $"可变表名称,对象{typeof(T).Name}传入动态参数不能为空.");
                 tableName = string.Format(tableName, tableNamePfx);
             }
-            else if (!string.IsNullOrEmpty(tableName) && !tableName.Contains("{0}"))
-            {   //不可变表名称 如果传入参数不为空,以传入参数作为表名称
-                if(!string.IsNullOrEmpty(tableNamePfx))
-                {
-                    tableName = tableNamePfx;
-                }
-            }
             else if(string.IsNullOrEmpty(tableName))
-            {   //未设置表名称 如果传入参数不为空,以传入参数作为表名称
-                if (!string.IsNullOrEmpty(tableNamePfx))
-                {
-                    tableName = tableNamePfx;
-                }
-                else
-                {   //未设置表名称,且传入参数为空.则以类名称作为表名称
-                    tableName = typeof(T).Name;
-                }
+            {   //未设置表名称.则以类名称作为表名称
+                tableName = typeof(T).Name;
             }
             return tableName;
         }

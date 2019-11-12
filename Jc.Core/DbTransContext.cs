@@ -16,24 +16,48 @@ using System.Data.Common;
 namespace Jc.Core
 {
     /// <summary>
-    /// DtoBase INotifyPropertyChanged
+    /// 事务DbContext
+    /// 事务需要明确提交或撤回
     /// </summary>
     public sealed class DbTransContext : DbContext
     {
+        internal bool isTransaction = false; //是否为事务
+        internal DbConnection transDbConnection;  //dbConnection
+
         private DbTransaction dbTransaction;//事务使用
 
-        internal DbTransContext(string connectString, DatabaseType dbType = DatabaseType.MsSql):base(connectString,dbType)
+        internal DbTransContext(string connectString, DatabaseType dbType = DatabaseType.MsSql,
+                                string subTablePfx = null, Type subTableType = null) :base(connectString,dbType)
         {
+            this.subTablePfx = subTablePfx;
+            this.subTableType = subTableType;
             BeginTrans();
+        }
+
+        /// <summary>
+        /// 关闭连接
+        /// </summary>
+        ~DbTransContext()
+        {
+            if (isTransaction)
+            {
+                //RollbackTrans();
+                throw new Exception("未正确处理的事务,需要明确提交或撤回.");
+            }
+        }
+
+        internal override DbConnection GetDbConnection()
+        {
+            return transDbConnection;
         }
 
         /// <summary>
         /// 开启事务
         /// </summary>
-        internal void BeginTrans()
+        private void BeginTrans()
         {
-            this.dbConnection = GetDbConnection();
-            dbTransaction = dbConnection.BeginTransaction();
+            this.transDbConnection = base.GetDbConnection();
+            dbTransaction = transDbConnection.BeginTransaction();
             isTransaction = true;
         }
 
@@ -46,7 +70,7 @@ namespace Jc.Core
             {
                 dbTransaction.Rollback();
                 dbTransaction.Dispose();
-                if (dbConnection != null) { try { dbConnection.Close(); } catch { } }
+                if (transDbConnection != null) { try { transDbConnection.Close(); } catch { } }
                 isTransaction = false;
             }
             else
@@ -64,7 +88,7 @@ namespace Jc.Core
             {
                 dbTransaction.Commit();
                 dbTransaction.Dispose();
-                if (dbConnection != null) { try { dbConnection.Close(); } catch { } }
+                if (transDbConnection != null) { try { transDbConnection.Close(); } catch { } }
                 isTransaction = false;
             }
             else

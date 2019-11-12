@@ -603,7 +603,7 @@ namespace Jc.Core
         /// <param name="where">删除条件</param>
         public int Delete<T>(Expression<Func<T, bool>> where) where T : class, new()
         {
-            return Delete<T>(where,null);
+            return Delete<T>(where);
         }
 
         /// <summary>
@@ -611,13 +611,17 @@ namespace Jc.Core
         /// </summary>
         /// <param name="where">删除条件</param>
         /// <param name="tableNamePfx">表名称参数.如果TableAttr设置Name.则根据Name格式化</param>
-        public int Delete<T>(Expression<Func<T, bool>> where, string tableNamePfx) where T : class, new()
+        public int Delete<T>(Expression<Func<T, bool>> where) where T : class, new()
         {
             ExHelper.ThrowIfNull(where, "删除条件对象不能为空.");
-
+            string subTablePfx = null;
+            if (typeof(T) == this.subTableType)
+            {   // 只有当前分表对象使用分表变量
+                subTablePfx = this.subTablePfx;
+            }
             int rowCount = 0;
             QueryFilter filter = QueryFilterHelper.GetFilter(where);
-            using (DbCommand dbCommand = dbProvider.GetDeleteDbCmd<T>(filter, tableNamePfx))
+            using (DbCommand dbCommand = dbProvider.GetDeleteDbCmd<T>(filter, subTablePfx))
             {
                 try
                 {
