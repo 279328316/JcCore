@@ -6,8 +6,8 @@ namespace Jc.Core.TestApp
     /// <summary>
     /// User Dto
     /// </summary>
-    [Table(Name = "t_User{0}", DisplayText = "",AutoCreate = true)]
-    public class UserDto
+    [Table(Name = "t_SubTbUser{0}", DisplayText = "",AutoCreate = true)]
+    public class SubTbUserDto
     {
         #region Properties
         /// <summary>

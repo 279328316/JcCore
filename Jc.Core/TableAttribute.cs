@@ -27,11 +27,11 @@ namespace Jc.Core
 
         /// <summary>
         /// 表名称
-        /// 1.如果设置了表名称中存在变量{0},则表名称可变.在使用时,请传入tableNamePfx参数
-        ///   如Name为Data{0}.tableNamePfx参数为2018.则表名称为Data2018
-        /// 3.如果未设置Name,将使用传入tableNamePfx参数作为表名称.
+        /// 1.如果设置了表名称中存在变量{0},则表名称可变.在使用时,请传入subTableArg参数
+        ///   如Name为Data{0}.subTableArg参数为2018.则表名称为Data2018
+        /// 3.如果未设置Name,将使用传入subTableArg参数作为表名称.
         /// 4.可变表一般为分表情况下使用.设置表AutoCreate属性为true.在插入数据时会自动创建表.
-        /// 5.如果表名称为空或未设置填充参数{0},则直接使用传入参数tableNamePfx作为表名
+        /// 5.如果表名称为空或未设置填充参数{0},则直接使用传入参数subTableArg作为表名
         /// </summary>
         public string Name { get; set; }
 

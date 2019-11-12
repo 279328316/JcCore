@@ -90,9 +90,9 @@ namespace Jc.Core.Data
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="filter">过滤条件</param>
-        /// <param name="tableNamePfx">表名称,如果为空,则使用T对应表名称</param>
+        /// <param name="subTableArg">表名称,如果为空,则使用T对应表名称</param>
         /// <returns></returns>
-        public override DbCommand GetQueryRecordsPageDbCommand<T>(QueryFilter filter, string tableNamePfx = null)
+        public override DbCommand GetQueryRecordsPageDbCommand<T>(QueryFilter filter, string subTableArg = null)
         {
             DbCommand dbCommand = CreateDbCommand();
 
@@ -136,7 +136,7 @@ namespace Jc.Core.Data
                     dbCommand.Parameters.Add(dbParameter);
                 }
             }
-            dbCommand.CommandText = string.Format(sqlStr, dtoDbMapping.GetTableName<T>(tableNamePfx), selectParams, dtoDbMapping.PkMap.FieldName);
+            dbCommand.CommandText = string.Format(sqlStr, dtoDbMapping.GetTableName<T>(subTableArg), selectParams, dtoDbMapping.PkMap.FieldName);
             return dbCommand;
         }
 
@@ -144,12 +144,12 @@ namespace Jc.Core.Data
         /// 获取建表DbCommand
         /// </summary>
         /// <typeparam name="T"></typeparam>
-        /// <param name="tableNamePfx">表名称,如果为空,则使用T对应表名称</param>
+        /// <param name="subTableArg">表名称,如果为空,则使用T对应表名称</param>
         /// <returns></returns>
-        public override DbCommand GetCreateTableDbCommand<T>(string tableNamePfx = null)
+        public override DbCommand GetCreateTableDbCommand<T>(string subTableArg = null)
         {
             DbCommand dbCommand = CreateDbCommand();
-            dbCommand.CommandText = GetCreateTableSql<T>(tableNamePfx);
+            dbCommand.CommandText = GetCreateTableSql<T>(subTableArg);
             return dbCommand;
         }
 
@@ -211,13 +211,13 @@ namespace Jc.Core.Data
         /// 获取检查表是否存在DbCommand
         /// </summary>
         /// <typeparam name="T"></typeparam>
-        /// <param name="tableNamePfx">表名称,如果为空,则使用T对应表名称</param>
+        /// <param name="subTableArg">表名称,如果为空,则使用T对应表名称</param>
         /// <returns></returns>
-        public override DbCommand GetCheckTableExistsDbCommand<T>(string tableNamePfx = null)
+        public override DbCommand GetCheckTableExistsDbCommand<T>(string subTableArg = null)
         {
             DbCommand dbCommand = CreateDbCommand();
             DtoMapping dtoDbMapping = DtoMappingHelper.GetDtoMapping<T>();
-            string tableName = dtoDbMapping.GetTableName<T>(tableNamePfx);
+            string tableName = dtoDbMapping.GetTableName<T>(subTableArg);
             dbCommand.CommandText = $"Select * from information_schema.tables where table_schema='public' and table_type='BASE TABLE' and table_name='{tableName}';";
             return dbCommand;
         }
@@ -226,14 +226,14 @@ namespace Jc.Core.Data
         /// 获取建表Sql
         /// </summary>
         /// <typeparam name="T"></typeparam>
-        /// <param name="tableNamePfx">表名称,如果为空,则使用T对应表名称</param>
+        /// <param name="subTableArg">表名称,如果为空,则使用T对应表名称</param>
         /// <returns></returns>
-        public override string GetCreateTableSql<T>(string tableNamePfx = null)
+        public override string GetCreateTableSql<T>(string subTableArg = null)
         {
             //表名 查询字段名 主键字段名
             DtoMapping dtoDbMapping = DtoMappingHelper.GetDtoMapping<T>();
             List<PiMap> piMapList = DtoMappingHelper.GetPiMapList<T>();
-            string tableName = dtoDbMapping.GetTableName<T>(tableNamePfx);            
+            string tableName = dtoDbMapping.GetTableName<T>(subTableArg);            
             StringBuilder sqlBuilder = new StringBuilder();
             sqlBuilder.Append($"Create table public.{tableName}(\r\n");
             for (int i = 0; i < piMapList.Count; i++)

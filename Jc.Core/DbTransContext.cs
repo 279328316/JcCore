@@ -27,9 +27,9 @@ namespace Jc.Core
         private DbTransaction dbTransaction;//事务使用
 
         internal DbTransContext(string connectString, DatabaseType dbType = DatabaseType.MsSql,
-                                string subTablePfx = null, Type subTableType = null) :base(connectString,dbType)
+                                string subTableArg = null, Type subTableType = null) :base(connectString,dbType)
         {
-            this.subTablePfx = subTablePfx;
+            this.subTableArg = subTableArg;
             this.subTableType = subTableType;
             BeginTrans();
         }

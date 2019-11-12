@@ -21,7 +21,7 @@ namespace Jc.Core
     {
         #region Fields
         private DbContext dbContext = null;
-        string tableNamePfx;    //表名称参数或表全称
+        string subTableArg;    //表名称参数
         Pager pager;
         List<OrderByClause> orderByClauseList = new List<OrderByClause>();
         Expression<Func<T, bool>> query = null;
@@ -59,18 +59,13 @@ namespace Jc.Core
         #region Methods
 
         /// <summary>
-        /// 设置查询表名称.
-        /// 1.如果设置了Variable=true,则表名称可变.在使用时,请传入tableNamePfx参数
-        /// 2.如TableAttr中Name为Data{0}.tableNamePfx参数为2018.则表名称为Data2018
-        /// 3.如果未设置Name,将使用传入tableNamePfx参数作为表名称.
-        /// 4.可变表一般为分表情况下使用.设置表AutoCreate属性为true.在插入数据时会自动创建表.
-        /// 5.如果表名称为空或未设置填充参数{0},则直接使用传入参数tableNamePfx作为表名
+        /// 分表参数
         /// </summary>
-        /// <param name="tableNamePfx">表名称参数或表全称</param>
+        /// <param name="subTableArg">分表参数</param>
         /// <returns></returns>
-        public IQuery<T> FromTable(string tableNamePfx)
+        public IQuery<T> FromTable(string subTableArg)
         {
-            this.tableNamePfx = tableNamePfx;
+            this.subTableArg = subTableArg;
             return this;
         }
 
@@ -170,7 +165,7 @@ namespace Jc.Core
         {
             QueryFilter filter = QueryFilterHelper.GetFilter(select, query, orderByClauseList, unSelect);
             T dto = null;
-            using (DbCommand dbCommand = dbContext.DbProvider.GetQueryDbCommand<T>(filter, tableNamePfx))
+            using (DbCommand dbCommand = dbContext.DbProvider.GetQueryDbCommand<T>(filter, subTableArg))
             {
                 try
                 {
@@ -202,7 +197,7 @@ namespace Jc.Core
             QueryFilter filter = QueryFilterHelper.GetFilter(select, query);
 
             decimal result = 0;
-            using (DbCommand dbCommand = dbContext.DbProvider.GetSumDbCommand<T>(filter, tableNamePfx))
+            using (DbCommand dbCommand = dbContext.DbProvider.GetSumDbCommand<T>(filter, subTableArg))
             {
                 try
                 {
@@ -236,7 +231,7 @@ namespace Jc.Core
             QueryFilter filter = QueryFilterHelper.GetFilter(this.query);
 
             int result = 0;
-            using (DbCommand dbCommand = dbContext.DbProvider.GetCountDbCommand<T>(filter, tableNamePfx))
+            using (DbCommand dbCommand = dbContext.DbProvider.GetCountDbCommand<T>(filter, subTableArg))
             {
                 try
                 {
@@ -269,7 +264,7 @@ namespace Jc.Core
                 filter.InitPage(pager.PageIndex, pager.PageSize);
             }
             List<T> list = new List<T>();
-            using (DbCommand dbCommand = this.dbContext.DbProvider.GetQueryDbCommand<T>(filter, tableNamePfx))
+            using (DbCommand dbCommand = this.dbContext.DbProvider.GetQueryDbCommand<T>(filter, subTableArg))
             {
                 try
                 {
@@ -307,7 +302,7 @@ namespace Jc.Core
                 }
                 else
                 {
-                    dbCommand = dbContext.DbProvider.GetQueryRecordsPageDbCommand<T>(filter, tableNamePfx);
+                    dbCommand = dbContext.DbProvider.GetQueryRecordsPageDbCommand<T>(filter, subTableArg);
                 }
                 dbCommand.Connection = dbContext.GetDbConnection();
                 DbDataReader dr = dbCommand.ExecuteReader();
@@ -316,7 +311,7 @@ namespace Jc.Core
                 list = dt.ToList<T>();
 
                 int totalCount = 0;
-                DbCommand getRecCountDbCommand = dbContext.DbProvider.GetRecCountDbCommand<T>(filter, tableNamePfx);
+                DbCommand getRecCountDbCommand = dbContext.DbProvider.GetRecCountDbCommand<T>(filter, subTableArg);
                 getRecCountDbCommand.Connection = dbCommand.Connection;
                 object valueObj = getRecCountDbCommand.ExecuteScalar();
                 if (valueObj != null && valueObj != DBNull.Value)

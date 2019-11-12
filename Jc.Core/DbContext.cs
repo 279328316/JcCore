@@ -29,7 +29,7 @@ namespace Jc.Core
         private DatabaseType dbType;
         private DbProvider dbProvider;    //DbProvider
 
-        internal string subTablePfx = null;  //分表TableName后缀
+        internal string subTableArg = null;  //分表TableName后缀
         internal Type subTableType = null;   //分表操作类型
 
         /// <summary>
@@ -47,12 +47,14 @@ namespace Jc.Core
         /// 分表操作使用Ctor
         /// <param name="connectString">数据库连接串或数据库名称</param>
         /// <param name="dbType">数据库类型</param>
-        /// <param name="subTablePfx">分表参数</param>
-        /// <param name="type">分表操作对象类型</param>
+        /// <param name="subTableArg">分表参数</param>
+        /// <param name="subTableType">分表操作对象类型</param>
         /// </summary>
-        internal DbContext(string connectString, DatabaseType dbType = DatabaseType.MsSql,string subTablePfx = null,Type type = null)
+        internal DbContext(string connectString, DatabaseType dbType = DatabaseType.MsSql,string subTableArg = null,Type subTableType = null)
         {
             InitDbContext(connectString, dbType);
+            this.subTableArg = subTableArg;
+            this.subTableType = subTableType;
         }
 
         /// <summary>
@@ -174,6 +176,23 @@ namespace Jc.Core
         }
         
         /// <summary>
+        /// 获取分表表名参数
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <returns></returns>
+        private string GetSubTableArg<T>()
+        {
+            if(this.subTableType !=null && this.subTableType == typeof(T))
+            {
+                return this.subTableArg;
+            }
+            else
+            {
+                return null;
+            }
+        }
+
+        /// <summary>
         /// 执行客户命令
         /// </summary>
         /// <returns>受影响记录数</returns>
@@ -255,7 +274,7 @@ namespace Jc.Core
         /// <returns></returns>
         public DbTransContext GetTransDbContext()
         {
-            DbTransContext dbContext = new DbTransContext(this.connectString,this.dbType,this.subTablePfx,this.subTableType);
+            DbTransContext dbContext = new DbTransContext(this.connectString,this.dbType,this.subTableArg, this.subTableType);
             return dbContext;
         }
 
@@ -266,17 +285,17 @@ namespace Jc.Core
         /// 如TableAttr的Name为Data{0}.tablePfx参数为2018.则表名称为Data2018
         /// </summary>
         /// <typeparam name="T">操作对象泛型</typeparam>
-        /// <param name="subTablePfx">分表参数</param>
+        /// <param name="subTableArg">分表参数</param>
         /// <returns>返回subTableDbContext.只能用于指定分表操作.</returns>
-        public DbContext SetSubTable<T>(string subTablePfx)
+        public DbContext SetSubTable<T>(string subTableArg)
         {
             DtoMapping dtoDbMapping = DtoMappingHelper.GetDtoMapping<T>();
             string tableName = dtoDbMapping.TableAttr.Name;
-            if (string.IsNullOrEmpty(tableName) || tableName.Contains("{0}"))
+            if (string.IsNullOrEmpty(tableName) || !tableName.Contains("{0}"))
             {
-                throw new Exception("必须为分表对象指定包含{0}参数的TableName属性");
+                throw new Exception("必须为分表对象" + typeof(T).Name + "指定包含{0}参数的TableName属性");
             }
-            DbContext subTableDbContext = new DbContext(this.connectString, this.dbType, subTablePfx,typeof(T));
+            DbContext subTableDbContext = new DbContext(this.connectString, this.dbType, subTableArg,typeof(T));
             return subTableDbContext;
         }
 

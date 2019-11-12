@@ -103,7 +103,7 @@ namespace Jc.Core.Data.Query
         public TableAttribute TableAttr { get { return tableAttr; } set { tableAttr = value; } }
 
         /// <summary>
-        /// EntityConvertorDelegate 实际值为 EntityConvertorDelegate<T>
+        /// EntityConvertorDelegate 实际值为 EntityConvertorDelegate(T)
         /// 使用时,再设置
         /// </summary>
         public object EntityConvertor { get => entityConvertor; set => entityConvertor = value; }
@@ -112,13 +112,13 @@ namespace Jc.Core.Data.Query
         /// 获取表名称
         /// </summary>
         /// <returns></returns>
-        public string GetTableName<T>(string tableNamePfx = null)
+        public string GetTableName<T>(string subTableArg = null)
         {
             string tableName = TableAttr?.Name;
             if (!string.IsNullOrEmpty(tableName) && tableName.Contains("{0}"))
             {
-                ExHelper.ThrowIfNull(tableNamePfx, $"可变表名称,对象{typeof(T).Name}传入动态参数不能为空.");
-                tableName = string.Format(tableName, tableNamePfx);
+                ExHelper.ThrowIfNull(subTableArg, $"对象{typeof(T).Name},分表参数不能为空,请使用分表方法SetSubTable");
+                tableName = string.Format(tableName, subTableArg);
             }
             else if(string.IsNullOrEmpty(tableName))
             {   //未设置表名称.则以类名称作为表名称

@@ -133,9 +133,9 @@ namespace Jc.Core.Data
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="filter">过滤条件</param>
-        /// <param name="tableNamePfx">表名称参数.如果TableAttr设置Name.则根据Name格式化</param>
+        /// <param name="subTableArg">表名称参数.如果TableAttr设置Name.则根据Name格式化</param>
         /// <returns></returns>
-        public abstract DbCommand GetQueryRecordsPageDbCommand<T>(QueryFilter filter, string tableNamePfx = null);
+        public abstract DbCommand GetQueryRecordsPageDbCommand<T>(QueryFilter filter, string subTableArg = null);
 
         /// <summary>
         /// 获取检查表是否存在DbCommand
@@ -183,9 +183,9 @@ namespace Jc.Core.Data
         /// <typeparam name="T"></typeparam>
         /// <param name="dto"></param>
         /// <param name="piMapList">查询属性MapList</param>
-        /// <param name="tableNamePfx">表名称参数.如果TableAttr设置Name.则根据Name格式化</param>
+        /// <param name="subTableArg">表名称参数.如果TableAttr设置Name.则根据Name格式化</param>
         /// <returns></returns>
-        internal DbCommand GetInsertDbCmd<T>(T dto, List<PiMap> piMapList, string tableNamePfx = null) where T : class, new()
+        internal DbCommand GetInsertDbCmd<T>(T dto, List<PiMap> piMapList, string subTableArg = null) where T : class, new()
         {
             DbCommand dbCommand = CreateDbCommand();
             DtoMapping dtoDbMapping = DtoMappingHelper.GetDtoMapping<T>();
@@ -225,7 +225,7 @@ namespace Jc.Core.Data
                 dbParameter.DbType = DbTypeConvertor.TypeToDbType(piMap.PropertyType);
                 dbCommand.Parameters.Add(dbParameter);
             }
-            dbCommand.CommandText = string.Format(sqlStr, dtoDbMapping.GetTableName<T>(tableNamePfx), fieldParams, valueParams);
+            dbCommand.CommandText = string.Format(sqlStr, dtoDbMapping.GetTableName<T>(subTableArg), fieldParams, valueParams);
             #endregion
             return dbCommand;
         }
@@ -237,9 +237,9 @@ namespace Jc.Core.Data
         /// <typeparam name="T"></typeparam>
         /// <param name="list"></param>
         /// <param name="piMapList">查询属性MapList</param>
-        /// <param name="tableNamePfx">表名称参数.如果TableAttr设置Name.则根据Name格式化</param>
+        /// <param name="subTableArg">表名称参数.如果TableAttr设置Name.则根据Name格式化</param>
         /// <returns></returns>
-        internal DbCommand GetInsertDbCmd<T>(List<T> list, List<PiMap> piMapList, string tableNamePfx = null) where T : class, new()
+        internal DbCommand GetInsertDbCmd<T>(List<T> list, List<PiMap> piMapList, string subTableArg = null) where T : class, new()
         {
             DbCommand dbCommand = CreateDbCommand();
             DtoMapping dtoDbMapping = DtoMappingHelper.GetDtoMapping<T>();
@@ -283,7 +283,7 @@ namespace Jc.Core.Data
                 strBuilder.Append("),");
             }
             valueParams = strBuilder.ToString().TrimEnd(',');
-            dbCommand.CommandText = string.Format(sqlStr, dtoDbMapping.GetTableName<T>(tableNamePfx), fieldParams, valueParams);
+            dbCommand.CommandText = string.Format(sqlStr, dtoDbMapping.GetTableName<T>(subTableArg), fieldParams, valueParams);
             #endregion
             return dbCommand;
         }
@@ -294,9 +294,9 @@ namespace Jc.Core.Data
         /// <typeparam name="T"></typeparam>
         /// <param name="dto"></param>
         /// <param name="piMapList">查询属性MapList</param>
-        /// <param name="tableNamePfx">表名称参数.如果TableAttr设置Name.则根据Name格式化</param>
+        /// <param name="subTableArg">表名称参数.如果TableAttr设置Name.则根据Name格式化</param>
         /// <returns></returns>
-        internal DbCommand GetImportDbCmd<T>(T dto, List<PiMap> piMapList, string tableNamePfx = null) where T : class, new()
+        internal DbCommand GetImportDbCmd<T>(T dto, List<PiMap> piMapList, string subTableArg = null) where T : class, new()
         {
             DbCommand dbCommand = CreateDbCommand();
             DtoMapping dtoDbMapping = DtoMappingHelper.GetDtoMapping<T>();
@@ -318,7 +318,7 @@ namespace Jc.Core.Data
                 dbParameter.DbType = DbTypeConvertor.TypeToDbType(piMap.PropertyType);
                 dbCommand.Parameters.Add(dbParameter);
             }
-            dbCommand.CommandText = string.Format(sqlStr, dtoDbMapping.GetTableName<T>(tableNamePfx), fieldParams, valueParams);
+            dbCommand.CommandText = string.Format(sqlStr, dtoDbMapping.GetTableName<T>(subTableArg), fieldParams, valueParams);
             #endregion
             return dbCommand;
         }
@@ -329,9 +329,9 @@ namespace Jc.Core.Data
         /// <typeparam name="T"></typeparam>
         /// <param name="dto"></param>
         /// <param name="piMapList">查询属性MapList</param>
-        /// <param name="tableNamePfx">表名称参数.如果TableAttr设置Name.则根据Name格式化</param>
+        /// <param name="subTableArg">表名称参数.如果TableAttr设置Name.则根据Name格式化</param>
         /// <returns></returns>
-        internal DbCommand GetUpdateDbCmd<T>(T dto, List<PiMap> piMapList, string tableNamePfx = null)
+        internal DbCommand GetUpdateDbCmd<T>(T dto, List<PiMap> piMapList, string subTableArg = null)
         {
             DbCommand dbCommand = CreateDbCommand();
             DtoMapping dtoDbMapping = DtoMappingHelper.GetDtoMapping<T>();
@@ -368,7 +368,7 @@ namespace Jc.Core.Data
             dbCommand.Parameters.Add(whereParameter);
             whereParams = $"{dtoDbMapping.PkMap.FieldName}={whereParameter.ParameterName}";
 
-            dbCommand.CommandText = string.Format(sqlStr, dtoDbMapping.GetTableName<T>(tableNamePfx), setParams, whereParams);
+            dbCommand.CommandText = string.Format(sqlStr, dtoDbMapping.GetTableName<T>(subTableArg), setParams, whereParams);
             #endregion
 
             return dbCommand;
@@ -380,9 +380,9 @@ namespace Jc.Core.Data
         /// <typeparam name="T"></typeparam>
         /// <param name="list"></param>
         /// <param name="piMapList">查询属性MapList</param>
-        /// <param name="tableNamePfx">表名称参数.如果TableAttr设置Name.则根据Name格式化</param>
+        /// <param name="subTableArg">表名称参数.如果TableAttr设置Name.则根据Name格式化</param>
         /// <returns></returns>
-        internal DbCommand GetUpdateDbCmd<T>(List<T> list, List<PiMap> piMapList, string tableNamePfx = null)
+        internal DbCommand GetUpdateDbCmd<T>(List<T> list, List<PiMap> piMapList, string subTableArg = null)
         {
             DbCommand dbCommand = CreateDbCommand();
             DtoMapping dtoDbMapping = DtoMappingHelper.GetDtoMapping<T>();
@@ -423,7 +423,7 @@ namespace Jc.Core.Data
                 dbCommand.Parameters.Add(whereParameter);
                 whereParams = $"{dtoDbMapping.PkMap.FieldName}={whereParameter.ParameterName}";
                 
-                string updateStr = string.Format(sqlStr, dtoDbMapping.GetTableName<T>(tableNamePfx), setParams, whereParams);
+                string updateStr = string.Format(sqlStr, dtoDbMapping.GetTableName<T>(subTableArg), setParams, whereParams);
                 strBuilder.Append(updateStr);
             }
             dbCommand.CommandText = strBuilder.ToString();
@@ -437,9 +437,9 @@ namespace Jc.Core.Data
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="dto"></param>
-        /// <param name="tableNamePfx">表名称参数.如果TableAttr设置Name.则根据Name格式化</param>
+        /// <param name="subTableArg">表名称参数.如果TableAttr设置Name.则根据Name格式化</param>
         /// <returns></returns>
-        internal DbCommand GetDeleteDbCmd<T>(T dto, string tableNamePfx = null)
+        internal DbCommand GetDeleteDbCmd<T>(T dto, string subTableArg = null)
         {
             DbCommand dbCommand = CreateDbCommand();
 
@@ -457,7 +457,7 @@ namespace Jc.Core.Data
             dbCommand.Parameters.Add(dbParameter);
 
             whereParams = dtoDbMapping.PkMap.FieldName + "=@" + dtoDbMapping.PkMap.FieldName;
-            dbCommand.CommandText = string.Format(sqlStr, dtoDbMapping.GetTableName<T>(tableNamePfx), whereParams);
+            dbCommand.CommandText = string.Format(sqlStr, dtoDbMapping.GetTableName<T>(subTableArg), whereParams);
             #endregion
 
             return dbCommand;
@@ -468,9 +468,9 @@ namespace Jc.Core.Data
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="filter">过滤条件</param>
-        /// <param name="tableNamePfx">表名称参数.如果TableAttr设置Name.则根据Name格式化</param>
+        /// <param name="subTableArg">表名称参数.如果TableAttr设置Name.则根据Name格式化</param>
         /// <returns></returns>
-        internal DbCommand GetDeleteDbCmd<T>(QueryFilter filter, string tableNamePfx = null)
+        internal DbCommand GetDeleteDbCmd<T>(QueryFilter filter, string subTableArg = null)
         {
             DbCommand dbCommand = CreateDbCommand();
 
@@ -495,7 +495,7 @@ namespace Jc.Core.Data
                 dbParameter.DbType = filter.FilterParameters[i].ParameterDbType;
                 dbCommand.Parameters.Add(dbParameter);
             }
-            dbCommand.CommandText = string.Format(sqlStr, dtoDbMapping.GetTableName<T>(tableNamePfx));
+            dbCommand.CommandText = string.Format(sqlStr, dtoDbMapping.GetTableName<T>(subTableArg));
             #endregion
 
             return dbCommand;
@@ -505,9 +505,9 @@ namespace Jc.Core.Data
         /// 获取删除DbCmd
         /// </summary>
         /// <typeparam name="T"></typeparam>
-        /// <param name="tableNamePfx">表名称参数.如果TableAttr设置Name.则根据Name格式化</param>
+        /// <param name="subTableArg">表名称参数.如果TableAttr设置Name.则根据Name格式化</param>
         /// <returns></returns>
-        internal DbCommand GetDeleteByIdDbCmd<T>(object pkValue, string tableNamePfx = null)
+        internal DbCommand GetDeleteByIdDbCmd<T>(object pkValue, string subTableArg = null)
         {
             DbCommand dbCommand = CreateDbCommand();
 
@@ -525,7 +525,7 @@ namespace Jc.Core.Data
             dbCommand.Parameters.Add(dbParameter);
 
             whereParams = dtoDbMapping.PkMap.FieldName + "=@" + dtoDbMapping.PkMap.FieldName;
-            dbCommand.CommandText = string.Format(sqlStr, dtoDbMapping.GetTableName<T>(tableNamePfx), whereParams);
+            dbCommand.CommandText = string.Format(sqlStr, dtoDbMapping.GetTableName<T>(subTableArg), whereParams);
             #endregion
 
             return dbCommand;
@@ -536,9 +536,9 @@ namespace Jc.Core.Data
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="filter"></param>
-        /// <param name="tableNamePfx">表名称参数.如果TableAttr设置Name.则根据Name格式化</param>
+        /// <param name="subTableArg">表名称参数.如果TableAttr设置Name.则根据Name格式化</param>
         /// <returns></returns>
-        internal DbCommand GetQueryDbCommand<T>(QueryFilter filter = null, string tableNamePfx = null)
+        internal DbCommand GetQueryDbCommand<T>(QueryFilter filter = null, string subTableArg = null)
         {
             DbCommand dbCommand = CreateDbCommand();
             string sqlStr = "Select {1} From {0}";
@@ -569,7 +569,7 @@ namespace Jc.Core.Data
                     dbCommand.Parameters.Add(dbParameter);
                 }
             }
-            dbCommand.CommandText = string.Format(sqlStr, dtoDbMapping.GetTableName<T>(tableNamePfx), selectParams);
+            dbCommand.CommandText = string.Format(sqlStr, dtoDbMapping.GetTableName<T>(subTableArg), selectParams);
             return dbCommand;
         }
         
@@ -579,9 +579,9 @@ namespace Jc.Core.Data
         /// <typeparam name="T"></typeparam>
         /// <param name="id"></param>
         /// <param name="piMapList">查询属性MapList</param>
-        /// <param name="tableNamePfx">表名称参数.如果TableAttr设置Name.则根据Name格式化</param>
+        /// <param name="subTableArg">表名称参数.如果TableAttr设置Name.则根据Name格式化</param>
         /// <returns></returns>
-        internal DbCommand GetQueryByIdDbCommand<T>(object id, List<PiMap> piMapList, string tableNamePfx = null)
+        internal DbCommand GetQueryByIdDbCommand<T>(object id, List<PiMap> piMapList, string subTableArg = null)
         {
             DbCommand dbCommand = CreateDbCommand();
             DtoMapping dtoDbMapping = DtoMappingHelper.GetDtoMapping<T>();
@@ -601,7 +601,7 @@ namespace Jc.Core.Data
 
             whereParams = dtoDbMapping.PkMap.FieldName + "=@" + dtoDbMapping.PkMap.FieldName;
 
-            dbCommand.CommandText = string.Format(sqlStr, dtoDbMapping.GetTableName<T>(tableNamePfx), selectParams, whereParams);
+            dbCommand.CommandText = string.Format(sqlStr, dtoDbMapping.GetTableName<T>(subTableArg), selectParams, whereParams);
             return dbCommand;
         }
 
@@ -610,9 +610,9 @@ namespace Jc.Core.Data
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="filter"></param>
-        /// <param name="tableNamePfx">表名称参数.如果TableAttr设置Name.则根据Name格式化</param>
+        /// <param name="subTableArg">表名称参数.如果TableAttr设置Name.则根据Name格式化</param>
         /// <returns></returns>
-        internal DbCommand GetSumDbCommand<T>(QueryFilter filter = null, string tableNamePfx = null)
+        internal DbCommand GetSumDbCommand<T>(QueryFilter filter = null, string subTableArg = null)
         {
             DbCommand dbCommand = CreateDbCommand();
             string sqlStr = "Select Sum{1} as Total From {0}";
@@ -640,7 +640,7 @@ namespace Jc.Core.Data
                     dbCommand.Parameters.Add(dbParameter);
                 }
             }
-            dbCommand.CommandText = string.Format(sqlStr, dtoDbMapping.GetTableName<T>(tableNamePfx), selectParams);
+            dbCommand.CommandText = string.Format(sqlStr, dtoDbMapping.GetTableName<T>(subTableArg), selectParams);
             return dbCommand;
         }
 
@@ -650,9 +650,9 @@ namespace Jc.Core.Data
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="filter"></param>
-        /// <param name="tableNamePfx">表名称参数.如果TableAttr设置Name.则根据Name格式化</param>
+        /// <param name="subTableArg">表名称参数.如果TableAttr设置Name.则根据Name格式化</param>
         /// <returns></returns>
-        internal DbCommand GetCountDbCommand<T>(QueryFilter filter = null, string tableNamePfx = null)
+        internal DbCommand GetCountDbCommand<T>(QueryFilter filter = null, string subTableArg = null)
         {
             DbCommand dbCommand = CreateDbCommand();
             string sqlStr = "Select Count(*) as RecCount From {0}";
@@ -674,7 +674,7 @@ namespace Jc.Core.Data
                     dbCommand.Parameters.Add(dbParameter);
                 }
             }
-            dbCommand.CommandText = string.Format(sqlStr, dtoDbMapping.GetTableName<T>(tableNamePfx), selectParams);
+            dbCommand.CommandText = string.Format(sqlStr, dtoDbMapping.GetTableName<T>(subTableArg), selectParams);
             return dbCommand;
         }
 
@@ -683,9 +683,9 @@ namespace Jc.Core.Data
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="filter"></param>
-        /// <param name="tableNamePfx">表名称参数.如果TableAttr设置Name.则根据Name格式化</param>
+        /// <param name="subTableArg">表名称参数.如果TableAttr设置Name.则根据Name格式化</param>
         /// <returns></returns>
-        internal DbCommand GetRecCountDbCommand<T>(QueryFilter filter, string tableNamePfx = null)
+        internal DbCommand GetRecCountDbCommand<T>(QueryFilter filter, string subTableArg = null)
         {
             DbCommand dbCommand = CreateDbCommand();
             string sqlStr = "Select Count(*) as RecCount From {0} {1}";
@@ -707,7 +707,7 @@ namespace Jc.Core.Data
                     dbCommand.Parameters.Add(dbParameter);
                 }
             }
-            dbCommand.CommandText = string.Format(sqlStr, dtoDbMapping.GetTableName<T>(tableNamePfx), queryStr);
+            dbCommand.CommandText = string.Format(sqlStr, dtoDbMapping.GetTableName<T>(subTableArg), queryStr);
             return dbCommand;
         }
 

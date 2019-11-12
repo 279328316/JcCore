@@ -175,29 +175,18 @@ namespace Jc.Core
             return IQuery<T>(nvCollection,operandSettings);            
         }
 
-        /// <summary>
-        /// 根据Id获取数据
-        /// </summary>
-        /// <param name="id">主键值</param>
-        /// <param name="tableNamePfx">表名称参数.如果TableAttr设置Name.则根据Name格式化</param>
-        /// <returns></returns>
-        public T GetById<T>(object id,string tableNamePfx) where T : class, new()
-        {
-            return GetById<T>(id, null, tableNamePfx);
-        }
 
         /// <summary>
         /// 根据Id获取数据
         /// </summary>
         /// <param name="id">主键值</param>
         /// <param name="select">查询属性</param>
-        /// <param name="tableNamePfx">表名称参数.如果TableAttr设置Name.则根据Name格式化</param>
         /// <returns></returns>
-        public T GetById<T>(object id,Expression<Func<T, object>> select = null, string tableNamePfx = null) where T : class, new()
+        public T GetById<T>(object id,Expression<Func<T, object>> select = null) where T : class, new()
         {
             T dto = null;
             List<PiMap> piMapList = DtoMappingHelper.GetPiMapList<T>(select);
-            using (DbCommand dbCommand = dbProvider.GetQueryByIdDbCommand<T>(id, piMapList, tableNamePfx))
+            using (DbCommand dbCommand = dbProvider.GetQueryByIdDbCommand<T>(id, piMapList, this.GetSubTableArg<T>()))
             {
                 try
                 {
@@ -223,24 +212,11 @@ namespace Jc.Core
         /// 获取单个对象
         /// </summary>
         /// <param name="where">查询条件</param>
-        /// <param name="tableNamePfx">表名称参数.如果TableAttr设置Name.则根据Name格式化</param>
-        /// <returns></returns>
-        public T Get<T>(Expression<Func<T, bool>> where, string tableNamePfx) where T : class, new()
-        {
-            return Get<T>(where, null, tableNamePfx);
-        }
-
-
-        /// <summary>
-        /// 获取单个对象
-        /// </summary>
-        /// <param name="where">查询条件</param>
         /// <param name="select">查询属性</param>
-        /// <param name="tableNamePfx">表名称参数.如果TableAttr设置Name.则根据Name格式化</param>
         /// <returns></returns>
-        public T Get<T>(Expression<Func<T, bool>> where = null, Expression<Func<T, object>> select = null, string tableNamePfx = null) where T : class, new()
+        public T Get<T>(Expression<Func<T, bool>> where = null, Expression<Func<T, object>> select = null) where T : class, new()
         {
-            IQuery<T> query = IQuery<T>().FromTable(tableNamePfx);
+            IQuery<T> query = IQuery<T>().FromTable(this.GetSubTableArg<T>());
             return query.Select(select).Where(where).FirstOrDefault();
         }
 
@@ -279,23 +255,11 @@ namespace Jc.Core
         /// 获取对象列表
         /// </summary>
         /// <param name="where">查询条件</param>
-        /// <param name="tableNamePfx">表名称参数.如果TableAttr设置Name.则根据Name格式化</param>
-        /// <returns></returns>
-        public List<T> GetList<T>(Expression<Func<T, bool>> where, string tableNamePfx) where T : class, new()
-        {
-            return GetList<T>(where, null,tableNamePfx);
-        }
-
-        /// <summary>
-        /// 获取对象列表
-        /// </summary>
-        /// <param name="where">查询条件</param>
         /// <param name="select">查询属性</param>
-        /// <param name="tableNamePfx">表名称参数.如果TableAttr设置Name.则根据Name格式化</param>
         /// <returns></returns>
-        public List<T> GetList<T>(Expression<Func<T, bool>> where = null, Expression<Func<T, object>> select = null, string tableNamePfx = null) where T : class, new()
+        public List<T> GetList<T>(Expression<Func<T, bool>> where = null, Expression<Func<T, object>> select = null) where T : class, new()
         {
-            IQuery<T> query = IQuery<T>().FromTable(tableNamePfx);
+            IQuery<T> query = IQuery<T>().FromTable(this.GetSubTableArg<T>());
             return query.Where(where).Select(select).ToList();
         }
 
@@ -306,11 +270,10 @@ namespace Jc.Core
         /// <param name="where">查询条件</param>
         /// <param name="sortExpr">排序属性</param>
         /// <param name="order">排序方向</param>
-        /// <param name="tableNamePfx">表名称参数.如果TableAttr设置Name.则根据Name格式化</param>
         /// <returns></returns>
-        public List<T> GetSortList<T>(Expression<Func<T, bool>> where,Expression<Func<T, object>> sortExpr, Sorting order = Sorting.Asc,string tableNamePfx = null) where T : class, new()
+        public List<T> GetSortList<T>(Expression<Func<T, bool>> where,Expression<Func<T, object>> sortExpr, Sorting order = Sorting.Asc) where T : class, new()
         {
-            IQuery<T> query = IQuery<T>().Where(where).FromTable(tableNamePfx);
+            IQuery<T> query = IQuery<T>().Where(where).FromTable(this.GetSubTableArg<T>());
             if (order == Sorting.Asc)
             {
                 query = query.OrderBy(sortExpr);
@@ -332,12 +295,11 @@ namespace Jc.Core
         /// <param name="pageSize">页大小</param>
         /// <param name="sortExpr">排序属性</param>
         /// <param name="order">排序方向</param>
-        /// <param name="tableNamePfx">表名称参数.如果TableAttr设置Name.则根据Name格式化</param>
         /// <returns></returns>
         public PageResult<T> GetPageList<T>(Expression<Func<T, bool>> where,
-            int pageIndex,int pageSize, Expression<Func<T, object>> sortExpr, Sorting order, string tableNamePfx = null) where T : class, new()
+            int pageIndex,int pageSize, Expression<Func<T, object>> sortExpr, Sorting order) where T : class, new()
         {
-            IQuery<T> query = IQuery<T>().Where(where).FromTable(tableNamePfx);
+            IQuery<T> query = IQuery<T>().Where(where).FromTable(this.GetSubTableArg<T>());
             if(order== Sorting.Asc)
             {
                 query = query.OrderBy(sortExpr);
@@ -393,12 +355,11 @@ namespace Jc.Core
         /// </summary>
         /// <param name="where">查询条件</param>
         /// <param name="select">查询属性(必须为可求和字段)</param>
-        /// <param name="tableNamePfx">表名称参数.如果TableAttr设置Name.则根据Name格式化</param>
         /// <returns></returns>
         public decimal Sum<T>(Expression<Func<T, object>> select = null,
-            Expression<Func<T, bool>> where = null, string tableNamePfx = null) where T : class, new()
+            Expression<Func<T, bool>> where = null) where T : class, new()
         {
-            IQuery<T> query = IQuery<T>().FromTable(tableNamePfx);
+            IQuery<T> query = IQuery<T>().FromTable(this.GetSubTableArg<T>());
             return query.Where(where).Sum(select);
         }
 
@@ -406,11 +367,10 @@ namespace Jc.Core
         /// 查询符合条件的记录数
         /// </summary>
         /// <param name="where">查询条件</param>
-        /// <param name="tableNamePfx">表名称参数.如果TableAttr设置Name.则根据Name格式化</param>
         /// <returns></returns>
-        public int Count<T>(Expression<Func<T, bool>> where = null, string tableNamePfx = null) where T : class, new()
+        public int Count<T>(Expression<Func<T, bool>> where = null) where T : class, new()
         {
-            IQuery<T> query = IQuery<T>().FromTable(tableNamePfx);
+            IQuery<T> query = IQuery<T>().FromTable(this.GetSubTableArg<T>());
             return query.Count(where);
         }
 
@@ -418,11 +378,10 @@ namespace Jc.Core
         /// 查询是否存在符合条件的记录
         /// </summary>
         /// <param name="where">查询条件</param>
-        /// <param name="tableNamePfx">表名称参数.如果TableAttr设置Name.则根据Name格式化</param>
         /// <returns></returns>
-        public bool Exists<T>(Expression<Func<T, bool>> where = null, string tableNamePfx = null) where T : class, new()
+        public bool Exists<T>(Expression<Func<T, bool>> where = null) where T : class, new()
         {
-            return Count(where, tableNamePfx) >0;
+            return Count(where) >0;
         }
 
         /// <summary>
