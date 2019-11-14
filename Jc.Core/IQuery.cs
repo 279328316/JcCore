@@ -217,14 +217,14 @@ namespace Jc.Core
             }
             return result;
         }
-
+        
         /// <summary>
         /// 返回RecCount
         /// </summary>
         /// <returns></returns>
         public int Count(Expression<Func<T, bool>> query = null)
         {
-            if (query!=null)
+            if (query != null)
             {
                 this.query = query;
             }
@@ -240,6 +240,71 @@ namespace Jc.Core
                     if (objVal != DBNull.Value)
                     {   //使用属性字典
                         result = Convert.ToInt32(objVal);
+                    }
+                    dbContext.CloseDbConnection(dbCommand);
+                }
+                catch (Exception ex)
+                {
+                    dbContext.CloseDbConnection(dbCommand);
+                    throw ex;
+                }
+            }
+            return result;
+        }
+
+        /// <summary>
+        /// 返回字段最小值
+        /// </summary>
+        /// <param name="select">计算属性</param>
+        /// <returns></returns>
+        public string Min(Expression<Func<T, object>> select)
+        {
+            this.select = select;
+            QueryFilter filter = QueryFilterHelper.GetFilter(select, query);
+
+            string result = null;
+            using (DbCommand dbCommand = dbContext.DbProvider.GetMinDbCommand<T>(filter, subTableArg))
+            {
+                try
+                {
+                    dbCommand.Connection = dbContext.GetDbConnection();
+                    object objVal = dbCommand.ExecuteScalar();
+                    if (objVal != DBNull.Value)
+                    {   //使用属性字典
+                        result = objVal.ToString();
+                    }
+                    dbContext.CloseDbConnection(dbCommand);
+                }
+                catch (Exception ex)
+                {
+                    dbContext.CloseDbConnection(dbCommand);
+                    throw ex;
+                }
+            }
+            return result;
+        }
+
+
+        /// <summary>
+        /// 返回字段最大值
+        /// </summary>
+        /// <param name="select">计算属性</param>
+        /// <returns></returns>
+        public string Max(Expression<Func<T, object>> select)
+        {
+            this.select = select;
+            QueryFilter filter = QueryFilterHelper.GetFilter(select, query);
+
+            string result = null;
+            using (DbCommand dbCommand = dbContext.DbProvider.GetMaxDbCommand<T>(filter, subTableArg))
+            {
+                try
+                {
+                    dbCommand.Connection = dbContext.GetDbConnection();
+                    object objVal = dbCommand.ExecuteScalar();
+                    if (objVal != DBNull.Value)
+                    {   //使用属性字典
+                        result = objVal.ToString();
                     }
                     dbContext.CloseDbConnection(dbCommand);
                 }
@@ -311,7 +376,7 @@ namespace Jc.Core
                 list = dt.ToList<T>();
 
                 int totalCount = 0;
-                DbCommand getRecCountDbCommand = dbContext.DbProvider.GetRecCountDbCommand<T>(filter, subTableArg);
+                DbCommand getRecCountDbCommand = dbContext.DbProvider.GetCountDbCommand<T>(filter, subTableArg);
                 getRecCountDbCommand.Connection = dbCommand.Connection;
                 object valueObj = getRecCountDbCommand.ExecuteScalar();
                 if (valueObj != null && valueObj != DBNull.Value)

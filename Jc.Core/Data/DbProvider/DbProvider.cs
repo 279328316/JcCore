@@ -615,7 +615,7 @@ namespace Jc.Core.Data
         internal DbCommand GetSumDbCommand<T>(QueryFilter filter = null, string subTableArg = null)
         {
             DbCommand dbCommand = CreateDbCommand();
-            string sqlStr = "Select Sum{1} as Total From {0}";
+            string sqlStr = "Select Sum({1}) as Total From {0}";
             string selectParams = null;
             DtoMapping dtoDbMapping = DtoMappingHelper.GetDtoMapping<T>();
             PiMap piMap = DtoMappingHelper.GetPiMapList<T>(filter).FirstOrDefault();
@@ -646,18 +646,63 @@ namespace Jc.Core.Data
 
 
         /// <summary>
-        /// 获取CountDbCommand 返回RecCount列
+        /// 获取字段求和DbCommand 返回Total列
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="filter"></param>
         /// <param name="subTableArg">表名称参数.如果TableAttr设置Name.则根据Name格式化</param>
         /// <returns></returns>
-        internal DbCommand GetCountDbCommand<T>(QueryFilter filter = null, string subTableArg = null)
+        internal DbCommand GetMinDbCommand<T>(QueryFilter filter = null, string subTableArg = null)
         {
             DbCommand dbCommand = CreateDbCommand();
-            string sqlStr = "Select Count(*) as RecCount From {0}";
+            string sqlStr = "Select Min({1}) as Total From {0}";
             string selectParams = null;
             DtoMapping dtoDbMapping = DtoMappingHelper.GetDtoMapping<T>();
+            PiMap piMap = DtoMappingHelper.GetPiMapList<T>(filter).FirstOrDefault();
+            if (piMap == null)
+            {
+                throw new Exception("计算字段不能为空");
+            }
+            selectParams = piMap.FieldName;
+            if (filter != null && filter.ItemList.Count > 0)
+            {
+                sqlStr += filter.FilterSQLString;
+            }
+            if (filter != null && filter.FilterParameters.Count > 0)
+            {
+                for (int i = 0; i < filter.FilterParameters.Count; i++)
+                {
+                    DbParameter dbParameter = dbCommand.CreateParameter();
+                    dbParameter.Direction = ParameterDirection.Input;
+                    dbParameter.ParameterName = filter.FilterParameters[i].ParameterName;
+                    dbParameter.Value = filter.FilterParameters[i].ParameterValue;
+                    dbParameter.DbType = filter.FilterParameters[i].ParameterDbType;
+                    dbCommand.Parameters.Add(dbParameter);
+                }
+            }
+            dbCommand.CommandText = string.Format(sqlStr, dtoDbMapping.GetTableName<T>(subTableArg), selectParams);
+            return dbCommand;
+        }
+
+        /// <summary>
+        /// 获取字段求和DbCommand 返回Total列
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="filter"></param>
+        /// <param name="subTableArg">表名称参数.如果TableAttr设置Name.则根据Name格式化</param>
+        /// <returns></returns>
+        internal DbCommand GetMaxDbCommand<T>(QueryFilter filter = null, string subTableArg = null)
+        {
+            DbCommand dbCommand = CreateDbCommand();
+            string sqlStr = "Select Max({1}) as Total From {0}";
+            string selectParams = null;
+            DtoMapping dtoDbMapping = DtoMappingHelper.GetDtoMapping<T>();
+            PiMap piMap = DtoMappingHelper.GetPiMapList<T>(filter).FirstOrDefault();
+            if (piMap == null)
+            {
+                throw new Exception("计算字段不能为空");
+            }
+            selectParams = piMap.FieldName;
             if (filter != null && filter.ItemList.Count > 0)
             {
                 sqlStr += filter.FilterSQLString;
@@ -685,7 +730,7 @@ namespace Jc.Core.Data
         /// <param name="filter"></param>
         /// <param name="subTableArg">表名称参数.如果TableAttr设置Name.则根据Name格式化</param>
         /// <returns></returns>
-        internal DbCommand GetRecCountDbCommand<T>(QueryFilter filter, string subTableArg = null)
+        internal DbCommand GetCountDbCommand<T>(QueryFilter filter, string subTableArg = null)
         {
             DbCommand dbCommand = CreateDbCommand();
             string sqlStr = "Select Count(*) as RecCount From {0} {1}";
