@@ -13,10 +13,14 @@ namespace Jc.Core.Data.Query
             DbType dbt;
             try
             {
-                string typeName = t.Name;
                 if(t.GenericTypeArguments!=null && t.GenericTypeArguments.Length>0)
                 {
-                    typeName = t.GenericTypeArguments[0].Name;
+                    t = t.GenericTypeArguments[0];
+                }
+                string typeName = t.Name;
+                if(t.IsEnum)
+                {
+                    typeName = typeof(int).Name;
                 }
                 dbt = (DbType)Enum.Parse(typeof(DbType), typeName);
             }

@@ -2,7 +2,7 @@
 using Microsoft.Extensions.Primitives;
 using System.Collections.Generic;
 
-namespace Jc.Core.TestApp
+namespace Jc.Core.UnitTestApp
 {
     /// <summary>
     /// DbCenter

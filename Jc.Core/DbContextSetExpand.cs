@@ -147,38 +147,48 @@ namespace Jc.Core
                 try
                 {
                     dbCommand.Connection = GetDbConnection();
-                    rowCount = dbCommand.ExecuteNonQuery();
-                    if (rowCount <= 0)
-                    {
-                        throw new Exception("插入记录失败.");
-                    }
-                    if ((dtoDbMapping.PkMap.PropertyType == typeof(int) 
+                    if ((dtoDbMapping.PkMap.PropertyType == typeof(int)
                         || dtoDbMapping.PkMap.PropertyType == typeof(int?))
-                        && (pkValue==null || (int)pkValue ==0))
+                        && (pkValue == null || (int)pkValue == 0))
                     {
                         int id = 0;
-                        DbCommand getIdCommand = dbProvider.GetAutoIdDbCommand();
-                        getIdCommand.Connection = dbCommand.Connection;
-                        object valueObj = getIdCommand.ExecuteScalar();
+                        dbCommand.CommandText += ";" + dbProvider.GetAutoIdDbCommand().CommandText;
+                        object valueObj = dbCommand.ExecuteScalar();
                         if (valueObj != null && valueObj != DBNull.Value)
                         {
                             id = Convert.ToInt32(valueObj);
                         }
+                        else
+                        {
+                            throw new Exception("插入记录失败.");
+                        }
                         dtoDbMapping.PkMap.Pi.SetValue(dto, id);
                     }
-                    else if ((dtoDbMapping.PkMap.PropertyType == typeof(long) || 
+                    else if ((dtoDbMapping.PkMap.PropertyType == typeof(long) ||
                         dtoDbMapping.PkMap.PropertyType == typeof(long?))
                         && (pkValue == null || (long)pkValue == 0))
                     {
                         long id = 0;
-                        DbCommand getIdCommand = dbProvider.GetAutoIdDbCommand();
-                        getIdCommand.Connection = dbCommand.Connection;
-                        object valueObj = getIdCommand.ExecuteScalar();
+                        dbCommand.CommandText += ";" + dbProvider.GetAutoIdDbCommand().CommandText;
+                        object valueObj = dbCommand.ExecuteScalar();
                         if (valueObj != null && valueObj != DBNull.Value)
                         {
                             id = Convert.ToInt64(valueObj);
                         }
+                        else
+                        {
+                            throw new Exception("插入记录失败.");
+                        }
                         dtoDbMapping.PkMap.Pi.SetValue(dto, id);
+                    }
+                    else
+                    {
+                        rowCount = dbCommand.ExecuteNonQuery();
+
+                        if (rowCount <= 0)
+                        {
+                            throw new Exception("插入记录失败.");
+                        }
                     }
                     CloseDbConnection(dbCommand);
                 }

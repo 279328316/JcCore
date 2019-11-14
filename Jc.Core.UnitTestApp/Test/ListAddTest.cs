@@ -4,7 +4,7 @@ using System.Collections.Specialized;
 using System.Diagnostics;
 using System.Text;
 
-namespace Jc.Core.TestApp.Test
+namespace Jc.Core.UnitTestApp
 {
     public class ListAddTest
     {

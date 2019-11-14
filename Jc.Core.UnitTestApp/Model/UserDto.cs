@@ -1,7 +1,7 @@
 ﻿using System;
 using Jc.Core;
 
-namespace Jc.Core.TestApp
+namespace Jc.Core.UnitTestApp
 {
     /// <summary>
     /// User Dto

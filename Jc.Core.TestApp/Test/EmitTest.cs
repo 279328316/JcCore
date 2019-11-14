@@ -1,52 +1,17 @@
-﻿using System;
+﻿using Jc.Core.Data.Query;
+using System;
 using System.Collections.Generic;
-using System.Text;
 using System.Data;
 using System.Reflection;
 using System.Reflection.Emit;
-using System.Linq.Expressions;
-using System.ComponentModel;
+using System.Text;
 
-namespace Jc.Core.Data.Query
+namespace Jc.Core.TestApp.Test
 {
-    /// <summary>
-    /// EntityConvertor delegate
-    /// </summary>
-    /// <typeparam name="T"></typeparam>
-    /// <param name="dr">DataRow</param>
-    /// <returns></returns>
-    public delegate object EntityConvertorDelegate(DataRow dr);
-
-    public class EntityConvertor
+    public class EmitTest
     {
-        /// <summary>
-        /// 构造EntityConvertor Handler
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <returns></returns>
-        public static EntityConvertorDelegate CreateEntityConvertor<T>()
-        {
-            DynamicMethod dynamicMethod = BuildSetValueMethod<T>();
-            EntityConvertorDelegate handler = (EntityConvertorDelegate)dynamicMethod.CreateDelegate(typeof(EntityConvertorDelegate));
-            return handler;
-        }
 
-        /// <summary>
-        /// 构造转换动态方法(核心代码)
-        /// </summary>
-        /// <typeparam name="T">返回的实体类型</typeparam>
-        /// <returns>实体对象</returns>
-        public static DynamicMethod BuildSetValueMethod<T>()
-        {
-            DynamicMethod method = new DynamicMethod("Convert" + typeof(T).Name,
-                    MethodAttributes.Public | MethodAttributes.Static,
-                    CallingConventions.Standard, typeof(T),
-                    new Type[] { typeof(DataRow) }, typeof(T).Module, true);
-            ILGenerator generator = method.GetILGenerator();
-            ILGenerateSetValueMethodContent<T>(generator);            
-            return method;
-        }
-        
+
         /// <summary>
         /// IL生成SetValueMethod内容
         /// 独立出来为共用代码
@@ -108,7 +73,7 @@ namespace Jc.Core.Data.Query
             }
             /*给本地变量（result）返回值*/
             il.Emit(OpCodes.Ldloc, result);
-            il.Emit(OpCodes.Ret);            
+            il.Emit(OpCodes.Ret);
         }
     }
 }

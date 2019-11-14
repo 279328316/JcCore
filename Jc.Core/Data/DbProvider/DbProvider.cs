@@ -221,26 +221,8 @@ namespace Jc.Core.Data
                 DbParameter dbParameter = dbCommand.CreateParameter();
                 dbParameter.Direction = ParameterDirection.Input;
                 dbParameter.ParameterName = "@" + piMap.FieldName;
-                object piValue = pi.GetValue(dto);
-                if (piValue == null)
-                {
-                    dbParameter.Value = DBNull.Value;
-                }
-                else
-                {
-                    Type piType = pi.PropertyType.GenericTypeArguments.Length>0 ?
-                               pi.PropertyType.GenericTypeArguments[0] : pi.PropertyType;
-                    if (piType.IsEnum)
-                    {
-                        dbParameter.Value = (int)piValue;
-                    }
-                    else
-                    {
-                        dbParameter.Value = piValue;
-                    }
-                }
-                DbType Error And Read Error
-                dbParameter.DbType = DbTypeConvertor.TypeToDbType(piMap.PropertyType);
+                dbParameter.Value = GetParameterValue(piMap.Pi, dto);
+                dbParameter.DbType = DbTypeConvertor.TypeToDbType(pi.PropertyType);
                 dbCommand.Parameters.Add(dbParameter);
             }
             dbCommand.CommandText = string.Format(sqlStr, dtoDbMapping.GetTableName<T>(subTableArg), fieldParams, valueParams);
@@ -293,7 +275,8 @@ namespace Jc.Core.Data
                     DbParameter dbParameter = dbCommand.CreateParameter();
                     dbParameter.Direction = ParameterDirection.Input;
                     dbParameter.ParameterName = $"@{piMap.FieldName}{i}";
-                    dbParameter.Value = pi.GetValue(list[i]) ?? DBNull.Value;
+                    //dbParameter.Value = pi.GetValue(list[i]) ?? DBNull.Value;
+                    dbParameter.Value = GetParameterValue(piMap.Pi, list[i]);
                     dbParameter.DbType = DbTypeConvertor.TypeToDbType(piMap.PropertyType);
                     dbCommand.Parameters.Add(dbParameter);
                 }
@@ -332,7 +315,8 @@ namespace Jc.Core.Data
                 DbParameter dbParameter = dbCommand.CreateParameter();
                 dbParameter.Direction = ParameterDirection.Input;
                 dbParameter.ParameterName = "@" + piMap.FieldName;
-                dbParameter.Value = pi.GetValue(dto) ?? DBNull.Value;
+                //dbParameter.Value = pi.GetValue(dto) ?? DBNull.Value;
+                dbParameter.Value = GetParameterValue(piMap.Pi, dto);
                 dbParameter.DbType = DbTypeConvertor.TypeToDbType(piMap.PropertyType);
                 dbCommand.Parameters.Add(dbParameter);
             }
@@ -366,8 +350,9 @@ namespace Jc.Core.Data
                 DbParameter dbParameter = dbCommand.CreateParameter();
                 dbParameter.Direction = ParameterDirection.Input;
                 dbParameter.ParameterName = $"@{piMap.FieldName}";
-                object value = piMap.Pi.GetValue(dto);
-                dbParameter.Value = value != null ? value : DBNull.Value;
+                //object value = piMap.Pi.GetValue(dto);
+                //dbParameter.Value = value != null ? value : DBNull.Value;
+                dbParameter.Value = GetParameterValue(piMap.Pi, dto);
                 dbParameter.DbType = DbTypeConvertor.TypeToDbType(piMap.PropertyType);
                 dbCommand.Parameters.Add(dbParameter);
                 
@@ -422,8 +407,9 @@ namespace Jc.Core.Data
                     DbParameter dbParameter = dbCommand.CreateParameter();
                     dbParameter.Direction = ParameterDirection.Input;
                     dbParameter.ParameterName = $"@{piMap.FieldName}{i}";
-                    object value = piMap.Pi.GetValue(dto);
-                    dbParameter.Value = value != null ? value : DBNull.Value;
+                    //object value = piMap.Pi.GetValue(dto);
+                    //dbParameter.Value = value != null ? value : DBNull.Value;
+                    dbParameter.Value = GetParameterValue(piMap.Pi, dto);
                     dbParameter.DbType = DbTypeConvertor.TypeToDbType(piMap.PropertyType);
                     dbCommand.Parameters.Add(dbParameter);
 
@@ -494,7 +480,7 @@ namespace Jc.Core.Data
 
             #region 设置DbCommand
 
-            string sqlStr = "Delete From {0}";
+            string sqlStr = "Delete From {0} ";
 
             DtoMapping dtoDbMapping = DtoMappingHelper.GetDtoMapping<T>();
 
@@ -774,6 +760,31 @@ namespace Jc.Core.Data
             return dbCommand;
         }
 
+        /// <summary>
+        /// Get Parameter Value
+        /// </summary>
+        /// <param name="pi"></param>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        private object GetParameterValue(PropertyInfo pi,object dto)
+        {
+            object dbValue = DBNull.Value;
+            object piValue = pi.GetValue(dto);
+            if (piValue !=null)
+            { 
+                Type piType = pi.PropertyType.GenericTypeArguments.Length > 0 ?
+                           pi.PropertyType.GenericTypeArguments[0] : pi.PropertyType;
+                if (piType.IsEnum)
+                {
+                    dbValue = (int)piValue;
+                }
+                else
+                {
+                    dbValue = piValue;
+                }
+            }
+            return dbValue;
+        }
         /// <summary>
         /// 获取ConTestDbCommand
         /// </summary>
