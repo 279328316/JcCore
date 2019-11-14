@@ -375,7 +375,7 @@ namespace Jc.Core
         }
 
         /// <summary>
-        /// 查询符合条件的记录数
+        /// 查询符合条件的记录Field字段的最小值
         /// </summary>
         /// <param name="field">计算属性</param>
         /// <param name="where">查询条件</param>
@@ -388,7 +388,7 @@ namespace Jc.Core
         }
 
         /// <summary>
-        /// 查询符合条件的记录数
+        /// 查询符合条件的记录Field字段的最大值
         /// </summary>
         /// <param name="field">计算属性</param>
         /// <param name="where">查询条件</param>
