@@ -165,17 +165,22 @@ namespace Jc.Core.Helper
             string result = "";
             try
             {
-                HttpWebResponse response = CreateGetHttpResponse(url, requestParams);
-                string encoding = string.IsNullOrEmpty(response.ContentEncoding) ? response.CharacterSet : response.ContentEncoding;
-                if (encoding == null || encoding.Length < 1)
+                using (HttpWebResponse response = CreateGetHttpResponse(url, requestParams))
                 {
-                    encoding = "UTF-8"; //默认编码
+                    string encoding = string.IsNullOrEmpty(response.ContentEncoding) ? response.CharacterSet : response.ContentEncoding;
+                    if (encoding == null || encoding.Length < 1)
+                    {
+                        encoding = "UTF-8"; //默认编码
+                    }
+                    //读取响应流
+                    using (StreamReader reader = new StreamReader(response.GetResponseStream(), Encoding.GetEncoding(encoding)))
+                    {
+                        result = reader.ReadToEnd();
+                        result = HandleUnicodeString(result);
+                        reader.Dispose();
+                    }
+                    response.Close();
                 }
-                //读取响应流
-                StreamReader reader = new StreamReader(response.GetResponseStream(), Encoding.GetEncoding(encoding));
-                result = reader.ReadToEnd();
-                reader.Dispose();
-                response.Close();
             }
             catch (System.Exception ex)
             {
@@ -248,17 +253,22 @@ namespace Jc.Core.Helper
             string result = "";
             try
             {
-                HttpWebResponse response = CreatePostHttpResponse(url, requestParams, contentType);
-                string encoding = string.IsNullOrEmpty(response.ContentEncoding) ? response.CharacterSet : response.ContentEncoding;
-                if (encoding == null || encoding.Length < 1)
+                using (HttpWebResponse response = CreatePostHttpResponse(url, requestParams, contentType))
                 {
-                    encoding = "UTF-8"; //默认编码
+                    string encoding = string.IsNullOrEmpty(response.ContentEncoding) ? response.CharacterSet : response.ContentEncoding;
+                    if (encoding == null || encoding.Length < 1)
+                    {
+                        encoding = "UTF-8"; //默认编码
+                    }
+                    //读取响应流
+                    using (StreamReader reader = new StreamReader(response.GetResponseStream(), Encoding.GetEncoding(encoding)))
+                    {
+                        result = reader.ReadToEnd();
+                        result = HandleUnicodeString(result);
+                        reader.Dispose();
+                    }
+                    response.Close();
                 }
-                //读取响应流
-                StreamReader reader = new StreamReader(response.GetResponseStream(), Encoding.GetEncoding(encoding));
-                result = reader.ReadToEnd();
-                reader.Dispose();
-                response.Close();
             }
             catch (System.Exception ex)
             {
@@ -332,17 +342,22 @@ namespace Jc.Core.Helper
             string result = "";
             try
             {
-                HttpWebResponse response = CreateUploadFileHttpResponse(url, requestParams, fileList);
-                string encoding = string.IsNullOrEmpty(response.ContentEncoding) ? response.CharacterSet : response.ContentEncoding;
-                if (encoding == null || encoding.Length < 1)
+                using (HttpWebResponse response = CreateUploadFileHttpResponse(url, requestParams, fileList))
                 {
-                    encoding = "UTF-8"; //默认编码
+                    string encoding = string.IsNullOrEmpty(response.ContentEncoding) ? response.CharacterSet : response.ContentEncoding;
+                    if (encoding == null || encoding.Length < 1)
+                    {
+                        encoding = "UTF-8"; //默认编码
+                    }
+                    //读取响应流
+                    using (StreamReader reader = new StreamReader(response.GetResponseStream(), Encoding.GetEncoding(encoding)))
+                    {
+                        result = reader.ReadToEnd();
+                        result = HandleUnicodeString(result);
+                        reader.Dispose();
+                    }
+                    response.Close();
                 }
-                //读取响应流
-                StreamReader reader = new StreamReader(response.GetResponseStream(), Encoding.GetEncoding(encoding));
-                result = reader.ReadToEnd();
-                reader.Dispose();
-                response.Close();
             }
             catch (System.Exception ex)
             {
@@ -605,6 +620,21 @@ namespace Jc.Core.Helper
         }
         #endregion
 
+        /// <summary>
+        /// 处理UnicodeString
+        /// 解决中文被Unicode编码问题
+        /// </summary>
+        /// <param name="result"></param>
+        /// <returns></returns>
+        private string HandleUnicodeString(string result)
+        {
+            result = Regex.Replace(result, @"\\u(?<Value>[a-zA-Z0-9]{4})",
+                    m => {
+                        return ((char)int.Parse(m.Groups["Value"].Value,
+                    System.Globalization.NumberStyles.HexNumber)).ToString();
+                    });
+            return result;
+        }
 
         /// <summary>
         /// 构造Form请求参数String
