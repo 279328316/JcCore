@@ -377,27 +377,27 @@ namespace Jc.Core
         /// <summary>
         /// 查询符合条件的记录数
         /// </summary>
-        /// <param name="select">计算属性</param>
+        /// <param name="field">计算属性</param>
         /// <param name="where">查询条件</param>
         /// <returns></returns>
-        public string Min<T>(Expression<Func<T, object>> select,Expression<Func<T, bool>> where = null) where T : class, new()
+        public string Min<T>(Expression<Func<T, object>> field, Expression<Func<T, bool>> where = null) where T : class, new()
         {
             IQuery<T> query = IQuery<T>().FromTable(this.GetSubTableArg<T>())
                                 .Where(where);
-            return query.Min(select);
+            return query.Min(field);
         }
 
         /// <summary>
         /// 查询符合条件的记录数
         /// </summary>
-        /// <param name="select">计算属性</param>
+        /// <param name="field">计算属性</param>
         /// <param name="where">查询条件</param>
         /// <returns></returns>
-        public string Max<T>(Expression<Func<T, object>> select,Expression<Func<T, bool>> where = null) where T : class, new()
+        public string Max<T>(Expression<Func<T, object>> field,Expression<Func<T, bool>> where = null) where T : class, new()
         {
             IQuery<T> query = IQuery<T>().FromTable(this.GetSubTableArg<T>())
                                 .Where(where);
-            return query.Max(select);
+            return query.Max(field);
         }
 
         /// <summary>
