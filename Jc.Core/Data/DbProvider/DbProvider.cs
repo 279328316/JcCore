@@ -221,7 +221,25 @@ namespace Jc.Core.Data
                 DbParameter dbParameter = dbCommand.CreateParameter();
                 dbParameter.Direction = ParameterDirection.Input;
                 dbParameter.ParameterName = "@" + piMap.FieldName;
-                dbParameter.Value = pi.GetValue(dto) ?? DBNull.Value;
+                object piValue = pi.GetValue(dto);
+                if (piValue == null)
+                {
+                    dbParameter.Value = DBNull.Value;
+                }
+                else
+                {
+                    Type piType = pi.PropertyType.GenericTypeArguments.Length>0 ?
+                               pi.PropertyType.GenericTypeArguments[0] : pi.PropertyType;
+                    if (piType.IsEnum)
+                    {
+                        dbParameter.Value = (int)piValue;
+                    }
+                    else
+                    {
+                        dbParameter.Value = piValue;
+                    }
+                }
+                DbType Error And Read Error
                 dbParameter.DbType = DbTypeConvertor.TypeToDbType(piMap.PropertyType);
                 dbCommand.Parameters.Add(dbParameter);
             }

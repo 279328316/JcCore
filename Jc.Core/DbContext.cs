@@ -101,7 +101,16 @@ namespace Jc.Core
         /// <returns></returns>
         public static DbContext CreateDbContext(string connectString, DatabaseType dbType = DatabaseType.MsSql)
         {
-            DbContext dbContext = new DbContext(connectString, dbType);
+            DbContext dbContext;
+            try
+            {
+                dbContext = new DbContext(connectString, dbType);
+            }
+            catch (Exception ex)
+            {
+                string msg = ex.InnerException != null ? ex.InnerException.Message : ex.Message;
+                throw new Exception(msg);
+            }
             return dbContext;
         }
 
