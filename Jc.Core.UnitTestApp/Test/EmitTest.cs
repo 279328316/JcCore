@@ -89,11 +89,11 @@ namespace Jc.Core.UnitTestApp
                         il.Emit(OpCodes.Unbox_Any, typeof(int));
                         Type realType = type.GenericTypeArguments.Length > 0 ?
                                         type.GenericTypeArguments[0] : type;
-                        Type helperType = typeof(Helper.TEnumHelper<>);
-                        Type thealperType = helperType.MakeGenericType(realType);
-                        MethodInfo convertMethod = thealperType.GetMethod("ToEnum");
-                        il.Emit(OpCodes.Callvirt, convertMethod);
-                        //il.Emit(OpCodes.Unbox_Any, realType);
+                        //Type helperType = typeof(Helper.TEnumHelper<>);
+                        //Type thealperType = helperType.MakeGenericType(realType);
+                        //MethodInfo convertMethod = thealperType.GetMethod("ToEnum");
+                        //il.Emit(OpCodes.Callvirt, convertMethod);
+                        il.Emit(OpCodes.Unbox_Any, realType);
                     }
                     else
                     {
@@ -193,11 +193,11 @@ namespace Jc.Core.UnitTestApp
                         il.Emit(OpCodes.Unbox_Any, typeof(int));
                         Type realType = type.GenericTypeArguments.Length > 0 ?
                                         type.GenericTypeArguments[0] : type;
-                        Type helperType = typeof(TEnumHelper<>);
-                        Type thealperType = helperType.MakeGenericType(realType);
-                        MethodInfo convertMethod = thealperType.GetMethod("ToEnum");
-                        il.Emit(OpCodes.Callvirt, convertMethod);
-                        //il.Emit(OpCodes.Unbox_Any, realType);
+                        //Type helperType = typeof(TEnumHelper<>);
+                        //Type thealperType = helperType.MakeGenericType(realType);
+                        //MethodInfo convertMethod = thealperType.GetMethod("ToEnum");
+                        //il.Emit(OpCodes.Callvirt, convertMethod);
+                        il.Emit(OpCodes.Unbox_Any, realType);
                     }
                     else
                     {
