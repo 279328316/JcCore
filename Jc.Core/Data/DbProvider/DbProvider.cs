@@ -760,6 +760,7 @@ namespace Jc.Core.Data
             { 
                 if (piMap.IsEnum)
                 {   //如果为枚举类型.转换为int
+                    //目前暂不支持 字段类型为枚举支持
                     dbValue = (int)piValue;
                 }
                 else

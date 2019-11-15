@@ -141,6 +141,7 @@
     <Compile Include="Test\EnumFieldTest.cs" />
     <Compile Include="Test\FileInfoTest.cs" />
     <Compile Include="Test\HttpHelperTest.cs" />
+    <Compile Include="Test\IEntityConvertor.cs" />
     <Compile Include="Test\ListAddTest.cs" />
     <Compile Include="Test\ListToStringExTest.cs" />
     <Compile Include="Test\NetShareHelperTest.cs" />

@@ -50,6 +50,7 @@ namespace Jc.Core.Data.Query
 
         /// <summary>
         /// 是否为枚举类型
+        /// 目前暂不支持 字段类型为枚举支持
         /// </summary>
         public bool IsEnum
         {
