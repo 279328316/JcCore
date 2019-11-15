@@ -183,7 +183,17 @@ namespace Jc.Core.Helper
             }
             return result;
         }
-
+        
+        /// <summary>
+        /// Enum 枚举值 Name
+        /// </summary>
+        /// <typeparam name="T">enum类型</typeparam>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        public static T ToEnum<T>(object value)
+        {
+            return (T)Enum.Parse(typeof(T), value.ToString());
+        }
     }
 
     /// <summary>

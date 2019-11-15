@@ -31,9 +31,9 @@ namespace Jc.Core.TestApp.Test
                 LastUpdateUser = Guid.NewGuid(),
                 LastUpdateDate = DateTime.Now
             };
-            Dbc.Db.SetSubTable<UserDto>(2019).Set(userDto);
+            Dbc.Db.Set(userDto);
 
-            UserDto user = Dbc.Db.SetSubTable<UserDto>(2019).Get<UserDto>();
+            UserDto user = Dbc.Db.Get<UserDto>();
             Console.WriteLine(user.UserName);
         }
     }

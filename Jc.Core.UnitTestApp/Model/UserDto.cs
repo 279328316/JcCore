@@ -6,7 +6,7 @@ namespace Jc.Core.UnitTestApp
     /// <summary>
     /// User Dto
     /// </summary>
-    [Table(Name = "t_User{0}", DisplayText = "",AutoCreate = true)]
+    [Table(Name = "t_User", DisplayText = "",AutoCreate = true)]
     public class UserDto
     {
         #region Properties

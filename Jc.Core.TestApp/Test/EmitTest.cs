@@ -10,7 +10,10 @@ namespace Jc.Core.TestApp.Test
 {
     public class EmitTest
     {
-
+        public void Test()
+        {
+            EmitGenerateCodeTest<UserDto>();
+        }
 
         /// <summary>
         /// IL生成SetValueMethod内容
@@ -18,62 +21,8 @@ namespace Jc.Core.TestApp.Test
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="il"></param>
-        public static void ILGenerateSetValueMethodContent<T>(ILGenerator il)
+        private void EmitGenerateCodeTest<T>()
         {
-            LocalBuilder result = il.DeclareLocal(typeof(T));
-            il.Emit(OpCodes.Newobj, typeof(T).GetConstructor(Type.EmptyTypes));
-            il.Emit(OpCodes.Stloc, result);
-
-            //取出dr中所有的列名集合
-            il.DeclareLocal(typeof(DataColumnCollection));
-            il.Emit(OpCodes.Ldarg_0);
-            il.Emit(OpCodes.Callvirt, typeof(DataRow).GetMethod("get_Table"));
-            il.Emit(OpCodes.Callvirt, typeof(DataTable).GetMethod("get_Columns"));
-            il.Emit(OpCodes.Stloc_1); //var columns = dr.Table.Columns
-
-            List<PiMap> piMapList = DtoMappingHelper.GetPiMapList<T>();
-            foreach (PiMap piMap in piMapList)
-            {
-                if (piMap.IsIgnore || piMap.Pi.SetMethod == null)
-                {
-                    continue;
-                }
-                //去掉关键词转义
-                string fieldName = piMap.FieldName.Replace("\"", "").Replace("'", "").Replace("[", "").Replace("]", "");
-                //加入判断条件 if (columns.Contains("Id") && !dataRow.IsNull("Id"))
-                var endIfLabel = il.DefineLabel();
-                il.Emit(OpCodes.Ldloc_1);    //columns
-                il.Emit(OpCodes.Ldstr, fieldName); //Id
-                il.Emit(OpCodes.Callvirt, typeof(DataColumnCollection).GetMethod("Contains", new Type[] { typeof(string) }));
-                il.Emit(OpCodes.Brfalse, endIfLabel); //判断columns.Contains("Id")
-
-                il.Emit(OpCodes.Ldarg_0);    //dr
-                il.Emit(OpCodes.Ldstr, fieldName);     //Id
-                il.Emit(OpCodes.Callvirt, typeof(DataRow).GetMethod("IsNull", new Type[] { typeof(string) }));
-                il.Emit(OpCodes.Brtrue, endIfLabel); //判断dr.IsNull("Id")
-
-                //自DataReader中读取值 调用get_Item方法 dataRow["Id"]
-                il.Emit(OpCodes.Ldloc, result);  //result
-                il.Emit(OpCodes.Ldarg_0);    //dataRow
-                il.Emit(OpCodes.Ldstr, fieldName);   //Id
-                il.Emit(OpCodes.Callvirt, typeof(DataRow).GetMethod("get_Item", new Type[] { typeof(string) }));
-
-                Type type = piMap.PropertyType;  //拆箱
-                if (type.IsValueType)
-                {   //直接拆箱 可空类型,也可以直接拆箱
-                    il.Emit(OpCodes.Unbox_Any, type);
-                }
-                else
-                {   //引用类型
-                    il.Emit(OpCodes.Castclass, type);
-                }
-                //给该属性设置对应值
-                il.Emit(OpCodes.Callvirt, piMap.Pi.GetSetMethod());
-                il.MarkLabel(endIfLabel);
-            }
-            /*给本地变量（result）返回值*/
-            il.Emit(OpCodes.Ldloc, result);
-            il.Emit(OpCodes.Ret);
         }
     }
 }

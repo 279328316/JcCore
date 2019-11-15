@@ -1,13 +1,13 @@
 ﻿using System;
 using Jc.Core;
 
-namespace Jc.Core.TestApp
+namespace Jc.Core.UnitTestApp
 {
     /// <summary>
     /// User Dto
     /// </summary>
-    [Table(Name = "t_User", DisplayText = "",AutoCreate = true)]
-    public class UserDto
+    [Table(Name = "t_EmitUser", DisplayText = "",AutoCreate = true)]
+    public class EmitUserDto
     {
         #region Properties
         /// <summary>

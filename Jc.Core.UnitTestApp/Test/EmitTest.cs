@@ -1,4 +1,5 @@
 ﻿using Jc.Core.Data.Query;
+using Jc.Core.Helper;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Collections.Generic;
@@ -18,16 +19,17 @@ namespace Jc.Core.UnitTestApp
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="il"></param>
-        [TestMethod]
         public static void ILGenerateSetValueMethodContent<T>()
         {
             var asmName = new AssemblyName("Test");
-            var asmBuilder = AppDomain.CurrentDomain.DefineDynamicAssembly(asmName, AssemblyBuilderAccess.Save);
-            var moduleBuilder = asmBuilder.DefineDynamicModule("Main", "Main.dll");
-            DynamicMethod method = new DynamicMethod("Convert" + typeof(T).Name,
-                    MethodAttributes.Public | MethodAttributes.Static,
-                    CallingConventions.Standard, typeof(T),
-                    new Type[] { typeof(DataRow) }, moduleBuilder, true);
+            var assemblyBuilder = AppDomain.CurrentDomain.DefineDynamicAssembly(asmName, AssemblyBuilderAccess.Save);
+            var moduleBuilder = assemblyBuilder.DefineDynamicModule("KittyModule", "Kitty.exe");
+            var typeBuilder = moduleBuilder.DefineType("HelloKittyClass", TypeAttributes.Public);
+            var method = typeBuilder.DefineMethod(
+                              "Convert" + typeof(T).Name,
+                              MethodAttributes.Public | MethodAttributes.Static,
+                              typeof(T),
+                              new Type[] { typeof(DataRow) });
             ILGenerator il = method.GetILGenerator();
             LocalBuilder result = il.DeclareLocal(typeof(T));
             il.Emit(OpCodes.Newobj, typeof(T).GetConstructor(Type.EmptyTypes));
@@ -67,10 +69,24 @@ namespace Jc.Core.UnitTestApp
                 il.Emit(OpCodes.Ldstr, fieldName);   //Id
                 il.Emit(OpCodes.Callvirt, typeof(DataRow).GetMethod("get_Item", new Type[] { typeof(string) }));
 
-                Type type = piMap.PropertyType;  //拆箱
+                Type type = piMap.PropertyType;  //拆箱                
                 if (type.IsValueType)
                 {   //直接拆箱 可空类型,也可以直接拆箱
-                    il.Emit(OpCodes.Unbox_Any, type);
+                    if (piMap.IsEnum)
+                    {   //如果为枚举类型,先转为int
+                        il.Emit(OpCodes.Unbox_Any, typeof(int));
+                        Type realType = type.GenericTypeArguments.Length > 0 ?
+                                        type.GenericTypeArguments[0] : type;
+                        Type helperType = typeof(TEnumHelper<>);
+                        Type thealperType = helperType.MakeGenericType(realType);
+                        MethodInfo convertMethod = thealperType.GetMethod("ToEnum");
+                        il.Emit(OpCodes.Callvirt, convertMethod);
+                        //il.Emit(OpCodes.Unbox_Any, realType);
+                    }
+                    else
+                    {
+                        il.Emit(OpCodes.Unbox_Any, type);
+                    }
                 }
                 else
                 {   //引用类型
@@ -83,7 +99,9 @@ namespace Jc.Core.UnitTestApp
             /*给本地变量（result）返回值*/
             il.Emit(OpCodes.Ldloc, result);
             il.Emit(OpCodes.Ret);
-            asmBuilder.Save("Test.dll");
+            var helloKittyClassType = typeBuilder.CreateType();
+            assemblyBuilder.SetEntryPoint(helloKittyClassType.GetMethod("Convert" + typeof(T).Name));
+            assemblyBuilder.Save("Kitty.exe");
         }
     }
 }

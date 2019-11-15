@@ -151,40 +151,29 @@ namespace Jc.Core
                         || dtoDbMapping.PkMap.PropertyType == typeof(int?))
                         && (pkValue == null || (int)pkValue == 0))
                     {
-                        int id = 0;
                         dbCommand.CommandText += ";" + dbProvider.GetAutoIdDbCommand().CommandText;
                         object valueObj = dbCommand.ExecuteScalar();
-                        if (valueObj != null && valueObj != DBNull.Value)
-                        {
-                            id = Convert.ToInt32(valueObj);
-                        }
-                        else
+                        if (valueObj == null || valueObj == DBNull.Value)
                         {
                             throw new Exception("插入记录失败.");
                         }
-                        dtoDbMapping.PkMap.Pi.SetValue(dto, id);
+                        dtoDbMapping.PkMap.Pi.SetValue(dto, Convert.ToInt32(valueObj));
                     }
                     else if ((dtoDbMapping.PkMap.PropertyType == typeof(long) ||
                         dtoDbMapping.PkMap.PropertyType == typeof(long?))
                         && (pkValue == null || (long)pkValue == 0))
                     {
-                        long id = 0;
                         dbCommand.CommandText += ";" + dbProvider.GetAutoIdDbCommand().CommandText;
                         object valueObj = dbCommand.ExecuteScalar();
-                        if (valueObj != null && valueObj != DBNull.Value)
-                        {
-                            id = Convert.ToInt64(valueObj);
-                        }
-                        else
+                        if (valueObj == null || valueObj != DBNull.Value)
                         {
                             throw new Exception("插入记录失败.");
                         }
-                        dtoDbMapping.PkMap.Pi.SetValue(dto, id);
+                        dtoDbMapping.PkMap.Pi.SetValue(dto, Convert.ToInt64(valueObj));
                     }
                     else
                     {
                         rowCount = dbCommand.ExecuteNonQuery();
-
                         if (rowCount <= 0)
                         {
                             throw new Exception("插入记录失败.");
