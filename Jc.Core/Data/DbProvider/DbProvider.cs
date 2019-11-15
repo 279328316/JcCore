@@ -261,7 +261,6 @@ namespace Jc.Core.Data
                     DbParameter dbParameter = dbCommand.CreateParameter();
                     dbParameter.Direction = ParameterDirection.Input;
                     dbParameter.ParameterName = $"@{piMap.FieldName}{i}";
-                    //dbParameter.Value = pi.GetValue(list[i]) ?? DBNull.Value;
                     dbParameter.Value = GetParameterValue(piMap, list[i]);
                     dbParameter.DbType = piMap.DbType;
                     dbCommand.Parameters.Add(dbParameter);
@@ -301,7 +300,6 @@ namespace Jc.Core.Data
                 DbParameter dbParameter = dbCommand.CreateParameter();
                 dbParameter.Direction = ParameterDirection.Input;
                 dbParameter.ParameterName = "@" + piMap.FieldName;
-                //dbParameter.Value = pi.GetValue(dto) ?? DBNull.Value;
                 dbParameter.Value = GetParameterValue(piMap, dto);
                 dbParameter.DbType = piMap.DbType;
                 dbCommand.Parameters.Add(dbParameter);
@@ -336,8 +334,6 @@ namespace Jc.Core.Data
                 DbParameter dbParameter = dbCommand.CreateParameter();
                 dbParameter.Direction = ParameterDirection.Input;
                 dbParameter.ParameterName = $"@{piMap.FieldName}";
-                //object value = piMap.Pi.GetValue(dto);
-                //dbParameter.Value = value != null ? value : DBNull.Value;
                 dbParameter.Value = GetParameterValue(piMap, dto);
                 dbParameter.DbType = piMap.DbType;
                 dbCommand.Parameters.Add(dbParameter);
@@ -393,8 +389,6 @@ namespace Jc.Core.Data
                     DbParameter dbParameter = dbCommand.CreateParameter();
                     dbParameter.Direction = ParameterDirection.Input;
                     dbParameter.ParameterName = $"@{piMap.FieldName}{i}";
-                    //object value = piMap.Pi.GetValue(dto);
-                    //dbParameter.Value = value != null ? value : DBNull.Value;
                     dbParameter.Value = GetParameterValue(piMap, dto);
                     dbParameter.DbType = piMap.DbType;
                     dbCommand.Parameters.Add(dbParameter);
@@ -757,16 +751,17 @@ namespace Jc.Core.Data
             object dbValue = DBNull.Value;
             object piValue = piMap.Pi.GetValue(dto);
             if (piValue !=null)
-            { 
-                if (piMap.IsEnum)
-                {   //如果为枚举类型.转换为int
-                    //目前暂不支持 字段类型为枚举支持
-                    dbValue = (int)piValue;
-                }
-                else
-                {
-                    dbValue = piValue;
-                }
+            {
+                dbValue = piValue;
+                //if (piMap.IsEnum)
+                //{   //如果为枚举类型.转换为int
+                //    //目前暂不支持 字段类型为枚举支持
+                //    dbValue = (int)piValue;
+                //}
+                //else
+                //{
+                //    dbValue = piValue;
+                //}
             }
             return dbValue;
         }

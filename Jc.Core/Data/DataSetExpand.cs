@@ -37,7 +37,7 @@ namespace Jc.Core.Data
             DtoMapping dtoMapping = DtoMappingHelper.GetDtoMapping<T>();
             if (dtoMapping.EntityConvertor == null)
             {
-                dtoMapping.EntityConvertor = EntityConvertor.CreateEntityConvertor<T>(dtoMapping);   //存入dtoMapping中,缓存起来
+                dtoMapping.EntityConvertor = EntityConvertor.CreateEntityConvertor<T>();   //存入dtoMapping中,缓存起来
             }
             return (T)((EntityConvertorDelegate)dtoMapping.EntityConvertor)(dr);
         }

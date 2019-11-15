@@ -41,7 +41,7 @@ namespace Jc.Core.Data.Query
             DynamicMethod method = new DynamicMethod("Convert" + typeof(T).Name,
                     MethodAttributes.Public | MethodAttributes.Static,
                     CallingConventions.Standard, typeof(T),
-                    new Type[] { typeof(DataRow)}, typeof(T).Module, true);
+                    new Type[] { typeof(DataRow) }, typeof(T).Module, true);
             ILGenerator generator = method.GetILGenerator();
             ILGenerateSetValueMethodContent<T>(generator);
             return method;
@@ -122,6 +122,5 @@ namespace Jc.Core.Data.Query
             il.Emit(OpCodes.Ldloc, result);
             il.Emit(OpCodes.Ret);            
         }
-
     }
 }
