@@ -4,7 +4,7 @@ using System.Collections.Specialized;
 using System.Diagnostics;
 using System.Text;
 
-namespace Jc.Core.TestApp.Test
+namespace Jc.Core.UnitTestApp
 {
     public class ListAddTest
     {
@@ -34,7 +34,7 @@ namespace Jc.Core.TestApp.Test
                     Email = $"Email{i}@qq.com",
                     Avatar = $"Avatar{i}",
                     PhoneNo = $"133810{i}".PadRight(11,'0'),
-                    Sex = (Sex)Enum.Parse(typeof(Sex),(i%2).ToString()),
+                    //Sex = (Sex)Enum.Parse(typeof(Sex),(i%2).ToString()),
                     Birthday = DateTime.Now.AddYears(-1).AddHours(-1*i),
                     WeChatOpenId = $"WeChatOpenId{i}",
                     IsDelete = i % 2 == 0 ? true : false,
@@ -75,7 +75,7 @@ namespace Jc.Core.TestApp.Test
                 users[i].Email = $"UpEmail{i}@qq.com";
                 users[i].Avatar = $"Avatar{i}";
                 users[i].PhoneNo = $"133810{i}".PadRight(11, '0');                
-                users[i].Sex = (Sex)Enum.Parse(typeof(Sex), (i % 2).ToString());
+                //users[i].Sex = (Sex)Enum.Parse(typeof(Sex), (i % 2).ToString());
                 users[i].Birthday = DateTime.Now.AddYears(-1).AddHours(-1 * i);
                 users[i].WeChatOpenId = $"WeChatOpenId{i}";
                 users[i].IsDelete = i % 2 == 0 ? true : false;

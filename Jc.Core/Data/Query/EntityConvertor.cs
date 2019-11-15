@@ -41,12 +41,12 @@ namespace Jc.Core.Data.Query
             DynamicMethod method = new DynamicMethod("Convert" + typeof(T).Name,
                     MethodAttributes.Public | MethodAttributes.Static,
                     CallingConventions.Standard, typeof(T),
-                    new Type[] { typeof(DataRow) }, typeof(T).Module, true);
+                    new Type[] { typeof(DataRow)}, typeof(T).Module, true);
             ILGenerator generator = method.GetILGenerator();
             ILGenerateSetValueMethodContent<T>(generator);
             return method;
         }
-        
+                
         /// <summary>
         /// IL生成SetValueMethod内容
         /// 独立出来为共用代码
@@ -96,6 +96,18 @@ namespace Jc.Core.Data.Query
                 Type type = piMap.PropertyType;  //拆箱
                 if (type.IsValueType)
                 {   //直接拆箱 可空类型,也可以直接拆箱
+                    //if (piMap.IsEnum)
+                    //{   //如果为枚举类型,先转为int
+                    //    //支持枚举类型失败
+                    //    //il.Emit(OpCodes.Unbox_Any, typeof(int));
+                    //    //Type realType = type.GenericTypeArguments.Length > 0 ?
+                    //    //                type.GenericTypeArguments[0] : type;
+                    //    //Type helperType = typeof(Helper.TEnumHelper<>);
+                    //    //Type thealperType = helperType.MakeGenericType(realType);
+                    //    //MethodInfo convertMethod = thealperType.GetMethod("ToEnum");
+                    //    //il.Emit(OpCodes.Callvirt, convertMethod);
+                    //    //il.Emit(OpCodes.Unbox_Any, realType);
+                    //}
                     il.Emit(OpCodes.Unbox_Any, type);
                 }
                 else
@@ -108,7 +120,8 @@ namespace Jc.Core.Data.Query
             }
             /*给本地变量（result）返回值*/
             il.Emit(OpCodes.Ldloc, result);
-            il.Emit(OpCodes.Ret);
+            il.Emit(OpCodes.Ret);            
         }
+
     }
 }

@@ -15,6 +15,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Jc.Core.PostgreSql", "Jc.Co
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Jc.Core.TestApp", "Jc.Core.TestApp\Jc.Core.TestApp.csproj", "{1F43D4D0-1BFB-4C56-93AC-8AB7EA84C39F}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Jc.Core.UnitTestApp", "Jc.Core.UnitTestApp\Jc.Core.UnitTestApp.csproj", "{66F0CAEA-8ECB-45F8-B769-C8791D14D9A3}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -45,6 +47,10 @@ Global
 		{1F43D4D0-1BFB-4C56-93AC-8AB7EA84C39F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1F43D4D0-1BFB-4C56-93AC-8AB7EA84C39F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1F43D4D0-1BFB-4C56-93AC-8AB7EA84C39F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{66F0CAEA-8ECB-45F8-B769-C8791D14D9A3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{66F0CAEA-8ECB-45F8-B769-C8791D14D9A3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{66F0CAEA-8ECB-45F8-B769-C8791D14D9A3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{66F0CAEA-8ECB-45F8-B769-C8791D14D9A3}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

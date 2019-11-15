@@ -1,13 +1,13 @@
 ﻿using System;
 using Jc.Core;
 
-namespace Jc.Core.TestApp
+namespace Jc.Core.UnitTestApp
 {
     /// <summary>
     /// User Dto
     /// </summary>
-    [Table(Name = "t_User", DisplayText = "",AutoCreate = true)]
-    public class UserDto
+    [Table(Name = "t_SubTbUser{0}", DisplayText = "",AutoCreate = true)]
+    public class SubTbUserDto
     {
         #region Properties
         /// <summary>
@@ -62,7 +62,7 @@ namespace Jc.Core.TestApp
         /// 性别 0女 1男
         /// </summary>
         [Field(DisplayText = "性别 0女 1男", FieldType = "int")]
-        public Sex? Sex { get; set; }
+        public int? Sex { get; set; }
 
         /// <summary>
         /// 出生日期

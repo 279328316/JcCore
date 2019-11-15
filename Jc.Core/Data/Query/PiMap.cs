@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
@@ -16,6 +17,8 @@ namespace Jc.Core.Data.Query
     {
         private PropertyInfo pi;    //pi属性对象
         private FieldAttribute fieldAttr; //fieldAttr对象
+        private bool? isEnum = null;    //属性是否为枚举类型
+        private DbType dbType;  //数据字段DbType
 
         /// <summary>
         /// Ctor
@@ -23,6 +26,7 @@ namespace Jc.Core.Data.Query
         public PiMap()
         {
         }
+
         /// <summary>
         /// Ctor
         /// </summary>
@@ -30,6 +34,7 @@ namespace Jc.Core.Data.Query
         {
             this.pi = pi;
             this.fieldAttr = fieldAttr;
+            this.dbType = DbTypeConvertor.TypeToDbType(pi.PropertyType);
         }
 
         /// <summary>
@@ -40,6 +45,24 @@ namespace Jc.Core.Data.Query
             get
             {
                 return pi.Name;
+            }
+        }
+
+        /// <summary>
+        /// 是否为枚举类型
+        /// 目前暂不支持 字段类型为枚举支持
+        /// </summary>
+        public bool IsEnum
+        {
+            get
+            {
+                if(isEnum == null)
+                {
+                    isEnum = Pi.PropertyType.GenericTypeArguments.Length > 0 ?
+                        Pi.PropertyType.GenericTypeArguments[0].IsEnum
+                        : Pi.PropertyType.IsEnum;
+                }
+                return isEnum.Value;
             }
         }
 
@@ -65,6 +88,7 @@ namespace Jc.Core.Data.Query
                 return fieldAttr.IsIgnore;
             }
         }
+
         /// <summary>
         /// 属性对象
         /// </summary>
@@ -104,5 +128,13 @@ namespace Jc.Core.Data.Query
                 fieldAttr = value;
             }
         }                
+
+        /// <summary>
+        /// 字段DbType
+        /// </summary>
+        public DbType DbType
+        {
+            get { return dbType; }
+        }
     }
 }

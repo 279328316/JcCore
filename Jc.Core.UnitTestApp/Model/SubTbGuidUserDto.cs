@@ -1,20 +1,20 @@
 ﻿using System;
 using Jc.Core;
 
-namespace Jc.Core.TestApp
+namespace Jc.Core.UnitTestApp
 {
     /// <summary>
     /// User Dto
     /// </summary>
-    [Table(Name = "t_User", DisplayText = "",AutoCreate = true)]
-    public class UserDto
+    [Table(Name = "t_SubTbGUser{0}", DisplayText = "",AutoCreate = true)]
+    public class SubTbGUserDto
     {
         #region Properties
         /// <summary>
         /// Id
         /// </summary>
-        [Field(DisplayText = "Id", IsPk = true, Required = true, FieldType = "int")]
-        public int? Id { get; set; }
+        [Field(DisplayText = "Id", IsPk = true, Required = true, FieldType = "uniqueidentifier")]
+        public Guid Id { get; set; }
 
         /// <summary>
         /// 用户名
@@ -62,7 +62,7 @@ namespace Jc.Core.TestApp
         /// 性别 0女 1男
         /// </summary>
         [Field(DisplayText = "性别 0女 1男", FieldType = "int")]
-        public Sex? Sex { get; set; }
+        public int? Sex { get; set; }
 
         /// <summary>
         /// 出生日期

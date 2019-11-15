@@ -296,7 +296,7 @@ namespace Jc.Core
         /// <typeparam name="T">操作对象泛型</typeparam>
         /// <param name="subTableArg">分表参数</param>
         /// <returns>返回subTableDbContext.只能用于指定分表操作.</returns>
-        public DbContext SetSubTable<T>(string subTableArg)
+        public DbContext SetSubTable<T>(object subTableArg)
         {
             DtoMapping dtoDbMapping = DtoMappingHelper.GetDtoMapping<T>();
             string tableName = dtoDbMapping.TableAttr.Name;
@@ -304,7 +304,11 @@ namespace Jc.Core
             {
                 throw new Exception("必须为分表对象" + typeof(T).Name + "指定包含{0}参数的TableName属性");
             }
-            DbContext subTableDbContext = new DbContext(this.connectString, this.dbType, subTableArg,typeof(T));
+            if (subTableArg == null)
+            {
+                throw new Exception("分表参数不能为空");
+            }
+            DbContext subTableDbContext = new DbContext(this.connectString, this.dbType, subTableArg.ToString(),typeof(T));
             return subTableDbContext;
         }
 

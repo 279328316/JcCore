@@ -5,49 +5,78 @@ using System.Text;
 
 namespace Jc.Core.Data.Query
 {
+    /// <summary>
+    /// DbTypeConvertor
+    /// </summary>
     public static class DbTypeConvertor
     {
+        //缓存类型与DbType对应关系
+        private static Dictionary<Type, DbType> typeDic = new Dictionary<Type, DbType>();
+
         // C#数据类型转换为DbType
-        public static DbType TypeToDbType(Type t)
+        /// <summary>
+        /// 获取数据类型对应的DbType
+        /// </summary>
+        /// <param name="type">类型</param>
+        /// <returns></returns>
+        public static DbType TypeToDbType(Type type)
         {
-            DbType dbt;
+            DbType dbType = DbType.Object;
             try
             {
-                string typeName = t.Name;
-                if(t.GenericTypeArguments!=null && t.GenericTypeArguments.Length>0)
+                if (typeDic.ContainsKey(type))
                 {
-                    typeName = t.GenericTypeArguments[0].Name;
+                    dbType = typeDic[type];
                 }
-                dbt = (DbType)Enum.Parse(typeof(DbType), typeName);
+                else
+                {
+                    #region 获取DbType,并添加到dic
+                    if (type.GenericTypeArguments != null && type.GenericTypeArguments.Length > 0)
+                    {
+                        Type realType = type.GenericTypeArguments[0];
+                        string typeName = realType.Name;
+                        if (realType.IsEnum)
+                        {
+                            typeName = typeof(int).Name;
+                        }
+                        dbType = (DbType)Enum.Parse(typeof(DbType), typeName);
+                    }
+                    else
+                    {
+                        string typeName = type.Name;
+                        dbType = (DbType)Enum.Parse(typeof(DbType), typeName);
+                    }
+
+                    try
+                    {
+                        typeDic.Add(type, dbType);
+                    }
+                    catch
+                    {
+                    }
+                    #endregion
+                }
             }
             catch
             {
-                dbt = DbType.Object;
             }
-            return dbt;
+            return dbType;
         }
 
         // C#数据类型转换为DbType
+        /// <summary>
+        /// 获取value对应的dbType
+        /// </summary>
+        /// <param name="value"></param>
+        /// <returns></returns>
         public static DbType GetDbType(object value)
         {
-            DbType dbt = DbType.Object;
-            try
+            DbType dbType = DbType.Object;
+            if (value != null)
             {
-                if (value != null)
-                {
-                    Type t = value.GetType();
-                    string typeName = t.Name;
-                    if (t.GenericTypeArguments != null && t.GenericTypeArguments.Length > 0)
-                    {
-                        typeName = t.GenericTypeArguments[0].Name;
-                    }
-                    dbt = (DbType)Enum.Parse(typeof(DbType), typeName);
-                }
+                dbType = TypeToDbType(value.GetType());
             }
-            catch
-            {
-            }
-            return dbt;
+            return dbType;
         }
     }
 }
