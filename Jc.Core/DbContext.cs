@@ -296,7 +296,7 @@ namespace Jc.Core
         /// <typeparam name="T">操作对象泛型</typeparam>
         /// <param name="subTableArg">分表参数</param>
         /// <returns>返回subTableDbContext.只能用于指定分表操作.</returns>
-        public DbContext SetSubTable<T>(object subTableArg)
+        public DbContext GetSubTableDbContext<T>(object subTableArg)
         {
             DtoMapping dtoDbMapping = DtoMappingHelper.GetDtoMapping<T>();
             string tableName = dtoDbMapping.TableAttr.Name;
