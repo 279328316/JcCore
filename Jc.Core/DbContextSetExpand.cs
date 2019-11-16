@@ -69,7 +69,7 @@ namespace Jc.Core
             #region 拆分新增或更新对象List
             for (int i = 0; i < list.Count; i++)
             {
-                object pkValue = dtoDbMapping.PkMap.Pi.GetValue(list);
+                object pkValue = dtoDbMapping.PkMap.Pi.GetValue(list[i]);
                 if (ExHelper.IsNullOrEmpty(pkValue))
                 {
                     addList.Add(list[i]);
