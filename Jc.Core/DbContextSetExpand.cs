@@ -165,7 +165,7 @@ namespace Jc.Core
                     {
                         dbCommand.CommandText += ";" + dbProvider.GetAutoIdDbCommand().CommandText;
                         object valueObj = dbCommand.ExecuteScalar();
-                        if (valueObj == null || valueObj != DBNull.Value)
+                        if (valueObj == null || valueObj == DBNull.Value)
                         {
                             throw new Exception("插入记录失败.");
                         }
