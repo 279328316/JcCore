@@ -112,7 +112,7 @@ namespace Jc.Core.Data.Query
                     {
                         Type realType = type.GenericTypeArguments.Length > 0 ?
                                             type.GenericTypeArguments[0] : type;
-                        throw new Exception($"{piMap.Pi.Name}[{realType.Name}]转换异常.对象属性暂不支持枚举类型,请使用int类型.");
+                        throw new Exception($"对象{typeof(T).Name}属性{piMap.Pi.Name}[{realType.Name}]转换异常.对象属性暂不支持枚举类型,请使用int类型.");
                         //throw new Exception("实体类属性暂不支持枚举类型.");
                     }
                     il.Emit(OpCodes.Unbox_Any, type);
