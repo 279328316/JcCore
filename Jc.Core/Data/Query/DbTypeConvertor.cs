@@ -31,21 +31,18 @@ namespace Jc.Core.Data.Query
                 else
                 {
                     #region 获取DbType,并添加到dic
-                    if (type.GenericTypeArguments != null && type.GenericTypeArguments.Length > 0)
+                    Type realType = type.GenericTypeArguments.Length > 0 ?
+                                        type.GenericTypeArguments[0] : type;
+                    string typeName;
+                    if (realType.IsEnum)
                     {
-                        Type realType = type.GenericTypeArguments[0];
-                        string typeName = realType.Name;
-                        if (realType.IsEnum)
-                        {
-                            typeName = typeof(int).Name;
-                        }
-                        dbType = (DbType)Enum.Parse(typeof(DbType), typeName);
+                        typeName = typeof(int).Name;
                     }
                     else
                     {
-                        string typeName = type.Name;
-                        dbType = (DbType)Enum.Parse(typeof(DbType), typeName);
+                        typeName = realType.Name;
                     }
+                    dbType = (DbType)Enum.Parse(typeof(DbType), typeName);
 
                     try
                     {
