@@ -96,24 +96,13 @@ namespace Jc.Core.Data.Query
                 Type type = piMap.PropertyType;  //拆箱
                 if (type.IsValueType)
                 {   //直接拆箱 可空类型,也可以直接拆箱
-                    //if (piMap.IsEnum)
-                    //{   //如果为枚举类型,先转为int
-                    //    //支持枚举类型失败
-                    //    //il.Emit(OpCodes.Unbox_Any, typeof(int));
-                    //    //Type realType = type.GenericTypeArguments.Length > 0 ?
-                    //    //                type.GenericTypeArguments[0] : type;
-                    //    //Type helperType = typeof(Helper.TEnumHelper<>);
-                    //    //Type thealperType = helperType.MakeGenericType(realType);
-                    //    //MethodInfo convertMethod = thealperType.GetMethod("ToEnum");
-                    //    //il.Emit(OpCodes.Callvirt, convertMethod);
-                    //    //il.Emit(OpCodes.Unbox_Any, realType);
-                    //}
                     if (piMap.IsEnum)
                     {
-                        Type realType = type.GenericTypeArguments.Length > 0 ?
-                                            type.GenericTypeArguments[0] : type;
-                        throw new Exception($"对象{typeof(T).Name}属性{piMap.Pi.Name}[{realType.Name}]转换异常.对象属性暂不支持枚举类型,请使用int类型.");
-                        //throw new Exception("实体类属性暂不支持枚举类型.");
+                        if (type.GenericTypeArguments.Length > 0)
+                        {   //如果为可空枚举类型,抛出异常
+                            Type realType = type.GenericTypeArguments[0];
+                            throw new Exception($"对象{typeof(T).Name}属性{piMap.Pi.Name}[{realType.Name}]转换异常.不支持可空枚举类型.");
+                        }
                     }
                     il.Emit(OpCodes.Unbox_Any, type);
                 }

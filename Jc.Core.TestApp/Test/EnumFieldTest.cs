@@ -1,5 +1,8 @@
-﻿using System;
+﻿using Jc.Core.TestApp.PetCt;
+using Jc.Core.TestBase;
+using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 
 namespace Jc.Core.TestApp.Test
@@ -35,6 +38,14 @@ namespace Jc.Core.TestApp.Test
 
             UserDto user = Dbc.Db.Get<UserDto>();
             Console.WriteLine(user.UserName);
+        }
+
+        public void EnumPropertyTest()
+        {
+            List<PetCt_PatientDto> patients = Dbc.PetCtDb.GetList<PetCt_PatientDto>();
+            List<PetCt_PatientDto> femalePatients = patients.Where(a => a.Sex == SexType.F).ToList();
+            List<PetCt_PatientDto> malePatients = patients.Where(a => a.Sex == SexType.M).ToList();
+            List<PetCt_PatientDto> oPatients = patients.Where(a => a.Sex == SexType.O).ToList();
         }
     }
 }

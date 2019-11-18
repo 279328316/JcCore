@@ -12,6 +12,7 @@ namespace Jc.Core.TestApp
             Console.ReadKey();
             EnumFieldTest test = new EnumFieldTest();
             test.Test();
+            test.EnumPropertyTest();
 
             Console.WriteLine("测试完成,请按任意键继续.");
             Console.ReadKey();

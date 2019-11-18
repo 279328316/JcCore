@@ -25,6 +25,11 @@ namespace Jc.Core.TestApp
         public static DbContext StockDb = DbContext.CreateDbContext("Stock", DatabaseType.MsSql);
 
         /// <summary>
+        /// PetCtDb
+        /// </summary>
+        public static DbContext PetCtDb = DbContext.CreateDbContext("PETCT_PUMC", DatabaseType.PostgreSql); //PETCT_PUMC Db 数据操作
+
+        /// <summary>
         /// 获取DbIQuery
         /// </summary>
         /// <typeparam name="T"></typeparam>
