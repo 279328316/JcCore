@@ -365,7 +365,7 @@ namespace Jc.Core
             }
             catch (Exception ex)
             {
-                throw new Exception("转换出错!", ex);
+                throw new Exception($"读取数据出错:{ex.Message}", ex);
             }
 
         }
