@@ -10,9 +10,10 @@ namespace Jc.Core.TestApp
         {
             Console.WriteLine("测试即将开始,请按任意键继续.");
             Console.ReadKey();
-            EnumFieldTest test = new EnumFieldTest();
+            ListAddTest test = new ListAddTest();
             test.Test();
-            test.EnumPropertyTest();
+            SubTableListAddTest test1 = new SubTableListAddTest();
+            test1.Test();
 
             Console.WriteLine("测试完成,请按任意键继续.");
             Console.ReadKey();

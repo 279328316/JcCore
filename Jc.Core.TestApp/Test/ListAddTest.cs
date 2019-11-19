@@ -50,7 +50,7 @@ namespace Jc.Core.TestApp.Test
             sw.Reset();
             Console.WriteLine("执行数据插入...");
             sw.Start();
-            Dbc.StockDb.GetSubTableDbContext<UserDto>("2019").AddList(users,a=>new { a.Id,a.UserName,a.Email,a.AddDate});
+            Dbc.StockDb.AddList(users,a=>new { a.Id,a.UserName,a.Email,a.AddDate},true);
             sw.Stop();
             Console.WriteLine($"Int插入{users.Count}条记录，共耗时{sw.ElapsedMilliseconds / 1000}S");
         }
@@ -60,7 +60,7 @@ namespace Jc.Core.TestApp.Test
             Console.WriteLine("批量更新测试.使用拼接批量SQL方式实现");
             Stopwatch sw = new Stopwatch();
             sw.Start();
-            List<UserDto> users = Dbc.StockDb.GetSubTableDbContext<UserDto>("2019").GetSortList<UserDto>(null, a => a.Id);
+            List<UserDto> users = Dbc.StockDb.GetSortList<UserDto>(null, a => a.Id);
             Console.WriteLine($"查询{users.Count}条记录，共耗时{sw.ElapsedMilliseconds}Ms");
             sw.Reset();
             sw.Start();
@@ -88,7 +88,7 @@ namespace Jc.Core.TestApp.Test
             sw.Reset();
             Console.WriteLine("执行数据更新...");
             sw.Start();
-            Dbc.StockDb.GetSubTableDbContext<UserDto>("2019").UpdateList(users,a=>new {a.Id,a.UserName,a.Email,a.LastUpdateDate,a.NickName});
+            Dbc.StockDb.UpdateList(users,a=>new {a.Id,a.UserName,a.Email,a.LastUpdateDate,a.NickName});
             sw.Stop();
             Console.WriteLine($"Int更新{users.Count}条记录，共耗时{sw.ElapsedMilliseconds / 1000}S");
         }
@@ -114,7 +114,7 @@ namespace Jc.Core.TestApp.Test
                     Email = $"Email{i}@qq.com",
                     Avatar = $"Avatar{i}",
                     PhoneNo = $"133810{i}".PadRight(11, '0'),
-                    Sex = i % 2,
+                    Sex = (Sex)(i % 2),
                     Birthday = DateTime.Now.AddYears(-1).AddHours(-1 * i),
                     WeChatOpenId = $"WeChatOpenId{i}",
                     IsDelete = i % 2 == 0 ? true : false,
@@ -130,7 +130,7 @@ namespace Jc.Core.TestApp.Test
             sw.Reset();
             Console.WriteLine("执行数据插入...");
             sw.Start();
-            Dbc.StockDb.GetSubTableDbContext<GUserDto>("2019").AddList(users, a => new { a.Id, a.UserName, a.Email, a.AddDate });
+            Dbc.StockDb.AddList(users, a => new { a.Id, a.UserName, a.Email, a.AddDate }, true);
             sw.Stop();
             Console.WriteLine($"Guid插入{users.Count}条记录，共耗时{sw.ElapsedMilliseconds / 1000}S");
         }
@@ -141,7 +141,7 @@ namespace Jc.Core.TestApp.Test
             Console.WriteLine("批量更新测试.使用拼接批量SQL方式实现");
             Stopwatch sw = new Stopwatch();
             sw.Start();
-            List<GUserDto> users = Dbc.StockDb.GetSubTableDbContext<GUserDto>("2019").GetSortList<GUserDto>(null, a => a.Id);
+            List<GUserDto> users = Dbc.StockDb.GetSortList<GUserDto>(null, a => a.Id);
             Console.WriteLine($"查询{users.Count}条记录，共耗时{sw.ElapsedMilliseconds}Ms");
             sw.Reset();
             sw.Start();
@@ -155,7 +155,7 @@ namespace Jc.Core.TestApp.Test
                 users[i].Email = $"UpEmail{i}@qq.com";
                 users[i].Avatar = $"Avatar{i}";
                 users[i].PhoneNo = $"133810{i}".PadRight(11, '0');
-                users[i].Sex = i % 2;
+                users[i].Sex = (Sex)(i % 2);
                 users[i].Birthday = DateTime.Now.AddYears(-1).AddHours(-1 * i);
                 users[i].WeChatOpenId = $"WeChatOpenId{i}";
                 users[i].IsDelete = i % 2 == 0 ? true : false;
@@ -168,7 +168,7 @@ namespace Jc.Core.TestApp.Test
             sw.Reset();
             Console.WriteLine("执行数据更新...");
             sw.Start();
-            Dbc.StockDb.GetSubTableDbContext<GUserDto>("2019").UpdateList(users, a => new { a.UserName, a.Email, a.LastUpdateDate, a.NickName });
+            Dbc.StockDb.UpdateList(users, a => new { a.UserName, a.Email, a.LastUpdateDate, a.NickName });
             sw.Stop();
             Console.WriteLine($"Guid更新{users.Count}条记录，共耗时{sw.ElapsedMilliseconds / 1000}S");
         }

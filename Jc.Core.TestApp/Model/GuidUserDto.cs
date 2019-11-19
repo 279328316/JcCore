@@ -6,7 +6,7 @@ namespace Jc.Core.TestApp
     /// <summary>
     /// User Dto
     /// </summary>
-    [Table(Name = "t_GUser{0}", DisplayText = "",AutoCreate = true)]
+    [Table(Name = "t_GUser", DisplayText = "",AutoCreate = true)]
     public class GUserDto
     {
         #region Properties
@@ -62,7 +62,7 @@ namespace Jc.Core.TestApp
         /// 性别 0女 1男
         /// </summary>
         [Field(DisplayText = "性别 0女 1男", FieldType = "int")]
-        public int? Sex { get; set; }
+        public Sex Sex { get; set; }
 
         /// <summary>
         /// 出生日期
