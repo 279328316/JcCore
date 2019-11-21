@@ -52,6 +52,17 @@ namespace Jc.Core.Helper
         public WebHeaderCollection Headers { get; set; } = new WebHeaderCollection();
         #endregion
 
+        #region Ctor
+        /// <summary>
+        /// 静态Ctor
+        /// 注册字符
+        /// </summary>
+        static HttpHelper()
+        {
+            Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
+        }
+        #endregion
+
         #region SetMethods
 
         /// <summary>
