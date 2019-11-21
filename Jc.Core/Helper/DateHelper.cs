@@ -57,8 +57,8 @@ namespace Jc.Core.Helper
             TimeSpan ts = dt2.Value - dt1.Value;
             int days = (int)ts.TotalDays;
             int hours = (int)(ts.TotalHours - days * 24);//总时间分差
-            int minutes = (int)(ts.TotalMinutes - hours * 60);//总时间分差
-            int seconds = (int)(ts.TotalSeconds - hours * 3600 - minutes * 60);//总时间分差
+            int minutes = (int)(ts.TotalMinutes - days * 24 * 60 - hours * 60);//总时间分差
+            int seconds = (int)(ts.TotalSeconds - days * 24 * 60 * 60 - hours * 3600 - minutes * 60);//总时间分差
 
             string result = string.Format("{0}:{1}:{2}",
                 hours.ToString().PadLeft(2, '0'),
