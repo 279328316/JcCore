@@ -94,7 +94,7 @@ namespace Jc.Core
             string result = "";
             try
             {
-                result = ObjToJson(obj, setting);
+                result = SerializeObject(obj, setting);
                 FileInfo fileInfo = new FileInfo(filePath);
                 if(fileInfo.Exists)
                 {
@@ -130,7 +130,7 @@ namespace Jc.Core
             T obj = default(T);
             try
             {
-                if (!string.IsNullOrEmpty(filePath))
+                if (string.IsNullOrEmpty(filePath) || !File.Exists(filePath))
                 {
                     throw new Exception("文件不存在");
                 }
