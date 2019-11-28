@@ -21,16 +21,21 @@ namespace Jc.Core
     /// </summary>
     public sealed class DbTransContext : DbContext
     {
-        internal bool isTransaction = false; //是否为事务
         internal DbConnection transDbConnection;  //dbConnection
 
         private DbTransaction dbTransaction;//事务使用
 
         internal DbTransContext(string connectString, DatabaseType dbType = DatabaseType.MsSql,
-                                string subTableArg = null, Type subTableType = null) :base(connectString,dbType)
+                                List<KeyValueObj<Type,string>> subTableArgList = null) :base(connectString,dbType)
         {
-            this.subTableArg = subTableArg;
-            this.subTableType = subTableType;
+            if (subTableArgList != null)
+            {   //使用新List,防止变量污染
+                this.subTableArgList = new List<KeyValueObj<Type, string>>();
+                for (int i = 0; i < subTableArgList.Count; i++)
+                {
+                    this.subTableArgList.Add(new KeyValueObj<Type, string>(subTableArgList[i].Key, subTableArgList[i].Value));
+                }
+            }
             BeginTrans();
         }
 

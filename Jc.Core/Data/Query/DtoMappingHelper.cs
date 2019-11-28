@@ -57,7 +57,7 @@ namespace Jc.Core.Data.Query
             }
             return (DtoMapping)dtoMappingCache[t];
         }
-
+        
         /// <summary>
         /// 通过解析获得Dto的对象的参数,Key:为类的属性名
         /// </summary>

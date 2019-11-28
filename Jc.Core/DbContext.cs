@@ -29,8 +29,10 @@ namespace Jc.Core
         private DatabaseType dbType;
         private DbProvider dbProvider;    //DbProvider
 
-        internal string subTableArg = null;  //分表TableName后缀
-        internal Type subTableType = null;   //分表操作类型
+        internal bool isTransaction = false; //是否为事务
+
+        //分表参数列表 对象类型,分表参数
+        internal List<KeyValueObj<Type, string>> subTableArgList = null;
 
         /// <summary>
         /// Ctor
@@ -40,21 +42,6 @@ namespace Jc.Core
         internal DbContext(string connectString, DatabaseType dbType = DatabaseType.MsSql)
         {
             InitDbContext(connectString, dbType);
-        }
-
-
-        /// <summary>
-        /// 分表操作使用Ctor
-        /// <param name="connectString">数据库连接串或数据库名称</param>
-        /// <param name="dbType">数据库类型</param>
-        /// <param name="subTableArg">分表参数</param>
-        /// <param name="subTableType">分表操作对象类型</param>
-        /// </summary>
-        internal DbContext(string connectString, DatabaseType dbType = DatabaseType.MsSql,string subTableArg = null,Type subTableType = null)
-        {
-            InitDbContext(connectString, dbType);
-            this.subTableArg = subTableArg;
-            this.subTableType = subTableType;
         }
 
         /// <summary>
@@ -191,14 +178,16 @@ namespace Jc.Core
         /// <returns></returns>
         private string GetSubTableArg<T>()
         {
-            if(this.subTableType !=null && this.subTableType == typeof(T))
+            string subTableArg = null;
+            if(this.subTableArgList != null)
             {
-                return this.subTableArg;
+                KeyValueObj<Type,string> subTableKv = subTableArgList.FirstOrDefault(kv => kv.Key == typeof(T));
+                if (subTableKv != null)
+                {
+                    subTableArg = subTableKv.Value;
+                }
             }
-            else
-            {
-                return null;
-            }
+            return subTableArg;
         }
 
         /// <summary>
@@ -283,21 +272,44 @@ namespace Jc.Core
         /// <returns></returns>
         public DbTransContext GetTransDbContext()
         {
-            DbTransContext dbContext = new DbTransContext(this.connectString,this.dbType,this.subTableArg, this.subTableType);
+            DbTransContext dbContext = new DbTransContext(this.connectString,this.dbType,this.subTableArgList);
             return dbContext;
         }
 
+        #region 分表操作
+
         /// <summary>
         /// 设置分表dbContext
-        /// 设置的DbContext只能用于本次指定分表操作.
         /// 需要为操作对象设置可变表名称.
         /// 如TableAttr的Name为Data{0}.tablePfx参数为2018.则表名称为Data2018
         /// </summary>
-        /// <typeparam name="T">操作对象泛型</typeparam>
-        /// <param name="subTableArg">分表参数</param>
         /// <returns>返回subTableDbContext.只能用于指定分表操作.</returns>
         public DbContext GetSubTableDbContext<T>(object subTableArg)
         {
+            if (isTransaction)
+            {
+                throw new Exception("请使用非TransDbContext获取SubTableDbContext");
+            }
+            DbContext subTableDbContext = new DbContext(this.connectString, this.dbType);
+            subTableDbContext.subTableArgList = new List<KeyValueObj<Type, string>>();
+            return subTableDbContext;
+        }
+
+        /// <summary>
+        /// 为指定类型对象,添加分表参数
+        /// </summary>
+        /// <typeparam name="T">操作对象类型</typeparam>
+        /// <param name="subTableArg">分表参数</param>
+        public void AddSubTableArg<T>(object subTableArg)
+        {
+            if (subTableArgList == null)
+            {
+                throw new Exception("不为非SubTableDbContext添加分表参数");
+            }
+            if (subTableArgList.Any(kv=>kv.Key == typeof(T)))
+            {
+                throw new Exception($"不能为类型{typeof(T).Name}重复添加分表参数");
+            }
             DtoMapping dtoDbMapping = DtoMappingHelper.GetDtoMapping<T>();
             string tableName = dtoDbMapping.TableAttr.Name;
             if (string.IsNullOrEmpty(tableName) || !tableName.Contains("{0}"))
@@ -308,9 +320,56 @@ namespace Jc.Core
             {
                 throw new Exception("分表参数不能为空");
             }
-            DbContext subTableDbContext = new DbContext(this.connectString, this.dbType, subTableArg.ToString(),typeof(T));
-            return subTableDbContext;
+            this.subTableArgList.Add(new KeyValueObj<Type, string>(typeof(T), subTableArg.ToString()));
         }
+        
+        /// <summary>
+        /// 查看当前分表参数List
+        /// </summary>
+        public List<KeyValuePair<Type,string>> GetSubTableArgs()
+        {
+            if (subTableArgList == null)
+            {
+                throw new Exception("非SubTableDbContext,不能进行此操作");
+            }
+            List<KeyValuePair<Type, string>> list = new List<KeyValuePair<Type, string>>();
+            for (int i = 0; i < subTableArgList.Count; i++)
+            {
+                Type type = subTableArgList[0].Key;
+                string tableName = "";
+                TableAttribute attr = type.GetCustomAttribute<TableAttribute>();
+                if (attr != null)
+                {
+                    tableName = string.Format(attr.Name, subTableArgList[0].Value);
+                }
+                else
+                {
+                    tableName = subTableArgList[0].Value;
+                }
+                list.Add(new KeyValuePair<Type, string>(type, tableName));
+            }
+            return list;
+        }
+
+        /// <summary>
+        /// 移除分表参数
+        /// </summary>
+        /// <typeparam name="T">操作对象类型</typeparam>
+        public void RemoveSubTableArg<T>()
+        {
+            if (subTableArgList == null)
+            {
+                throw new Exception("非SubTableDbContext,不能进行此操作");
+            }
+            KeyValueObj<Type, string> kvObj = subTableArgList.FirstOrDefault(a=>a.Key == typeof(T));
+            if (kvObj == null)
+            {
+                throw new Exception($"不存在类型{typeof(T).Name}的分表参数");
+            }
+            this.subTableArgList.Remove(kvObj);
+        }
+
+        #endregion
 
         /// <summary>
         /// 关闭非事务DbConnection
