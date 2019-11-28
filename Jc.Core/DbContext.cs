@@ -284,7 +284,7 @@ namespace Jc.Core
         /// 如TableAttr的Name为Data{0}.tablePfx参数为2018.则表名称为Data2018
         /// </summary>
         /// <returns>返回subTableDbContext.只能用于指定分表操作.</returns>
-        public DbContext GetSubTableDbContext<T>(object subTableArg)
+        public DbContext GetSubTableDbContext()
         {
             if (isTransaction)
             {
@@ -296,11 +296,12 @@ namespace Jc.Core
         }
 
         /// <summary>
-        /// 为指定类型对象,添加分表参数
+        /// 添加分表参数.返回当前SubTableDbContext
         /// </summary>
         /// <typeparam name="T">操作对象类型</typeparam>
         /// <param name="subTableArg">分表参数</param>
-        public void AddSubTableArg<T>(object subTableArg)
+        /// <returns>返回当前SubTableDbContext</returns>
+        public DbContext AddSubTableArg<T>(object subTableArg)
         {
             if (subTableArgList == null)
             {
@@ -321,6 +322,7 @@ namespace Jc.Core
                 throw new Exception("分表参数不能为空");
             }
             this.subTableArgList.Add(new KeyValueObj<Type, string>(typeof(T), subTableArg.ToString()));
+            return this;
         }
         
         /// <summary>

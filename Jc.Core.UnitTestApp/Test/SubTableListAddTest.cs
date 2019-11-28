@@ -50,7 +50,7 @@ namespace Jc.Core.UnitTestApp
             sw.Reset();
             Console.WriteLine("执行数据插入...");
             sw.Start();
-            Dbc.StockDb.GetSubTableDbContext<SubTbUserDto>("2019").AddList(users,a=>new { a.Id,a.UserName,a.Email,a.AddDate});
+            Dbc.StockDb.GetSubTableDbContext().AddSubTableArg<SubTbUserDto>("2019").AddList(users,a=>new { a.Id,a.UserName,a.Email,a.AddDate});
             sw.Stop();
             Console.WriteLine($"Int插入{users.Count}条记录，共耗时{sw.ElapsedMilliseconds / 1000}S");
         }
@@ -60,7 +60,7 @@ namespace Jc.Core.UnitTestApp
             Console.WriteLine("批量更新测试.使用拼接批量SQL方式实现");
             Stopwatch sw = new Stopwatch();
             sw.Start();
-            List<SubTbUserDto> users = Dbc.StockDb.GetSubTableDbContext<SubTbUserDto>("2019").GetSortList<SubTbUserDto>(null, a => a.Id);
+            List<SubTbUserDto> users = Dbc.StockDb.GetSubTableDbContext().AddSubTableArg<SubTbUserDto>("2019").GetSortList<SubTbUserDto>(null, a => a.Id);
             Console.WriteLine($"查询{users.Count}条记录，共耗时{sw.ElapsedMilliseconds}Ms");
             sw.Reset();
             sw.Start();
@@ -88,7 +88,7 @@ namespace Jc.Core.UnitTestApp
             sw.Reset();
             Console.WriteLine("执行数据更新...");
             sw.Start();
-            Dbc.StockDb.GetSubTableDbContext<SubTbUserDto>("2019").UpdateList(users,a=>new {a.Id,a.UserName,a.Email,a.LastUpdateDate,a.NickName});
+            Dbc.StockDb.GetSubTableDbContext().AddSubTableArg<SubTbUserDto>("2019").UpdateList(users,a=>new {a.Id,a.UserName,a.Email,a.LastUpdateDate,a.NickName});
             sw.Stop();
             Console.WriteLine($"Int更新{users.Count}条记录，共耗时{sw.ElapsedMilliseconds / 1000}S");
         }
@@ -130,7 +130,7 @@ namespace Jc.Core.UnitTestApp
             sw.Reset();
             Console.WriteLine("执行数据插入...");
             sw.Start();
-            Dbc.StockDb.GetSubTableDbContext<SubTbGUserDto>("2019").AddList(users, a => new { a.Id, a.UserName, a.Email, a.AddDate });
+            Dbc.StockDb.GetSubTableDbContext().AddSubTableArg<SubTbGUserDto>("2019").AddList(users, a => new { a.Id, a.UserName, a.Email, a.AddDate });
             sw.Stop();
             Console.WriteLine($"Guid插入{users.Count}条记录，共耗时{sw.ElapsedMilliseconds / 1000}S");
         }
@@ -141,7 +141,7 @@ namespace Jc.Core.UnitTestApp
             Console.WriteLine("批量更新测试.使用拼接批量SQL方式实现");
             Stopwatch sw = new Stopwatch();
             sw.Start();
-            List<SubTbGUserDto> users = Dbc.StockDb.GetSubTableDbContext<SubTbGUserDto>("2019").GetSortList<SubTbGUserDto>(null, a => a.Id);
+            List<SubTbGUserDto> users = Dbc.StockDb.GetSubTableDbContext().AddSubTableArg<SubTbGUserDto>("2019").GetSortList<SubTbGUserDto>(null, a => a.Id);
             Console.WriteLine($"查询{users.Count}条记录，共耗时{sw.ElapsedMilliseconds}Ms");
             sw.Reset();
             sw.Start();
@@ -168,7 +168,7 @@ namespace Jc.Core.UnitTestApp
             sw.Reset();
             Console.WriteLine("执行数据更新...");
             sw.Start();
-            Dbc.StockDb.GetSubTableDbContext<SubTbGUserDto>("2019").UpdateList(users, a => new { a.UserName, a.Email, a.LastUpdateDate, a.NickName });
+            Dbc.StockDb.GetSubTableDbContext().AddSubTableArg<SubTbGUserDto>("2019").UpdateList(users, a => new { a.UserName, a.Email, a.LastUpdateDate, a.NickName });
             sw.Stop();
             Console.WriteLine($"Guid更新{users.Count}条记录，共耗时{sw.ElapsedMilliseconds / 1000}S");
         }
