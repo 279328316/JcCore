@@ -188,6 +188,7 @@ namespace Jc.Core.Helper
                     {
                         result = reader.ReadToEnd();
                         result = HandleUnicodeString(result);
+                        reader.Close();
                         reader.Dispose();
                     }
                     response.Close();
@@ -276,6 +277,7 @@ namespace Jc.Core.Helper
                     {
                         result = reader.ReadToEnd();
                         result = HandleUnicodeString(result);
+                        reader.Close();
                         reader.Dispose();
                     }
                     response.Close();
@@ -365,6 +367,7 @@ namespace Jc.Core.Helper
                     {
                         result = reader.ReadToEnd();
                         result = HandleUnicodeString(result);
+                        reader.Close();
                         reader.Dispose();
                     }
                     response.Close();
@@ -422,6 +425,7 @@ namespace Jc.Core.Helper
                 }
             }
             request.Timeout = Timeout;
+            request.ReadWriteTimeout = Timeout;
             request.CookieContainer = new CookieContainer();
             request.CookieContainer.Add(Cookies);
             #endregion
@@ -474,6 +478,7 @@ namespace Jc.Core.Helper
                 }
             }
             request.Timeout = Timeout;
+            request.ReadWriteTimeout = Timeout;
             request.CookieContainer = new CookieContainer();
             request.CookieContainer.Add(Cookies);
 
@@ -538,6 +543,7 @@ namespace Jc.Core.Helper
                 }
             }
             request.Timeout = Timeout;
+            request.ReadWriteTimeout = Timeout;
             request.CookieContainer = new CookieContainer();
             request.CookieContainer.Add(Cookies);
 
