@@ -363,21 +363,21 @@ namespace Jc.Core.Helper
                 //读取响应流
                 using (StreamReader reader = new StreamReader(response.GetResponseStream(), Encoding.GetEncoding(encoding)))
                 {
-                    result = reader.ReadToEnd();
-                    //待观察是否使用异步读取
                     //ReadToEnd 会出现无限阻塞状态 已设置ReadWriteTimeout时间.
-                    //Task<string> task = reader.ReadToEndAsync();
-                    //int t = 0;
-                    //while (task.Status != TaskStatus.RanToCompletion)
-                    //{
-                    //    Thread.Sleep(1000);
-                    //    t++;
-                    //    if (t > Timeout / 1000)
-                    //    {
-                    //        throw new Exception("读取数据超时");
-                    //    }
-                    //}
-                    //result = task.Result;
+                    //使用异步读取,添加Timeout处理.
+                    //result = reader.ReadToEnd();
+                    Task<string> task = reader.ReadToEndAsync();
+                    int t = 0;
+                    while (task.Status != TaskStatus.RanToCompletion)
+                    {
+                        Thread.Sleep(1000);
+                        t++;
+                        if (t > Timeout / 1000)
+                        {
+                            throw new Exception("读取数据超时");
+                        }
+                    }
+                    result = task.Result;
                     result = HandleUnicodeString(result);
                     reader.Close();
                     reader.Dispose();
