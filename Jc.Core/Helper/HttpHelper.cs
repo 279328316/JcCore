@@ -374,6 +374,7 @@ namespace Jc.Core.Helper
                         t++;
                         if (t > Timeout / 1000)
                         {
+                            reader.Close();
                             throw new Exception("读取数据超时");
                         }
                     }
