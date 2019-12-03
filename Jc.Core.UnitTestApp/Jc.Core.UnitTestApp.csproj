@@ -129,6 +129,7 @@
   <ItemGroup>
     <Compile Include="Common\DbCenter.cs" />
     <Compile Include="Common\Enums.cs" />
+    <Compile Include="Helper\HttpHelperTests.cs" />
     <Compile Include="Model\ApiDto.cs" />
     <Compile Include="Model\GuidUserDto.cs" />
     <Compile Include="Model\SubTbGuidUserDto.cs" />

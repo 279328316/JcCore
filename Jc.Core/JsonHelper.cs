@@ -75,8 +75,9 @@ namespace Jc.Core
                     obj = JsonConvert.DeserializeObject<T>(str);
                 }
             }
-            catch
+            catch (Exception ex)
             {
+                throw ex;
             }
             return obj;
         }
@@ -137,8 +138,9 @@ namespace Jc.Core
                 string content = File.ReadAllText(filePath);
                 obj = DeserializeObject<T>(content);
             }
-            catch
+            catch (Exception ex)
             {
+                throw ex;
             }
             return obj;
         }

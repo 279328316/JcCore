@@ -10,6 +10,7 @@ using System.IO.Compression;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Reflection;
+using System.Threading;
 
 namespace Jc.Core.Helper
 {
@@ -178,19 +179,7 @@ namespace Jc.Core.Helper
             {
                 using (HttpWebResponse response = CreateGetHttpResponse(url, requestParams))
                 {
-                    string encoding = string.IsNullOrEmpty(response.ContentEncoding) ? response.CharacterSet : response.ContentEncoding;
-                    if (encoding == null || encoding.Length < 1)
-                    {
-                        encoding = "UTF-8"; //默认编码
-                    }
-                    //读取响应流
-                    using (StreamReader reader = new StreamReader(response.GetResponseStream(), Encoding.GetEncoding(encoding)))
-                    {
-                        result = reader.ReadToEnd();
-                        result = HandleUnicodeString(result);
-                        reader.Close();
-                        reader.Dispose();
-                    }
+                    result = ReadResponse(response);
                     response.Close();
                 }
             }
@@ -267,19 +256,7 @@ namespace Jc.Core.Helper
             {
                 using (HttpWebResponse response = CreatePostHttpResponse(url, requestParams, contentType))
                 {
-                    string encoding = string.IsNullOrEmpty(response.ContentEncoding) ? response.CharacterSet : response.ContentEncoding;
-                    if (encoding == null || encoding.Length < 1)
-                    {
-                        encoding = "UTF-8"; //默认编码
-                    }
-                    //读取响应流
-                    using (StreamReader reader = new StreamReader(response.GetResponseStream(), Encoding.GetEncoding(encoding)))
-                    {
-                        result = reader.ReadToEnd();
-                        result = HandleUnicodeString(result);
-                        reader.Close();
-                        reader.Dispose();
-                    }
+                    result = ReadResponse(response);
                     response.Close();
                 }
             }
@@ -357,19 +334,7 @@ namespace Jc.Core.Helper
             {
                 using (HttpWebResponse response = CreateUploadFileHttpResponse(url, requestParams, fileList))
                 {
-                    string encoding = string.IsNullOrEmpty(response.ContentEncoding) ? response.CharacterSet : response.ContentEncoding;
-                    if (encoding == null || encoding.Length < 1)
-                    {
-                        encoding = "UTF-8"; //默认编码
-                    }
-                    //读取响应流
-                    using (StreamReader reader = new StreamReader(response.GetResponseStream(), Encoding.GetEncoding(encoding)))
-                    {
-                        result = reader.ReadToEnd();
-                        result = HandleUnicodeString(result);
-                        reader.Close();
-                        reader.Dispose();
-                    }
+                    result = ReadResponse(response);
                     response.Close();
                 }
             }
@@ -379,6 +344,52 @@ namespace Jc.Core.Helper
             }
             return result;
         }
+
+        /// <summary>
+        /// 读取response返回结果
+        /// </summary>
+        /// <param name="response"></param>
+        /// <returns></returns>
+        private string ReadResponse(HttpWebResponse response)
+        {
+            string result = null;
+            try
+            {
+                string encoding = string.IsNullOrEmpty(response.ContentEncoding) ? response.CharacterSet : response.ContentEncoding;
+                if (encoding == null || encoding.Length < 1)
+                {
+                    encoding = "UTF-8"; //默认编码
+                }
+                //读取响应流
+                using (StreamReader reader = new StreamReader(response.GetResponseStream(), Encoding.GetEncoding(encoding)))
+                {
+                    result = reader.ReadToEnd();
+                    //待观察是否使用异步读取
+                    //ReadToEnd 会出现无限阻塞状态 已设置ReadWriteTimeout时间.
+                    //Task<string> task = reader.ReadToEndAsync();
+                    //int t = 0;
+                    //while (task.Status != TaskStatus.RanToCompletion)
+                    //{
+                    //    Thread.Sleep(1000);
+                    //    t++;
+                    //    if (t > Timeout / 1000)
+                    //    {
+                    //        throw new Exception("读取数据超时");
+                    //    }
+                    //}
+                    //result = task.Result;
+                    result = HandleUnicodeString(result);
+                    reader.Close();
+                    reader.Dispose();
+                }
+            }
+            catch (System.Exception ex)
+            {
+                throw new System.Exception(ex.Message);
+            }
+            return result;
+        }
+
         #endregion
 
         #region 创建请求
@@ -488,7 +499,7 @@ namespace Jc.Core.Helper
                 string paramStr = null;
                 if (contentType == HttpContentType.Json)
                 {
-                    paramStr = JsonHelper.ObjToJson(requestParams);
+                    paramStr = JsonHelper.SerializeObject(requestParams);
                 }
                 else
                 {
