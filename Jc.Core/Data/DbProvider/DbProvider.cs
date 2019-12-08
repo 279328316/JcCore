@@ -197,7 +197,7 @@ namespace Jc.Core.Data
             {
                 PropertyInfo pi = piMap.Pi;
                 if (piMap.FieldAttr.ReadOnly) continue;  //跳过只读字段
-                if (piMap.FieldAttr.IsPk && dtoMapping.IsAutoIncrementPk)
+                if (piMap == dtoMapping.PkMap && dtoMapping.IsAutoIncrementPk)
                 {   //如果是自动设置Id 主键是int or long 自增Id 为null or 0 跳过插入
                     continue;
                 }
