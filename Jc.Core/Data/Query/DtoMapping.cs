@@ -56,19 +56,23 @@ namespace Jc.Core.Data.Query
                 if (pkMap == null)
                 {
                     KeyValuePair<string, PiMap> pkFieldPair = piMapDic.Where(map => map.Value.FieldAttr.IsPk == true).FirstOrDefault();
-                    if (pkFieldPair.Key == null)
+                    if (pkFieldPair.Key != null)
+                    {
+                        pkMap = piMapDic[pkFieldPair.Key];
+                    }
+                    else
                     {
                         pkFieldPair = piMapDic.Where(map => map.Key.ToLower() == "id").FirstOrDefault();
                         if (pkFieldPair.Key != null)
                         {
+                            pkMap = piMapDic[pkFieldPair.Key];
                             pkMap.FieldAttr.IsPk = true;
                         }
+                        else 
+                        {
+                            throw new Exception($"未为表{TableName}设置主键.");
+                        }
                     }
-                    if (pkFieldPair.Key == null)
-                    {
-                        throw new Exception($"未为表{TableName}设置主键.");
-                    }
-                    pkMap = piMapDic[pkFieldPair.Key];
                 }
                 return pkMap;
             }
