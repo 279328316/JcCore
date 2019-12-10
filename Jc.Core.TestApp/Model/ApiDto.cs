@@ -13,6 +13,7 @@ namespace Jc.Core.TestApp
         /// <summary>
         /// Id
         /// </summary>
+        [PkField]
         public Guid Id { get; set; }
 
         /// <summary>

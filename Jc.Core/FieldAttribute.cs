@@ -114,6 +114,17 @@ namespace Jc.Core
         #endregion
     }
 
+    /// <summary>
+    /// FieldAttribute
+    /// FieldName字段默认与属性值一致
+    /// </summary>
+    public class PkFieldAttribute : FieldAttribute
+    {
+        public PkFieldAttribute()
+        {
+            IsPk = true;
+        }
+    }
 
     /// <summary>
     /// NoMappingAttribute
