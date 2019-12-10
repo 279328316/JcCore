@@ -144,7 +144,7 @@ namespace Jc.Core.Data
             outDbParameter.ParameterName = "@RecCount";
             outDbParameter.Size = 8;
             dbCommand.Parameters.Add(outDbParameter); //RecCount 总记录数
-            dbCommand.CommandText = string.Format(sqlStr, dtoDbMapping.GetTableName<T>(subTableArg), selectParams, dtoDbMapping.PkMap.FieldName);
+            dbCommand.CommandText = string.Format(sqlStr, dtoDbMapping.GetTableName(subTableArg), selectParams, dtoDbMapping.PkMap.FieldName);
             return dbCommand;
         }
 
@@ -158,7 +158,7 @@ namespace Jc.Core.Data
         {
             DbCommand dbCommand = CreateDbCommand();
             DtoMapping dtoDbMapping = DtoMappingHelper.GetDtoMapping<T>();
-            subTableArg = dtoDbMapping.GetTableName<T>(subTableArg);
+            subTableArg = dtoDbMapping.GetTableName(subTableArg);
             dbCommand.CommandText = $"Select id from dbo.sysobjects where id = object_id(N'[dbo].[{subTableArg}]')";
             return dbCommand;
         }
@@ -225,7 +225,7 @@ namespace Jc.Core.Data
             DtoMapping dtoDbMapping = DtoMappingHelper.GetDtoMapping<T>();
             List<PiMap> piMapList = DtoMappingHelper.GetPiMapList<T>();
 
-            string tableName = dtoDbMapping.GetTableName<T>(subTableArg);
+            string tableName = dtoDbMapping.GetTableName(subTableArg);
 
             StringBuilder sqlBuilder = new StringBuilder();
             sqlBuilder.Append($"Create table [{tableName}](\r\n");

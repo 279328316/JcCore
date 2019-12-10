@@ -211,7 +211,7 @@ namespace Jc.Core.Data
                 dbParameter.DbType = piMap.DbType;
                 dbCommand.Parameters.Add(dbParameter);
             }
-            dbCommand.CommandText = string.Format(sqlStr, dtoMapping.GetTableName<T>(subTableArg), fieldParams, valueParams);
+            dbCommand.CommandText = string.Format(sqlStr, dtoMapping.GetTableName(subTableArg), fieldParams, valueParams);
             #endregion
             return dbCommand;
         }
@@ -269,7 +269,7 @@ namespace Jc.Core.Data
                 strBuilder.Append("),");
             }
             valueParams = strBuilder.ToString().TrimEnd(',');
-            dbCommand.CommandText = string.Format(sqlStr, dtoDbMapping.GetTableName<T>(subTableArg), fieldParams, valueParams);
+            dbCommand.CommandText = string.Format(sqlStr, dtoDbMapping.GetTableName(subTableArg), fieldParams, valueParams);
             #endregion
             return dbCommand;
         }
@@ -304,7 +304,7 @@ namespace Jc.Core.Data
                 dbParameter.DbType = piMap.DbType;
                 dbCommand.Parameters.Add(dbParameter);
             }
-            dbCommand.CommandText = string.Format(sqlStr, dtoDbMapping.GetTableName<T>(subTableArg), fieldParams, valueParams);
+            dbCommand.CommandText = string.Format(sqlStr, dtoDbMapping.GetTableName(subTableArg), fieldParams, valueParams);
             #endregion
             return dbCommand;
         }
@@ -353,7 +353,7 @@ namespace Jc.Core.Data
             dbCommand.Parameters.Add(whereParameter);
             whereParams = $"{dtoDbMapping.PkMap.FieldName}={whereParameter.ParameterName}";
 
-            dbCommand.CommandText = string.Format(sqlStr, dtoDbMapping.GetTableName<T>(subTableArg), setParams, whereParams);
+            dbCommand.CommandText = string.Format(sqlStr, dtoDbMapping.GetTableName(subTableArg), setParams, whereParams);
             #endregion
 
             return dbCommand;
@@ -407,7 +407,7 @@ namespace Jc.Core.Data
                 dbCommand.Parameters.Add(whereParameter);
                 whereParams = $"{dtoDbMapping.PkMap.FieldName}={whereParameter.ParameterName}";
                 
-                string updateStr = string.Format(sqlStr, dtoDbMapping.GetTableName<T>(subTableArg), setParams, whereParams);
+                string updateStr = string.Format(sqlStr, dtoDbMapping.GetTableName(subTableArg), setParams, whereParams);
                 strBuilder.Append(updateStr);
             }
             dbCommand.CommandText = strBuilder.ToString();
@@ -441,7 +441,7 @@ namespace Jc.Core.Data
             dbCommand.Parameters.Add(dbParameter);
 
             whereParams = dtoDbMapping.PkMap.FieldName + "=@" + dtoDbMapping.PkMap.FieldName;
-            dbCommand.CommandText = string.Format(sqlStr, dtoDbMapping.GetTableName<T>(subTableArg), whereParams);
+            dbCommand.CommandText = string.Format(sqlStr, dtoDbMapping.GetTableName(subTableArg), whereParams);
             #endregion
 
             return dbCommand;
@@ -479,7 +479,7 @@ namespace Jc.Core.Data
                 dbParameter.DbType = filter.FilterParameters[i].ParameterDbType;
                 dbCommand.Parameters.Add(dbParameter);
             }
-            dbCommand.CommandText = string.Format(sqlStr, dtoDbMapping.GetTableName<T>(subTableArg));
+            dbCommand.CommandText = string.Format(sqlStr, dtoDbMapping.GetTableName(subTableArg));
             #endregion
 
             return dbCommand;
@@ -509,7 +509,7 @@ namespace Jc.Core.Data
             dbCommand.Parameters.Add(dbParameter);
 
             whereParams = dtoDbMapping.PkMap.FieldName + "=@" + dtoDbMapping.PkMap.FieldName;
-            dbCommand.CommandText = string.Format(sqlStr, dtoDbMapping.GetTableName<T>(subTableArg), whereParams);
+            dbCommand.CommandText = string.Format(sqlStr, dtoDbMapping.GetTableName(subTableArg), whereParams);
             #endregion
 
             return dbCommand;
@@ -553,7 +553,7 @@ namespace Jc.Core.Data
                     dbCommand.Parameters.Add(dbParameter);
                 }
             }
-            dbCommand.CommandText = string.Format(sqlStr, dtoDbMapping.GetTableName<T>(subTableArg), selectParams);
+            dbCommand.CommandText = string.Format(sqlStr, dtoDbMapping.GetTableName(subTableArg), selectParams);
             return dbCommand;
         }
         
@@ -585,7 +585,7 @@ namespace Jc.Core.Data
 
             whereParams = dtoDbMapping.PkMap.FieldName + "=@" + dtoDbMapping.PkMap.FieldName;
 
-            dbCommand.CommandText = string.Format(sqlStr, dtoDbMapping.GetTableName<T>(subTableArg), selectParams, whereParams);
+            dbCommand.CommandText = string.Format(sqlStr, dtoDbMapping.GetTableName(subTableArg), selectParams, whereParams);
             return dbCommand;
         }
 
@@ -624,7 +624,7 @@ namespace Jc.Core.Data
                     dbCommand.Parameters.Add(dbParameter);
                 }
             }
-            dbCommand.CommandText = string.Format(sqlStr, dtoDbMapping.GetTableName<T>(subTableArg), selectParams);
+            dbCommand.CommandText = string.Format(sqlStr, dtoDbMapping.GetTableName(subTableArg), selectParams);
             return dbCommand;
         }
 
@@ -664,7 +664,7 @@ namespace Jc.Core.Data
                     dbCommand.Parameters.Add(dbParameter);
                 }
             }
-            dbCommand.CommandText = string.Format(sqlStr, dtoDbMapping.GetTableName<T>(subTableArg), selectParams);
+            dbCommand.CommandText = string.Format(sqlStr, dtoDbMapping.GetTableName(subTableArg), selectParams);
             return dbCommand;
         }
 
@@ -703,7 +703,7 @@ namespace Jc.Core.Data
                     dbCommand.Parameters.Add(dbParameter);
                 }
             }
-            dbCommand.CommandText = string.Format(sqlStr, dtoDbMapping.GetTableName<T>(subTableArg), selectParams);
+            dbCommand.CommandText = string.Format(sqlStr, dtoDbMapping.GetTableName(subTableArg), selectParams);
             return dbCommand;
         }
 
@@ -736,7 +736,7 @@ namespace Jc.Core.Data
                     dbCommand.Parameters.Add(dbParameter);
                 }
             }
-            dbCommand.CommandText = string.Format(sqlStr, dtoDbMapping.GetTableName<T>(subTableArg), queryStr);
+            dbCommand.CommandText = string.Format(sqlStr, dtoDbMapping.GetTableName(subTableArg), queryStr);
             return dbCommand;
         }
 

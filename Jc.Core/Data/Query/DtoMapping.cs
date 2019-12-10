@@ -17,6 +17,7 @@ namespace Jc.Core.Data.Query
         private Dictionary<string, PiMap> piMapDic = new Dictionary<string, PiMap>();    //piMapDic
         private PiMap pkMap; //pkMap
 
+        private Type entityType;  //T Type
         private object entityConvertor;    //实际值为 EntityConvertorDelegate<T>
 
         /// <summary>
@@ -62,7 +63,9 @@ namespace Jc.Core.Data.Query
                     }
                     else
                     {
-                        pkFieldPair = piMapDic.Where(map => map.Key.ToLower() == "id").FirstOrDefault();
+                        string pkFiledName = !string.IsNullOrEmpty(TableAttr.PkField) ? TableAttr.PkField : "Id";
+
+                        pkFieldPair = piMapDic.Where(map => map.Key.ToLower() == pkFiledName.ToLower()).FirstOrDefault();
                         if (pkFieldPair.Key != null)
                         {
                             pkMap = piMapDic[pkFieldPair.Key];
@@ -70,7 +73,7 @@ namespace Jc.Core.Data.Query
                         }
                         else 
                         {
-                            throw new Exception($"未为表{TableName}设置主键.");
+                            throw new Exception($"请为 Class { EntityType.Name } 设置主键字段");
                         }
                     }
                 }
@@ -107,6 +110,11 @@ namespace Jc.Core.Data.Query
         public TableAttribute TableAttr { get { return tableAttr; } set { tableAttr = value; } }
 
         /// <summary>
+        /// EntityType
+        /// </summary>
+        public Type EntityType { get => entityType; set => entityType = value; }
+
+        /// <summary>
         /// EntityConvertorDelegate 实际值为 EntityConvertorDelegate(T)
         /// 使用时,再设置
         /// </summary>
@@ -116,17 +124,17 @@ namespace Jc.Core.Data.Query
         /// 获取表名称
         /// </summary>
         /// <returns></returns>
-        public string GetTableName<T>(string subTableArg = null)
+        public string GetTableName(string subTableArg = null)
         {
             string tableName = TableAttr?.Name;
             if (!string.IsNullOrEmpty(tableName) && tableName.Contains("{0}"))
             {
-                ExHelper.ThrowIfNull(subTableArg, $"对象{typeof(T).Name},分表参数不能为空,请使用分表DbContext.调用GetSubTableDbContext获取分表DbContext");
+                ExHelper.ThrowIfNull(subTableArg, $"对象{EntityType.Name},分表参数不能为空,请使用分表DbContext.调用GetSubTableDbContext获取分表DbContext");
                 tableName = string.Format(tableName, subTableArg);
             }
             else if(string.IsNullOrEmpty(tableName))
             {   //未设置表名称.则以类名称作为表名称
-                tableName = typeof(T).Name;
+                tableName = EntityType.Name;
             }
             return tableName;
         }

@@ -136,7 +136,7 @@ namespace Jc.Core.Data
                     dbCommand.Parameters.Add(dbParameter);
                 }
             }
-            dbCommand.CommandText = string.Format(sqlStr, dtoDbMapping.GetTableName<T>(subTableArg), selectParams, dtoDbMapping.PkMap.FieldName);
+            dbCommand.CommandText = string.Format(sqlStr, dtoDbMapping.GetTableName(subTableArg), selectParams, dtoDbMapping.PkMap.FieldName);
             return dbCommand;
         }
 
@@ -203,7 +203,7 @@ namespace Jc.Core.Data
         {
             DbCommand dbCommand = CreateDbCommand();
             DtoMapping dtoDbMapping = DtoMappingHelper.GetDtoMapping<T>();
-            string tableName = dtoDbMapping.GetTableName<T>(subTableArg);
+            string tableName = dtoDbMapping.GetTableName(subTableArg);
             dbCommand.CommandText = $"Select * from information_schema.tables where table_schema = '{DbName}' and table_name ='{tableName}';";
             return dbCommand;
         }
@@ -219,7 +219,7 @@ namespace Jc.Core.Data
             //表名 查询字段名 主键字段名
             DtoMapping dtoDbMapping = DtoMappingHelper.GetDtoMapping<T>();
             List<PiMap> piMapList = DtoMappingHelper.GetPiMapList<T>();
-            string tableName = dtoDbMapping.GetTableName<T>(subTableArg);            
+            string tableName = dtoDbMapping.GetTableName(subTableArg);            
             StringBuilder sqlBuilder = new StringBuilder();
             sqlBuilder.Append($"Create table {tableName}(\r\n");
             for (int i = 0; i < piMapList.Count; i++)

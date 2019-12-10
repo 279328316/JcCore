@@ -42,6 +42,10 @@ namespace Jc.Core
         /// </summary>
         public bool AutoCreate { get; set; }
 
+        /// <summary>
+        /// 主键字段 属性名称
+        /// </summary>
+        public string PkField { get; set; }
         #endregion
 
         #region Methods

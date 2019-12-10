@@ -50,6 +50,7 @@ namespace Jc.Core.Data.Query
                     {
                         DtoMapping mapping = new DtoMapping();
                         SetDtoMappingDic<T>(mapping);
+                        mapping.EntityType = t;
                         mapping.TableAttr = GetDtoTableAttr<T>();
                         dtoMappingCache.Add(t, mapping);
                     }
