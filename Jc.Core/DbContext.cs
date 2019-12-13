@@ -22,8 +22,6 @@ namespace Jc.Core
     public partial class DbContext
     {
         internal DbProvider dbProvider;    //DbProvider
-        private List<DbProvider> readDbProviders = null;  //读库DbContext
-        private volatile int curReadDbIndex;    //当前ReadDbIndex
 
         /// <summary>
         /// Ctor
@@ -98,48 +96,16 @@ namespace Jc.Core
                 return dbProvider;
             }
         }
-
-        /// <summary>
-        /// 注册的只读数据库Provider
-        /// </summary>
-        public List<DbProvider> ReadDbProvider
-        {
-            get
-            {
-                return readDbProviders;
-            }
-        }
         #endregion
 
-        #region 对象方法        
-
-        /// <summary>
-        /// 获取DbProvider
-        /// </summary>
-        /// <param name="forRead"></param>
-        /// <returns></returns>
-        private DbProvider GetDbProvider(bool forRead = false)
-        {
-            DbProvider dbProvider = this.dbProvider;
-            if (forRead && readDbProviders?.Count > 0)
-            {
-                curReadDbIndex++;
-                if (curReadDbIndex >= readDbProviders.Count)
-                {
-                    curReadDbIndex = 0;
-                }
-                dbProvider = readDbProviders[curReadDbIndex];
-            }
-            return dbProvider;
-        }
+        #region 对象方法
 
         /// <summary>
         /// 获取DbConnection
         /// </summary>
         /// <returns></returns>
-        internal virtual DbConnection GetDbConnection(bool forRead)
+        internal virtual DbConnection GetDbConnection()
         {
-            DbProvider dbProvider = GetDbProvider(forRead);
             return dbProvider.CreateDbConnection();
         }
 
@@ -153,7 +119,7 @@ namespace Jc.Core
             {
                 try
                 {
-                    dbCommand.Connection = GetDbConnection(false);
+                    dbCommand.Connection = GetDbConnection();
                     dbCommand.ExecuteNonQuery();
                     CloseDbConnection(dbCommand);
                 }

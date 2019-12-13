@@ -41,7 +41,7 @@ namespace Jc.Core
             BeginTrans();
         }
 
-        internal override DbConnection GetDbConnection(bool forRead = false)
+        internal override DbConnection GetDbConnection()
         {
             return transDbConnection;
         }

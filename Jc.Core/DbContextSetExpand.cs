@@ -155,7 +155,7 @@ namespace Jc.Core
             {
                 try
                 {
-                    dbCommand.Connection = GetDbConnection(false);
+                    dbCommand.Connection = GetDbConnection();
                     if ((dtoDbMapping.PkMap.PropertyType == typeof(int)
                         || dtoDbMapping.PkMap.PropertyType == typeof(int?))
                         && (pkValue == null || (int)pkValue == 0))
@@ -233,7 +233,7 @@ namespace Jc.Core
             if (useTransaction)
             {
                 #region Use Transaction
-                using (DbConnection dbConnection = GetDbConnection(false))
+                using (DbConnection dbConnection = GetDbConnection())
                 {
                     DbTransaction transaction = dbConnection.BeginTransaction();
                     int i = 0;
@@ -292,7 +292,7 @@ namespace Jc.Core
             else
             {
                 #region Not Use Transaction
-                using (DbConnection dbConnection = GetDbConnection(false))
+                using (DbConnection dbConnection = GetDbConnection())
                 {
                     int i = 0;
                     T curItem;
@@ -377,7 +377,7 @@ namespace Jc.Core
             {
                 try
                 {
-                    dbCommand.Connection = GetDbConnection(false);
+                    dbCommand.Connection = GetDbConnection();
                     rowCount = dbCommand.ExecuteNonQuery();
                     if (rowCount <= 0)
                     {
@@ -424,7 +424,7 @@ namespace Jc.Core
             if (useTransaction)
             {
                 #region Use Transaction
-                using (DbConnection dbConnection = GetDbConnection(false))
+                using (DbConnection dbConnection = GetDbConnection())
                 {
                     DbTransaction transaction = dbConnection.BeginTransaction();
                     try
@@ -463,7 +463,7 @@ namespace Jc.Core
             else
             {
                 #region Not Use Transaction
-                using (DbConnection dbConnection = GetDbConnection(false))
+                using (DbConnection dbConnection = GetDbConnection())
                 {
                     try
                     {
@@ -529,7 +529,7 @@ namespace Jc.Core
             {
                 try
                 {
-                    dbCommand.Connection = GetDbConnection(false);
+                    dbCommand.Connection = GetDbConnection();
                     rowCount = dbCommand.ExecuteNonQuery();
                     if (rowCount <= 0)
                     {
@@ -560,7 +560,7 @@ namespace Jc.Core
             {
                 try
                 {
-                    dbCommand.Connection = GetDbConnection(false);
+                    dbCommand.Connection = GetDbConnection();
                     rowCount = dbCommand.ExecuteNonQuery();
                     if (rowCount <= 0)
                     {
@@ -590,7 +590,7 @@ namespace Jc.Core
             {
                 try
                 {
-                    dbCommand.Connection = GetDbConnection(false);
+                    dbCommand.Connection = GetDbConnection();
                     rowCount = dbCommand.ExecuteNonQuery();
                     if (rowCount <= 0)
                     {
@@ -619,7 +619,7 @@ namespace Jc.Core
             {
                 try
                 {
-                    dbCommand.Connection = GetDbConnection(false);
+                    dbCommand.Connection = GetDbConnection();
                     DbDataReader dr = dbCommand.ExecuteReader();
                     result = dr.HasRows;
                     CloseDbConnection(dbCommand);
@@ -644,7 +644,7 @@ namespace Jc.Core
             {
                 try
                 {
-                    dbCommand.Connection = GetDbConnection(false);
+                    dbCommand.Connection = GetDbConnection();
                     dbCommand.ExecuteNonQuery();
                     CloseDbConnection(dbCommand);
                 }

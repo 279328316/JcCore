@@ -186,7 +186,7 @@ namespace Jc.Core
             {
                 try
                 {
-                    dbCommand.Connection = GetDbConnection(false);
+                    dbCommand.Connection = GetDbConnection();
                     rowCount = dbCommand.ExecuteNonQuery();
                     CloseDbConnection(dbCommand);
                 }
@@ -214,7 +214,7 @@ namespace Jc.Core
                 {
                     try
                     {
-                        dbCommand.Connection = GetDbConnection(true);
+                        dbCommand.Connection = GetDbConnection();
                         result = dbCommand.ExecuteScalar();
                         CloseDbConnection(dbCommand);
                     }
@@ -293,7 +293,7 @@ namespace Jc.Core
             {
                 try
                 {
-                    dbCommand.Connection = GetDbConnection(true);
+                    dbCommand.Connection = GetDbConnection();
                     DbDataReader dr = dbCommand.ExecuteReader();
                     DataTable dt = ConvertDataReaderToDataTable(dr,1);
                     if (dt != null && dt.Rows.Count > 0)
@@ -335,7 +335,7 @@ namespace Jc.Core
             {
                 try
                 {
-                    dbCommand.Connection = GetDbConnection(true);
+                    dbCommand.Connection = GetDbConnection();
 
                     DbDataReader dr = dbCommand.ExecuteReader();
                     DataTable dt = ConvertDataReaderToDataTable(dr,1);
@@ -437,7 +437,7 @@ namespace Jc.Core
             {
                 try
                 {
-                    dbCommand.Connection = GetDbConnection(true);
+                    dbCommand.Connection = GetDbConnection();
                     DbDataReader dr = dbCommand.ExecuteReader();
                     DataTable dt = ConvertDataReaderToDataTable(dr);
                     list = dt.ToList<T>();
@@ -526,7 +526,7 @@ namespace Jc.Core
             {
                 try
                 {
-                    dbCommand.Connection = GetDbConnection(true);
+                    dbCommand.Connection = GetDbConnection();
                     DbDataReader dr = dbCommand.ExecuteReader();
                     dt = ConvertDataReaderToDataTable(dr);
                     CloseDbConnection(dbCommand);
