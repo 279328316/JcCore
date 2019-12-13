@@ -21,6 +21,8 @@ namespace Jc.Core.Data
         private string dbName;
         private string connectString;
 
+        internal DatabaseType dbType;
+
         internal IDbCreator dbCreator;  //DbCreator
 
         /// <summary>
@@ -54,6 +56,17 @@ namespace Jc.Core.Data
                 connectString = value;
             }
         }
+
+        /// <summary>
+        /// 数据库类型
+        /// </summary>
+        public DatabaseType DbType
+        {
+            get
+            {
+                return dbType;
+            }
+        }
         #endregion
 
         /// <summary>
@@ -63,6 +76,8 @@ namespace Jc.Core.Data
         internal DbProvider(string connectString)
         {
             this.ConnectString = connectString;
+
+            DbName 非必须.只有MySql 检查表是否存在时使用.考虑优化.只在MySql中添加.
             this.DbName = GetDbNameFromConnectString(connectString);
         }
 
@@ -92,6 +107,7 @@ namespace Jc.Core.Data
                     dbProvider = new MsSqlDbProvider(connectString);
                     break;
             }
+            dbProvider.dbType = dbType;
             return dbProvider;
         }
 
@@ -108,7 +124,7 @@ namespace Jc.Core.Data
         /// 创建连接
         /// </summary>
         /// <returns></returns>
-        public DbConnection CreateDbConnection(string connectString)
+        public DbConnection CreateDbConnection()
         {
             return dbCreator.CreateDbConnection(connectString);
         }

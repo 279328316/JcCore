@@ -21,6 +21,8 @@ namespace Jc.Core
     /// </summary>
     public sealed class DbTransContext : DbContext
     {
+        internal bool isTransaction = false; //是否为事务
+
         internal DbConnection transDbConnection;  //dbConnection
 
         private DbTransaction dbTransaction;//事务使用
@@ -37,18 +39,6 @@ namespace Jc.Core
                 }
             }
             BeginTrans();
-        }
-
-        /// <summary>
-        /// 关闭连接
-        /// </summary>
-        ~DbTransContext()
-        {
-            if (isTransaction)
-            {
-                //RollbackTrans();
-                throw new Exception("未正确处理的事务,需要明确提交或撤回.");
-            }
         }
 
         internal override DbConnection GetDbConnection()
@@ -98,7 +88,19 @@ namespace Jc.Core
             }
             else
             {
-                throw new Exception("未开启事务,无法提交事务.");
+                throw new Exception("未开启事务,无法提交.");
+            }
+        }
+        
+        /// <summary>
+        /// 关闭连接
+        /// </summary>
+        ~DbTransContext()
+        {
+            if (isTransaction)
+            {
+                //RollbackTrans();
+                throw new Exception("未正确处理的事务,需要明确提交或撤回.");
             }
         }
 
