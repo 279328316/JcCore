@@ -169,7 +169,7 @@ namespace Jc.Core
             {
                 try
                 {
-                    dbCommand.Connection = dbContext.GetDbConnection();
+                    dbCommand.Connection = dbContext.GetDbConnection(true);
                     DbDataReader dr = dbCommand.ExecuteReader();
                     DataTable dt = dbContext.ConvertDataReaderToDataTable(dr,1);
                     if (dt != null && dt.Rows.Count > 0)
@@ -201,7 +201,7 @@ namespace Jc.Core
             {
                 try
                 {
-                    dbCommand.Connection = dbContext.GetDbConnection();
+                    dbCommand.Connection = dbContext.GetDbConnection(true);
                     object objVal = dbCommand.ExecuteScalar();
                     if (objVal != DBNull.Value)
                     {   //使用属性字典
@@ -235,7 +235,7 @@ namespace Jc.Core
             {
                 try
                 {
-                    dbCommand.Connection = dbContext.GetDbConnection();
+                    dbCommand.Connection = dbContext.GetDbConnection(true);
                     object objVal = dbCommand.ExecuteScalar();
                     if (objVal != DBNull.Value)
                     {   //使用属性字典
@@ -267,7 +267,7 @@ namespace Jc.Core
             {
                 try
                 {
-                    dbCommand.Connection = dbContext.GetDbConnection();
+                    dbCommand.Connection = dbContext.GetDbConnection(true);
                     object objVal = dbCommand.ExecuteScalar();
                     if (objVal != DBNull.Value)
                     {   //使用属性字典
@@ -300,7 +300,7 @@ namespace Jc.Core
             {
                 try
                 {
-                    dbCommand.Connection = dbContext.GetDbConnection();
+                    dbCommand.Connection = dbContext.GetDbConnection(true);
                     object objVal = dbCommand.ExecuteScalar();
                     if (objVal != DBNull.Value)
                     {   //使用属性字典
@@ -333,7 +333,7 @@ namespace Jc.Core
             {
                 try
                 {
-                    dbCommand.Connection = this.dbContext.GetDbConnection();
+                    dbCommand.Connection = this.dbContext.GetDbConnection(true);
                     DbDataReader dr = dbCommand.ExecuteReader();
                     DataTable dt = this.dbContext.ConvertDataReaderToDataTable(dr);
                     list = dt.ToList<T>();
@@ -369,7 +369,7 @@ namespace Jc.Core
                 {
                     dbCommand = dbContext.DbProvider.GetQueryRecordsPageDbCommand<T>(filter, subTableArg);
                 }
-                dbCommand.Connection = dbContext.GetDbConnection();
+                dbCommand.Connection = dbContext.GetDbConnection(true);
                 DbDataReader dr = dbCommand.ExecuteReader();
                 DataTable dt = dbContext.ConvertDataReaderToDataTable(dr);
 

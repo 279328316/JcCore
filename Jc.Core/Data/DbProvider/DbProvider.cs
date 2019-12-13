@@ -16,7 +16,7 @@ namespace Jc.Core.Data
     /// </summary>
     public abstract class DbProvider
     {
-        #region Fields
+        #region Fields & Properties
 
         private string dbName;
         private string connectString;
@@ -76,43 +76,10 @@ namespace Jc.Core.Data
         internal DbProvider(string connectString)
         {
             this.ConnectString = connectString;
-
-            DbName 非必须.只有MySql 检查表是否存在时使用.考虑优化.只在MySql中添加.
             this.DbName = GetDbNameFromConnectString(connectString);
         }
 
-        /// <summary>
-        /// 获取DbProvider
-        /// </summary>
-        /// <param name="connectString">连接串</param>
-        /// <param name="dbType">数据库类型</param>
-        public static DbProvider GetDbProvider(string connectString, DatabaseType dbType = DatabaseType.MsSql)
-        {
-            DbProvider dbProvider = null;
-            switch (dbType)
-            {
-                case DatabaseType.MsSql:
-                    dbProvider = new MsSqlDbProvider(connectString);
-                    break;
-                case DatabaseType.Sqlite:
-                    dbProvider = new SqliteDbProvider(connectString);
-                    break;
-                case DatabaseType.MySql:
-                    dbProvider = new MySqlDbProvider(connectString);
-                    break;
-                case DatabaseType.PostgreSql:
-                    dbProvider = new PostgreSqlDbProvider(connectString);
-                    break;
-                default:
-                    dbProvider = new MsSqlDbProvider(connectString);
-                    break;
-            }
-            dbProvider.dbType = dbType;
-            return dbProvider;
-        }
-
         #region Abstract Methods
-
 
         /// <summary>
         /// 自连接串中获取DbName

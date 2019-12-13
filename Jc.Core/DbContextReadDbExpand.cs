@@ -13,6 +13,7 @@ using System.Linq.Expressions;
 using Jc.Core.Helper;
 using System.Data.Common;
 using Jc.Core.Data.Query;
+using Jc.Core.Data;
 
 namespace Jc.Core
 {
@@ -22,45 +23,36 @@ namespace Jc.Core
     /// </summary>
     public partial class DbContext
     {
-        private List<DbContext> readDbContexts = null;  //读库DbContext
-
         /// <summary>
         /// 注册只读数据库
         /// </summary>
         /// <param name="connectString">数据库连接串或数据库名称</param>
         /// <param name="dbType">数据库类型</param>
         /// <returns></returns>
-        public DbContext RegisterReadDbContext(string connectString, DatabaseType dbType = DatabaseType.MsSql)
+        public void RegisterReadDb(string connectString, DatabaseType dbType = DatabaseType.MsSql)
         {
-            DbContext dbContext;
             try
             {
-                dbContext = new DbContext(connectString, dbType);
+                if (readDbProviders == null)
+                {
+                    readDbProviders = new List<DbProvider>();
+                }
+                if (dbType != this.DbType)
+                {
+                    throw new Exception("只读库类型必须与写入数据库一致.");
+                }
+                DbProvider dbProvider = DbProviderHelper.GetDbProvider(connectString, dbType);
+                if (readDbProviders.Any(a=>a == dbProvider))
+                {
+                    throw new Exception("只读库已存在.");
+                }
+                readDbProviders.Add(dbProvider);
             }
             catch (Exception ex)
             {
                 string msg = ex.InnerException != null ? ex.InnerException.Message : ex.Message;
                 throw new Exception(msg);
             }
-            RegisterReadDbContext(dbContext);
-            return dbContext;
         }
-
-        /// <summary>
-        /// 注册只读数据库
-        /// </summary>
-        /// <param name="dbContext">只读数据库DbContext</param>
-        /// <param name="weight">使用权重</param>
-        /// <returns></returns>
-        public DbContext RegisterReadDbContext(DbContext dbContext,int weight = 1)
-        {
-            if(this.ConnectString == dbContext.ConnectString)
-            {
-                throw new Exception("不能注册自己为当前数据库的只读库.");
-            }
-
-            return dbContext;
-        }
-
     }
 }

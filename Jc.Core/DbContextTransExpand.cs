@@ -29,7 +29,7 @@ namespace Jc.Core
         /// <returns></returns>
         public DbTransContext GetTransDbContext()
         {
-            DbTransContext dbContext = new DbTransContext(this.connectString, this.dbType, this.subTableArgList);
+            DbTransContext dbContext = new DbTransContext(this.ConnectString, this.DbType, this.subTableArgList);
             return dbContext;
         }
     }

@@ -41,7 +41,7 @@ namespace Jc.Core
             BeginTrans();
         }
 
-        internal override DbConnection GetDbConnection()
+        internal override DbConnection GetDbConnection(bool forRead = false)
         {
             return transDbConnection;
         }
@@ -51,7 +51,7 @@ namespace Jc.Core
         /// </summary>
         private void BeginTrans()
         {
-            this.transDbConnection = base.GetDbConnection();
+            this.transDbConnection = this.DbProvider.CreateDbConnection();
             dbTransaction = transDbConnection.BeginTransaction();
             isTransaction = true;
         }

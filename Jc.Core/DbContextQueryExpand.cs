@@ -175,6 +175,109 @@ namespace Jc.Core
             return IQuery<T>(nvCollection,operandSettings);            
         }
 
+        /// <summary>
+        /// 执行客户命令
+        /// </summary>
+        /// <returns>受影响记录数</returns>
+        public int ExCustomerCommand(string sql)
+        {
+            int rowCount = 0;
+            using (DbCommand dbCommand = dbProvider.CreateDbCommand(sql))
+            {
+                try
+                {
+                    dbCommand.Connection = GetDbConnection(false);
+                    rowCount = dbCommand.ExecuteNonQuery();
+                    CloseDbConnection(dbCommand);
+                }
+                catch (Exception ex)
+                {
+                    CloseDbConnection(dbCommand);
+                    throw ex;
+                }
+            }
+            return rowCount;
+        }
+
+        /// <summary>
+        /// 返回第一行第一列数据
+        /// </summary>
+        /// <param name="sql">查询Sql</param>
+        /// <returns></returns>
+        public object ExScalar(string sql)
+        {
+            object result = null;
+            if (!string.IsNullOrEmpty(sql))
+            {
+                DbCommand dbCommand = dbProvider.CreateDbCommand(sql);
+                using (dbCommand)
+                {
+                    try
+                    {
+                        dbCommand.Connection = GetDbConnection(true);
+                        result = dbCommand.ExecuteScalar();
+                        CloseDbConnection(dbCommand);
+                    }
+                    catch (Exception ex)
+                    {
+                        CloseDbConnection(dbCommand);
+                        throw ex;
+                    }
+                }
+            }
+            return result;
+        }
+
+        /// <summary>
+        /// 关闭非事务DbConnection
+        /// </summary>
+        internal void CloseDbConnection(DbCommand dbCmd)
+        {
+            if (dbCmd != null) { CloseDbConnection(dbCmd.Connection); }
+        }
+
+        /// <summary>
+        /// 将DataReader转换为DataTable
+        /// </summary>
+        /// <param name="dr">DataReader</param>
+        /// <param name="loadAmount">加载数量</param>
+        /// <returns></returns>
+        internal DataTable ConvertDataReaderToDataTable(DbDataReader dr, int? loadAmount = null)
+        {
+            try
+            {
+                DataTable dt = new DataTable();
+                int fieldCount = dr.FieldCount;
+                for (int intCounter = 0; intCounter < fieldCount; ++intCounter)
+                {
+                    dt.Columns.Add(dr.GetName(intCounter), dr.GetFieldType(intCounter));
+                }
+                dt.BeginLoadData();
+
+                object[] objValues = new object[fieldCount];
+                int rowsCount = 0;
+                while (dr.Read())
+                {
+                    rowsCount++;
+                    dr.GetValues(objValues);
+                    dt.LoadDataRow(objValues, true);
+
+                    if (rowsCount >= loadAmount)
+                    {
+                        break;
+                    }
+                }
+                dr.Close();
+                dt.EndLoadData();
+                return dt;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"读取数据出错:{ex.Message}", ex);
+            }
+
+        }
+
 
         /// <summary>
         /// 根据Id获取数据
@@ -190,7 +293,7 @@ namespace Jc.Core
             {
                 try
                 {
-                    dbCommand.Connection = GetDbConnection();
+                    dbCommand.Connection = GetDbConnection(true);
                     DbDataReader dr = dbCommand.ExecuteReader();
                     DataTable dt = ConvertDataReaderToDataTable(dr,1);
                     if (dt != null && dt.Rows.Count > 0)
@@ -232,7 +335,7 @@ namespace Jc.Core
             {
                 try
                 {
-                    dbCommand.Connection = GetDbConnection();
+                    dbCommand.Connection = GetDbConnection(true);
 
                     DbDataReader dr = dbCommand.ExecuteReader();
                     DataTable dt = ConvertDataReaderToDataTable(dr,1);
@@ -334,7 +437,7 @@ namespace Jc.Core
             {
                 try
                 {
-                    dbCommand.Connection = GetDbConnection();
+                    dbCommand.Connection = GetDbConnection(true);
                     DbDataReader dr = dbCommand.ExecuteReader();
                     DataTable dt = ConvertDataReaderToDataTable(dr);
                     list = dt.ToList<T>();
@@ -423,7 +526,7 @@ namespace Jc.Core
             {
                 try
                 {
-                    dbCommand.Connection = GetDbConnection();
+                    dbCommand.Connection = GetDbConnection(true);
                     DbDataReader dr = dbCommand.ExecuteReader();
                     dt = ConvertDataReaderToDataTable(dr);
                     CloseDbConnection(dbCommand);

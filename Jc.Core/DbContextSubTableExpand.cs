@@ -54,7 +54,7 @@ namespace Jc.Core
         /// <returns>返回subTableDbContext.只能用于指定分表操作.</returns>
         public DbContext GetSubTableDbContext()
         {
-            DbContext subTableDbContext = new DbContext(this.connectString, this.dbType);
+            DbContext subTableDbContext = new DbContext(this.ConnectString, this.DbType);
             subTableDbContext.subTableArgList = new List<KeyValueObj<Type, string>>();
             return subTableDbContext;
         }
