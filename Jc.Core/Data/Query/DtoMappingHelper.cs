@@ -211,15 +211,22 @@ namespace Jc.Core.Data.Query
             {   //排除忽略字段
                 result = dtoMapping.PiMapDic.Where(piMap => !piMap.Value.IsIgnore).Select(piMap => piMap.Value).ToList();
             }
-            if (!piMappingCache.Keys.Contains(cacheKey))
+
+            try
             {
-                lock (lockForPiMappingCacheObj)
+                if (!piMappingCache.Keys.Contains(cacheKey))
                 {
-                    if (!piMappingCache.Keys.Contains(cacheKey))
+                    lock (lockForPiMappingCacheObj)
                     {
-                        piMappingCache.Add(cacheKey, result);
+                        if (!piMappingCache.Keys.Contains(cacheKey))
+                        {
+                            piMappingCache.Add(cacheKey, result);
+                        }
                     }
                 }
+            }
+            catch
+            {//忽略此处异常
             }
             return result;
         }
