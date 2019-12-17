@@ -225,7 +225,7 @@ namespace Jc.Core.Data.Query
                     }
                 }
             }
-            catch
+            catch(Exception ex)
             {//忽略此处异常
             }
             return result;
