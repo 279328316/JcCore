@@ -99,9 +99,9 @@ namespace Jc.Core.TestApp.Test
             for (int i = 0; i < runCount; i++)
             {
                 JcLogHelper.WriteLog($"正在执行:{i + 1}");                
-                DtoMappingHelper.GetPiMapListWithoutCatch<ApiDto>(exp);
-                DtoMappingHelper.GetPiMapListWithoutCatch<ApiDto>(null, unexp);
-                DtoMappingHelper.GetPiMapListWithoutCatch<ApiDto>(exp, unexp);
+                DtoMappingHelper.GetPiMapListWithCatch<ApiDto>(exp);
+                DtoMappingHelper.GetPiMapListWithCatch<ApiDto>(null, unexp);
+                DtoMappingHelper.GetPiMapListWithCatch<ApiDto>(exp, unexp);
                 //curCount--;
             }
             while (curCount > 0)
@@ -213,9 +213,9 @@ namespace Jc.Core.TestApp.Test
                 {
                     try
                     {
-                        DtoMappingHelper.GetPiMapListWithoutCatch<ApiDto>(exp);
-                        DtoMappingHelper.GetPiMapListWithoutCatch<ApiDto>(null, unexp);
-                        DtoMappingHelper.GetPiMapListWithoutCatch<ApiDto>(exp, unexp);
+                        DtoMappingHelper.GetPiMapListWithCatch<ApiDto>(exp);
+                        DtoMappingHelper.GetPiMapListWithCatch<ApiDto>(null, unexp);
+                        DtoMappingHelper.GetPiMapListWithCatch<ApiDto>(exp, unexp);
                     }
                     catch (Exception ex)
                     {
