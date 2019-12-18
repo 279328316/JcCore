@@ -8,7 +8,6 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Collections;
 using System.Reflection;
-using Jc.Core.Helper;
 using System.Collections.Specialized;
 using Jc.Core.Data.Model;
 using Jc.Core.Data.Query;

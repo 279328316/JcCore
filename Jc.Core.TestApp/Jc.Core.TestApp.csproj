@@ -11,6 +11,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Jc.Core.Base\Jc.Core.Base.csproj" />
     <ProjectReference Include="..\Jc.Core.MsSql\Jc.Core.MsSql.csproj" />
     <ProjectReference Include="..\Jc.Core.MySql\Jc.Core.MySql.csproj" />
     <ProjectReference Include="..\Jc.Core.PostgreSql\Jc.Core.PostgreSql.csproj" />

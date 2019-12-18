@@ -9,7 +9,7 @@ namespace Jc.Core.Data.Model
     /// <summary>
     /// 数据Model
     /// </summary>
-    public class DbModel:DtoBase
+    public class DbModel
     {
         #region Fields
         private string dbName = null;//表名称

@@ -10,9 +10,8 @@ using System.Data;
 using System.Runtime.Serialization;
 
 using System.Linq.Expressions;
-using Jc.Core.Helper;
 
-namespace Jc.Core
+namespace Jc.Core.OrmBase
 {
     /// <summary>
     /// DtoBase INotifyPropertyChanged

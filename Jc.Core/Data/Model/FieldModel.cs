@@ -9,7 +9,7 @@ namespace Jc.Core.Data.Model
     /// <summary>
     /// 数据表字段Model
     /// </summary>
-    public class FieldModel : DtoBase
+    public class FieldModel
     {
         #region Fields
         private string fieldName =null;//字段名称

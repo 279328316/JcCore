@@ -5,7 +5,6 @@ using System.Reflection;
 using System.Linq;
 using System.Text;
 using System.Linq.Expressions;
-using Jc.Core.Helper;
 using System.Configuration;
 
 namespace Jc.Core.Data.Query

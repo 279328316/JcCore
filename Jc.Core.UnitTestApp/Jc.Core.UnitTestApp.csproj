@@ -161,6 +161,10 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Jc.Core.Base\Jc.Core.Base.csproj">
+      <Project>{c1047fcc-6916-403e-b0bb-e0a171326ef0}</Project>
+      <Name>Jc.Core.Base</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Jc.Core.MsSql\Jc.Core.MsSql.csproj">
       <Project>{a852343d-c8b3-4c62-8138-ee2c6f1fccf7}</Project>
       <Name>Jc.Core.MsSql</Name>

@@ -7,7 +7,6 @@ using System.Reflection;
 using System.ComponentModel;
 using System.Runtime.Serialization;
 using System.Diagnostics;
-using Newtonsoft.Json;
 
 namespace Jc.Core
 {
@@ -77,25 +76,21 @@ namespace Jc.Core
         /// <summary>
         /// 成功
         /// </summary>
-        [JsonProperty("1000")]
         Success = 1000,
 
         /// <summary>
         /// 登录超时,需重新登录
         /// </summary>
-        [JsonProperty("2000")]
         NeedLogin = 2000,
 
         /// <summary>
         /// 程序异常
         /// </summary>
-        [JsonProperty("3000")]
         Exception = 3000,
 
         /// <summary>
         /// 系统错误
         /// </summary>
-        [JsonProperty("4000")]
         SysError = 4000
     }
 }

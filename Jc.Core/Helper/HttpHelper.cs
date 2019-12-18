@@ -16,6 +16,20 @@ using System.ComponentModel;
 namespace Jc.Core.Helper
 {
     /// <summary>
+    /// 类型ContentType
+    /// </summary>
+    public enum HttpContentType
+    {
+        /// <summary>
+        /// Json
+        /// </summary>
+        Json = 1,
+        /// <summary>
+        /// Form
+        /// </summary>
+        Form = 2
+    }
+    /// <summary>
     /// 有关HTTP请求的辅助类
     /// 如果需要解析中文GBK请在程序启动时注册Encoding 
     /// 调用静态方法RegisterEncodingProvider

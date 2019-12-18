@@ -8,11 +8,11 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Collections;
 using System.Reflection;
-using Jc.Core.Helper;
 using System.Collections.Specialized;
 using Jc.Core.Data.Model;
 using Jc.Core.Data.Query;
 using Microsoft.Extensions.Primitives;
+using Newtonsoft.Json;
 
 namespace Jc.Core
 {
@@ -81,7 +81,7 @@ namespace Jc.Core
                             List<string> valueList;
                             if (queryItemVal.StartsWith("[") && queryItemVal.EndsWith("]"))
                             {
-                                valueList = JsonHelper.DeserializeObject<List<string>>(queryItemVal);
+                                valueList = JsonConvert.DeserializeObject<List<string>>(queryItemVal);
                             }
                             else
                             {

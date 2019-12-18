@@ -1,4 +1,4 @@
-﻿using Newtonsoft.Json;
+﻿
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -18,13 +18,11 @@ namespace Jc.Core
         /// 总记录数
         /// </summary>
         [DisplayName("Total")]
-        [JsonProperty("total")]
         public int Total { get; set; }
         /// <summary>
         /// 列表对象
         /// </summary>
         [DisplayName("Rows")]
-        [JsonProperty("rows")]
         public List<T> Rows { get; set; }
 
         /// <summary>

@@ -10,7 +10,6 @@ using System.Data;
 using System.Runtime.Serialization;
 
 using System.Linq.Expressions;
-using Jc.Core.Helper;
 using System.Data.Common;
 
 namespace Jc.Core
