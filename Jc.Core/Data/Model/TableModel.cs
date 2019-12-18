@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Text;
 using System.ComponentModel;
 using System.Data;
-using Jc.Core.OrmBase;
 
 namespace Jc.Core.Data.Model
 {
