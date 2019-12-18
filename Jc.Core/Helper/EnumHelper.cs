@@ -26,7 +26,7 @@ namespace Jc.Core.Helper
             Dictionary<string, string> tempDic = new Dictionary<string, string>();
 
             #region 获取值
-            Type typeDescription = typeof(EnumDisplayAttribute);
+            Type typeDescription = typeof(DisplayNameAttribute);
             FieldInfo[] fields = enumType.GetFields();
             string strText = "";
             string strValue = "";
@@ -38,7 +38,7 @@ namespace Jc.Core.Helper
                     object[] arr = field.GetCustomAttributes(typeDescription, true);
                     if (arr.Length > 0)
                     {
-                        EnumDisplayAttribute aa = (EnumDisplayAttribute)arr[0];
+                        DisplayNameAttribute aa = (DisplayNameAttribute)arr[0];
                         strText = aa.DisplayName;
                     }
                     else
@@ -172,7 +172,7 @@ namespace Jc.Core.Helper
         private static string GetEnumDisplayName(FieldInfo fieldInfo)
         {
             string result = "";
-            var enumDisplayAttribute = fieldInfo.GetCustomAttribute<EnumDisplayAttribute>();
+            var enumDisplayAttribute = fieldInfo.GetCustomAttribute<DisplayNameAttribute>();
             if (enumDisplayAttribute == null)
             {
                 result = fieldInfo.Name;

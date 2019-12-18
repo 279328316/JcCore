@@ -10,17 +10,17 @@ namespace Jc.Core
     /// <summary>
     /// 枚举DisplayAttribute
     /// </summary>
-    public class EnumDisplayAttribute : Attribute
+    public class DisplayNameAttribute : Attribute
     {
         /// <summary>
         /// 显示名称
         /// </summary>
         public string DisplayName { get; set; }
 
-        public EnumDisplayAttribute()
+        public DisplayNameAttribute()
         {
         }
-        public EnumDisplayAttribute(string displayName)
+        public DisplayNameAttribute(string displayName)
         {
             this.DisplayName = displayName;
         }
