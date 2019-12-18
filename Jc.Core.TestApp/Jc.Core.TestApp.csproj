@@ -7,6 +7,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="log4net" Version="2.0.8" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\Jc.Core.MsSql\Jc.Core.MsSql.csproj" />
     <ProjectReference Include="..\Jc.Core.MySql\Jc.Core.MySql.csproj" />
     <ProjectReference Include="..\Jc.Core.PostgreSql\Jc.Core.PostgreSql.csproj" />
@@ -16,6 +20,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Update="appLog.config">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Update="appsettings.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>

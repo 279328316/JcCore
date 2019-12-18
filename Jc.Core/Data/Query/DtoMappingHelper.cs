@@ -235,6 +235,59 @@ namespace Jc.Core.Data.Query
         /// 根据查询表达式获取查询属性,转换为表字段
         /// 忽略IsIgnore=true的属性
         /// </summary>
+        /// <param name="select">查询表达式</param>
+        /// <param name="unSelect">排除查询表达式</param>
+        /// <returns></returns>
+        public static List<PiMap> GetPiMapListWithoutCatch<T>(Expression select = null, Expression unSelect = null)
+        {
+            List<PiMap> result = new List<PiMap>();
+            List<string> inPiList = null;
+            List<string> exPiList = null;
+            DtoMapping dtoMapping = GetDtoMapping<T>();
+            if (select != null)
+            {
+                inPiList = ExpressionHelper.GetPiList((Expression<Func<T, object>>)select);
+                for (int i = 0; i < inPiList.Count; i++)
+                {
+                    if (!dtoMapping.PiMapDic.Keys.Contains(inPiList[i]))
+                    {
+                        continue;
+                        //throw new Exception("属性:" + inPiList[i] + "未包含在目标对象" + typeof(T).Name + "中.");
+                    }
+                    if (dtoMapping.PiMapDic[inPiList[i]].IsIgnore)
+                    {   //如果是忽略字段
+                        continue;
+                    }
+                    result.Add(dtoMapping.PiMapDic[inPiList[i]]);
+                }
+            }
+            else if (unSelect != null)
+            {
+                exPiList = ExpressionHelper.GetPiList((Expression<Func<T, object>>)unSelect);
+                foreach (KeyValuePair<string, PiMap> piMapItem in dtoMapping.PiMapDic)
+                {
+                    if (exPiList.Contains(piMapItem.Key))
+                    {   //如果包含在排除列表,则跳过该属性
+                        continue;
+                    }
+                    if (piMapItem.Value.IsIgnore)
+                    {   //如果是忽略字段
+                        continue;
+                    }
+                    result.Add(piMapItem.Value);
+                }
+            }
+            else
+            {   //排除忽略字段
+                result = dtoMapping.PiMapDic.Where(piMap => !piMap.Value.IsIgnore).Select(piMap => piMap.Value).ToList();
+            }
+            return result;
+        }
+
+        /// <summary>
+        /// 根据查询表达式获取查询属性,转换为表字段
+        /// 忽略IsIgnore=true的属性
+        /// </summary>
         /// <param name="filter">filter过滤</param>
         /// <returns></returns>
         public static List<PiMap> GetPiMapList<T>(QueryFilter filter)
