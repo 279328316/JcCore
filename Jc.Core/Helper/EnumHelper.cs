@@ -17,10 +17,10 @@ namespace Jc.Core.Helper
         /// Key为关键字,Value为显示文本.
         /// </summary>
         /// <param name="enumType">枚举类型 typeof(enum)</param>
-        /// <param name="sort">排序方式 默认不排序</param>
+        /// <param name="sort">排序方式</param>
         /// <param name="order">排序方向</param>
         /// <returns></returns>
-        public static Dictionary<string, int> GetDictionary(Type enumType,SortingType sort = SortingType.Default,Sorting order = Sorting.Asc)
+        public static Dictionary<string, int> GetDictionary(Type enumType,SortingType sort = SortingType.Value,Sorting order = Sorting.Asc)
         {
             Dictionary<string, int> dic = new Dictionary<string, int>();
 
