@@ -20,32 +20,22 @@ namespace Jc.Core.Helper
         /// <param name="sortingType">排序方式 默认不排序</param>
         /// <param name="order">排序方向</param>
         /// <returns></returns>
-        public static Dictionary<string, string> GetEnumDictionary(Type enumType,KeyValueSortingType sortingType = KeyValueSortingType.Default,Sorting order = Sorting.Asc)
+        public static Dictionary<string, int> GetDictionary(Type enumType,KeyValueSortingType sortingType = KeyValueSortingType.Default,Sorting order = Sorting.Asc)
         {
-            Dictionary<string, string> dic = new Dictionary<string, string>();
-            Dictionary<string, string> tempDic = new Dictionary<string, string>();
+            Dictionary<string, int> dic = new Dictionary<string, int>();
 
             #region 获取值
             Type typeDescription = typeof(DisplayNameAttribute);
             FieldInfo[] fields = enumType.GetFields();
-            string strText = "";
-            string strValue = "";
+            string key = "";
+            int value = 0;
             foreach (FieldInfo field in fields)
             {
                 if (field.FieldType.IsEnum)
                 {
-                    strValue = ((int)enumType.InvokeMember(field.Name, BindingFlags.GetField, null, null, null)).ToString();
-                    object[] arr = field.GetCustomAttributes(typeDescription, true);
-                    if (arr.Length > 0)
-                    {
-                        DisplayNameAttribute aa = (DisplayNameAttribute)arr[0];
-                        strText = aa.DisplayName;
-                    }
-                    else
-                    {
-                        strText = field.Name;
-                    }
-                    tempDic.Add(strValue, strText);
+                    value = (int)enumType.InvokeMember(field.Name, BindingFlags.GetField, null, null, null);
+                    key = GetDisplayName(field);
+                    dic.Add(key, value);
                 }
             }
             #endregion
@@ -57,25 +47,24 @@ namespace Jc.Core.Helper
                 case KeyValueSortingType.Key:
                     if (order == Sorting.Asc)
                     {
-                        dic = tempDic.OrderBy(kv => kv.Key).ToDictionary(kv=>kv.Key,kv=>kv.Value);                        
+                        dic = dic.OrderBy(kv => kv.Key).ToDictionary(kv=>kv.Key,kv=>kv.Value);                        
                     }
                     else
                     {
-                        dic = tempDic.OrderByDescending(kv => kv.Key).ToDictionary(kv => kv.Key, kv => kv.Value);
+                        dic = dic.OrderByDescending(kv => kv.Key).ToDictionary(kv => kv.Key, kv => kv.Value);
                     }
                     break;
                 case KeyValueSortingType.Value:
                     if (order == Sorting.Asc)
                     {
-                        dic = tempDic.OrderBy(kv => kv.Value).ToDictionary(kv => kv.Key, kv => kv.Value);
+                        dic = dic.OrderBy(kv => kv.Value).ToDictionary(kv => kv.Key, kv => kv.Value);
                     }
                     else
                     {
-                        dic = tempDic.OrderByDescending(kv => kv.Value).ToDictionary(kv => kv.Key, kv => kv.Value);
+                        dic = dic.OrderByDescending(kv => kv.Value).ToDictionary(kv => kv.Key, kv => kv.Value);
                     }
                     break;
                 default:
-                    dic = tempDic;
                     break;
             }
             #endregion
@@ -99,7 +88,7 @@ namespace Jc.Core.Helper
                 }
                 else
                 {
-                    return GetEnumDisplayName(fieldInfo);
+                    return GetDisplayName(fieldInfo);
                 }
             }
             else
@@ -158,7 +147,7 @@ namespace Jc.Core.Helper
                 FieldInfo fieldInfo = type.GetFields().FirstOrDefault(f => f.Name.Equals(enumName));
                 if (fieldInfo != null)
                 {
-                    result = GetEnumDisplayName(fieldInfo);
+                    result = GetDisplayName(fieldInfo);
                 }
             }
             return result;
@@ -169,17 +158,17 @@ namespace Jc.Core.Helper
         /// </summary>
         /// <param name="fieldInfo"></param>
         /// <returns></returns>
-        private static string GetEnumDisplayName(FieldInfo fieldInfo)
+        private static string GetDisplayName(FieldInfo fieldInfo)
         {
             string result = "";
             var enumDisplayAttribute = fieldInfo.GetCustomAttribute<DisplayNameAttribute>();
-            if (enumDisplayAttribute == null)
-            {
-                result = fieldInfo.Name;
-            }
-            else
+            if (enumDisplayAttribute != null)
             {
                 result = enumDisplayAttribute.DisplayName;
+            }
+            if(string.IsNullOrEmpty(result))
+            {
+                result = fieldInfo.Name;
             }
             return result;
         }
