@@ -14,13 +14,11 @@ namespace Jc.Core.Helper
     {
         /// <summary>
         /// 将Enum类型转换为 Dictionary
-        /// Key为关键字,Value为显示文本.
+        /// Key为关键字,Value为值
         /// </summary>
         /// <param name="enumType">枚举类型 typeof(enum)</param>
-        /// <param name="sort">排序方式</param>
-        /// <param name="order">排序方向</param>
         /// <returns></returns>
-        public static Dictionary<string, int> GetDictionary(Type enumType,SortingType sort = SortingType.Value,Sorting order = Sorting.Asc)
+        public static Dictionary<string, int> GetDictionary(Type enumType)
         {
             Dictionary<string, int> dic = new Dictionary<string, int>();
 
@@ -39,36 +37,7 @@ namespace Jc.Core.Helper
                 }
             }
             #endregion
-
-            //处理排序
-            #region 排序处理
-            switch (sort)
-            {
-                case SortingType.Key:
-                    if (order == Sorting.Asc)
-                    {
-                        dic = dic.OrderBy(kv => kv.Key).ToDictionary(kv=>kv.Key,kv=>kv.Value);                        
-                    }
-                    else
-                    {
-                        dic = dic.OrderByDescending(kv => kv.Key).ToDictionary(kv => kv.Key, kv => kv.Value);
-                    }
-                    break;
-                case SortingType.Value:
-                    if (order == Sorting.Asc)
-                    {
-                        dic = dic.OrderBy(kv => kv.Value).ToDictionary(kv => kv.Key, kv => kv.Value);
-                    }
-                    else
-                    {
-                        dic = dic.OrderByDescending(kv => kv.Value).ToDictionary(kv => kv.Key, kv => kv.Value);
-                    }
-                    break;
-                default:
-                    break;
-            }
-            #endregion
-
+            //dic = dic.OrderBy(kv => kv.Value).ToDictionary(kv => kv.Key, kv => kv.Value);
             return dic;
         }
 
@@ -171,26 +140,6 @@ namespace Jc.Core.Helper
                 result = fieldInfo.Name;
             }
             return result;
-        }
-        
-    }
-
-    /// <summary>
-    /// KeyValuePair排序方式
-    /// </summary>
-    public enum SortingType
-    {
-        /// <summary>
-        /// 默认不做排序
-        /// </summary>
-        Default = 0,
-        /// <summary>
-        /// 按照Key排序
-        /// </summary>
-        Key = 1,
-        /// <summary>
-        /// 按照Value排序
-        /// </summary>
-        Value = 2
+        }        
     }
 }
