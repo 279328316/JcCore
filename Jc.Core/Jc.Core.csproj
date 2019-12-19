@@ -39,4 +39,8 @@ https://github.com/279328316/JcCore</Description>
     <ProjectReference Include="..\Jc.Core.Base\Jc.Core.Base.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Model\" />
+  </ItemGroup>
+
 </Project>

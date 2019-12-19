@@ -5,7 +5,7 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Jc.Core.Helper
+namespace Jc.Core
 {
     /// <summary>
     /// Enum操作Helper
@@ -13,31 +13,40 @@ namespace Jc.Core.Helper
     public class EnumHelper
     {
         /// <summary>
-        /// 将Enum类型转换为 Dictionary
-        /// Key为关键字,Value为值
+        /// 将Enum类型转换为 EnumModel
         /// </summary>
         /// <param name="enumType">枚举类型 typeof(enum)</param>
-        /// <returns></returns>
-        public static Dictionary<string, int> GetDictionary(Type enumType)
+        /// <returns>EnumModel</returns>
+        public static EnumModel GetEnumModel(Type enumType)
         {
-            Dictionary<string, int> dic = new Dictionary<string, int>();
+            string enumTypeName = enumType.Name;
+            string enumName = enumTypeName.Substring(enumTypeName.LastIndexOf(".") + 1);
+            EnumModel enumModel = new EnumModel()
+            {
+                Name = enumName,
+                DisplayName = GetDisplayName(enumType)
+            };
 
             #region 获取值
             FieldInfo[] fields = enumType.GetFields();
-            string key = "";
-            int value = 0;
+            
             foreach (FieldInfo field in fields)
             {
                 if (field.FieldType.IsEnum)
                 {
-                    value = (int)enumType.InvokeMember(field.Name, BindingFlags.GetField, null, null, null);
-                    key = GetDisplayName(field);
-                    dic.Add(key, value);
+                    int value = (int)enumType.InvokeMember(field.Name, BindingFlags.GetField, null, null, null);
+                    string key = GetDisplayName(field);
+                    EnumItemModel enumItem = new EnumItemModel()
+                    {
+                        Name = enumName,
+                        DisplayName = GetDisplayName(enumType),
+                        Value = value
+                    };
+                    enumModel.EnumItems.Add(enumItem);
                 }
             }
             #endregion
-            //dic = dic.OrderBy(kv => kv.Value).ToDictionary(kv => kv.Key, kv => kv.Value);
-            return dic;
+            return enumModel;
         }
 
         /// <summary>
