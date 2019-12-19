@@ -23,7 +23,6 @@ namespace Jc.Core.Helper
             Dictionary<string, int> dic = new Dictionary<string, int>();
 
             #region 获取值
-            Type typeDescription = typeof(DisplayNameAttribute);
             FieldInfo[] fields = enumType.GetFields();
             string key = "";
             int value = 0;
@@ -123,17 +122,37 @@ namespace Jc.Core.Helper
         }
 
         /// <summary>
+        /// 获取 Jc DisplayName
+        /// </summary>
+        /// <param name="type"></param>
+        /// <returns></returns>
+        public static string GetDisplayName(Type type)
+        {
+            string result = "";
+            DisplayAttribute attr = type.GetCustomAttribute<DisplayAttribute>();
+            if (attr != null)
+            {
+                result = attr.Name;
+            }
+            if(string.IsNullOrEmpty(result))
+            {
+                result = type.Name;
+            }
+            return result;
+        }        
+
+        /// <summary>
         /// 获取Enum显示名称
         /// </summary>
         /// <param name="fieldInfo"></param>
         /// <returns></returns>
-        private static string GetDisplayName(FieldInfo fieldInfo)
+        public static string GetDisplayName(FieldInfo fieldInfo)
         {
             string result = "";
-            var enumDisplayAttribute = fieldInfo.GetCustomAttribute<DisplayNameAttribute>();
-            if (enumDisplayAttribute != null)
+            DisplayAttribute attr = fieldInfo.GetCustomAttribute<DisplayAttribute>();
+            if (attr != null)
             {
-                result = enumDisplayAttribute.DisplayName;
+                result = attr.Name;
             }
             if(string.IsNullOrEmpty(result))
             {

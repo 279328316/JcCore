@@ -65,14 +65,14 @@ namespace Jc.Core
         private static string GetEnumDisplayName(FieldInfo fieldInfo)
         {
             string result = "";
-            var enumDisplayAttribute = fieldInfo.GetCustomAttribute<DisplayNameAttribute>();
+            var enumDisplayAttribute = fieldInfo.GetCustomAttribute<DisplayAttribute>();
             if (enumDisplayAttribute == null)
             {
                 result = fieldInfo.Name;
             }
             else
             {
-                result = enumDisplayAttribute.DisplayName;
+                result = enumDisplayAttribute.Name;
             }
             return result;
         }

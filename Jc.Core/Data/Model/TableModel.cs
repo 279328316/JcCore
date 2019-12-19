@@ -30,7 +30,7 @@ namespace Jc.Core.Data.Model
         /// <summary>
         ///表名称
         /// </summary>
-        [DisplayName("表名称")]
+        [Display("表名称")]
         public string TableName
         {
             get
@@ -46,7 +46,7 @@ namespace Jc.Core.Data.Model
         /// <summary>
         /// 表类型
         /// </summary>
-        [DisplayName("表类型")]
+        [Display("表类型")]
         public TableType TbType
         {
             get
@@ -62,7 +62,7 @@ namespace Jc.Core.Data.Model
         /// <summary>
         /// 表类型描述
         /// </summary>
-        [DisplayName("表类型描述")]
+        [Display("表类型描述")]
         public string TableTypeStr
         {
             get
@@ -88,7 +88,7 @@ namespace Jc.Core.Data.Model
         /// <summary>
         ///表名称
         /// </summary>
-        [DisplayName("表说明")]
+        [Display("表说明")]
         public string TableDes
         {
             get

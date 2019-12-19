@@ -8,21 +8,21 @@ using System.Reflection;
 namespace Jc.Core
 {
     /// <summary>
-    /// 枚举DisplayAttribute
+    /// DisplayAttribute
     /// </summary>
-    public class DisplayNameAttribute : Attribute
+    public class DisplayAttribute : Attribute
     {
         /// <summary>
         /// 显示名称
         /// </summary>
-        public string DisplayName { get; set; }
+        public string Name { get; set; }
 
-        public DisplayNameAttribute()
+        public DisplayAttribute()
         {
         }
-        public DisplayNameAttribute(string displayName)
+        public DisplayAttribute(string name)
         {
-            this.DisplayName = displayName;
+            this.Name = name;
         }
     }
 }

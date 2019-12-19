@@ -42,7 +42,7 @@ namespace Jc.Core.Data.Model
         /// <summary>
         ///数据库名称
         /// </summary>
-        [DisplayName("数据库名称")]
+        [Display("数据库名称")]
         public string DbName
         {
             get
@@ -57,7 +57,7 @@ namespace Jc.Core.Data.Model
         /// <summary>
         ///数据库类型
         /// </summary>
-        [DisplayName("数据库类型")]
+        [Display("数据库类型")]
         public DatabaseType DbType
         {
             get
@@ -73,7 +73,7 @@ namespace Jc.Core.Data.Model
         /// <summary>
         ///数据库名称
         /// </summary>
-        [DisplayName("数据库说明")]
+        [Display("数据库说明")]
         public string DbDes
         {
             get
