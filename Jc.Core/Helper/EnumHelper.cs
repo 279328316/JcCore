@@ -17,10 +17,10 @@ namespace Jc.Core.Helper
         /// Key为关键字,Value为显示文本.
         /// </summary>
         /// <param name="enumType">枚举类型 typeof(enum)</param>
-        /// <param name="sortingType">排序方式 默认不排序</param>
+        /// <param name="sort">排序方式 默认不排序</param>
         /// <param name="order">排序方向</param>
         /// <returns></returns>
-        public static Dictionary<string, int> GetDictionary(Type enumType,KeyValueSortingType sortingType = KeyValueSortingType.Default,Sorting order = Sorting.Asc)
+        public static Dictionary<string, int> GetDictionary(Type enumType,SortingType sort = SortingType.Default,Sorting order = Sorting.Asc)
         {
             Dictionary<string, int> dic = new Dictionary<string, int>();
 
@@ -42,9 +42,9 @@ namespace Jc.Core.Helper
 
             //处理排序
             #region 排序处理
-            switch (sortingType)
+            switch (sort)
             {
-                case KeyValueSortingType.Key:
+                case SortingType.Key:
                     if (order == Sorting.Asc)
                     {
                         dic = dic.OrderBy(kv => kv.Key).ToDictionary(kv=>kv.Key,kv=>kv.Value);                        
@@ -54,7 +54,7 @@ namespace Jc.Core.Helper
                         dic = dic.OrderByDescending(kv => kv.Key).ToDictionary(kv => kv.Key, kv => kv.Value);
                     }
                     break;
-                case KeyValueSortingType.Value:
+                case SortingType.Value:
                     if (order == Sorting.Asc)
                     {
                         dic = dic.OrderBy(kv => kv.Value).ToDictionary(kv => kv.Key, kv => kv.Value);
@@ -178,7 +178,7 @@ namespace Jc.Core.Helper
     /// <summary>
     /// KeyValuePair排序方式
     /// </summary>
-    public enum KeyValueSortingType
+    public enum SortingType
     {
         /// <summary>
         /// 默认不做排序
