@@ -39,7 +39,7 @@ namespace Jc.Core
                     EnumItemModel enumItem = new EnumItemModel()
                     {
                         Name = enumName,
-                        DisplayName = GetDisplayName(enumType),
+                        DisplayName = GetDisplayName(field),
                         Value = value
                     };
                     enumModel.EnumItems.Add(enumItem);
