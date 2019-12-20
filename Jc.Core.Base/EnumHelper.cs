@@ -138,10 +138,10 @@ namespace Jc.Core
         public static string GetDisplayName(Type type)
         {
             string result = "";
-            DisplayAttribute attr = type.GetCustomAttribute<DisplayAttribute>();
+            DisplayNameAttribute attr = type.GetCustomAttribute<DisplayNameAttribute>();
             if (attr != null)
             {
-                result = attr.Name;
+                result = attr.DisplayName;
             }
             if(string.IsNullOrEmpty(result))
             {
@@ -158,10 +158,10 @@ namespace Jc.Core
         public static string GetDisplayName(FieldInfo fieldInfo)
         {
             string result = "";
-            DisplayAttribute attr = fieldInfo.GetCustomAttribute<DisplayAttribute>();
+            DisplayNameAttribute attr = fieldInfo.GetCustomAttribute<DisplayNameAttribute>();
             if (attr != null)
             {
-                result = attr.Name;
+                result = attr.DisplayName;
             }
             if(string.IsNullOrEmpty(result))
             {

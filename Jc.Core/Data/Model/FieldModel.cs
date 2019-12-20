@@ -38,7 +38,6 @@ namespace Jc.Core.Data.Model
         /// <summary>
         ///字段名称
         /// </summary>
-        [Display("字段名称")]
         public string FieldName
         {
             get
@@ -53,7 +52,6 @@ namespace Jc.Core.Data.Model
         /// <summary>
         ///字段中文名称
         /// </summary>
-        [Display("字段中文名称")]
         public string FieldChName
         {
             get
@@ -69,7 +67,6 @@ namespace Jc.Core.Data.Model
         ///是否主键 1 主键 0 非主键
         ///为兼容各种数据库,使用long类型
         /// </summary>
-        [Display("是否主键")]
         public bool IsPk
         {
             get
@@ -84,7 +81,6 @@ namespace Jc.Core.Data.Model
         /// <summary>
         ///字段类型
         /// </summary>
-        [Display("字段类型")]
         public string FieldType
         {
             get
@@ -99,7 +95,6 @@ namespace Jc.Core.Data.Model
         /// <summary>
         ///字段长度
         /// </summary>
-        [Display("字段长度")]
         public int? FieldLength
         {
             get
@@ -114,7 +109,6 @@ namespace Jc.Core.Data.Model
         /// <summary>
         ///可否为空
         /// </summary>
-        [Display("可否为空")]
         public bool IsNullAble
         {
             get
@@ -129,7 +123,6 @@ namespace Jc.Core.Data.Model
         /// <summary>
         ///备注
         /// </summary>
-        [Display("备注")]
         public string Note
         {
             get
@@ -146,7 +139,6 @@ namespace Jc.Core.Data.Model
         /// <summary>
         ///是否主键 0非主键 1主键
         /// </summary>
-        [Display("是否主键")]
         public string IsPkStr
         {
             set
@@ -170,7 +162,6 @@ namespace Jc.Core.Data.Model
         /// <summary>
         ///是否为空 0不能为空 1可以为空
         /// </summary>
-        [Display("是否为空")]
         public string IsNullAbleStr
         {
             set
@@ -194,7 +185,6 @@ namespace Jc.Core.Data.Model
         /// <summary>
         ///字段长度Str
         /// </summary>
-        [Display("字段长度Str")]
         public string FieldLengthStr
         {
             set

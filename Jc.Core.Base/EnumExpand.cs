@@ -48,33 +48,13 @@ namespace Jc.Core
                 }
                 else
                 {
-                    return GetEnumDisplayName(fieldInfo);
+                    return EnumHelper.GetDisplayName(fieldInfo);
                 }
             }
             else
             {
                 return null;
             }
-        }
-
-        /// <summary>
-        /// 获取Enum显示名称
-        /// </summary>
-        /// <param name="fieldInfo"></param>
-        /// <returns></returns>
-        private static string GetEnumDisplayName(FieldInfo fieldInfo)
-        {
-            string result = "";
-            var enumDisplayAttribute = fieldInfo.GetCustomAttribute<DisplayAttribute>();
-            if (enumDisplayAttribute == null)
-            {
-                result = fieldInfo.Name;
-            }
-            else
-            {
-                result = enumDisplayAttribute.Name;
-            }
-            return result;
         }
     }
 }

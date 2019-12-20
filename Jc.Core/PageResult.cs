@@ -17,12 +17,10 @@ namespace Jc.Core
         /// <summary>
         /// 总记录数
         /// </summary>
-        [Display("Total")]
         public int Total { get; set; }
         /// <summary>
         /// 列表对象
         /// </summary>
-        [Display("Rows")]
         public List<T> Rows { get; set; }
 
         /// <summary>
