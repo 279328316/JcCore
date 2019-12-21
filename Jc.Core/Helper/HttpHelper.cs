@@ -803,7 +803,7 @@ namespace Jc.Core.Helper
                         }
                         else
                         {
-                            strBuilder.Append(JsonHelper.ObjToJson(requestParams));
+                            strBuilder.Append(JsonHelper.SerializeObject(requestParams));
                         }
                     }
                     #endregion
@@ -829,7 +829,7 @@ namespace Jc.Core.Helper
                             }
                             else
                             {
-                                valueStr = JsonHelper.ObjToJson(value);
+                                valueStr = JsonHelper.SerializeObject(value);
                             }
                             if (strBuilder.Length > 0)
                             {
@@ -876,7 +876,7 @@ namespace Jc.Core.Helper
                         }
                         else
                         {
-                            dic.Add("params", JsonHelper.ObjToJson(requestParams));
+                            dic.Add("params", JsonHelper.SerializeObject(requestParams));
                         }
                     }
                     #endregion
@@ -932,7 +932,7 @@ namespace Jc.Core.Helper
                             }
                             else
                             {
-                                valueStr = JsonHelper.ObjToJson(value);
+                                valueStr = JsonHelper.SerializeObject(value);
                             }
                             dic.Add(piList[i].Name.ToLower(), valueStr);
                         }
@@ -942,12 +942,6 @@ namespace Jc.Core.Helper
             }
             return dic;
         }
-        /// <summary>
-        /// 注册CodePagesEncoding 解决中文乱码问题
-        /// </summary>
-        public static void RegisterEncodingProvider()
-        {
-            Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
-        }
+
     }
 }
