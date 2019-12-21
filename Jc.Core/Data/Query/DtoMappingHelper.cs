@@ -81,6 +81,10 @@ namespace Jc.Core.Data.Query
                         PiName = pi.Name,
                     };
                 }
+                if(!pi.CanRead || !pi.CanWrite)
+                {   //如果只读或只写,则该字段IsIgnore属性设置为True
+                    attr.IsIgnore = true;
+                }
                 if (noMappingAttr != null)
                 {   //如果发现NoMapping,则该字段IsIgnore属性设置为True
                     attr.IsIgnore = true;
