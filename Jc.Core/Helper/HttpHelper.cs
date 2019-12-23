@@ -203,6 +203,77 @@ namespace Jc.Core.Helper
             t.Start();
             return afterDto;
         }
+
+        /// <summary>
+        /// 文件下载
+        /// </summary>
+        /// <param name="url">请求URL</param>
+        /// <param name="requestParams">请求参数</param>
+        /// <param name="filePath">文件路径</param>
+        /// <param name="overWrite">是否覆盖</param>
+        /// <param name="progressChanged">进度通知</param>
+        /// <returns></returns>
+        public void PostDownload(string url, object requestParams, string filePath, bool overWrite = false, ProgressChangedEventHandler progressChanged = null)
+        {
+            try
+            {
+                using (HttpWebResponse response = CreatePostHttpResponse(url, requestParams))
+                {
+                    using (Stream responseStream = response.GetResponseStream())
+                    {
+                        using (Stream stream = new FileStream(filePath, overWrite ? FileMode.Create : FileMode.CreateNew))
+                        {
+                            long totalLength = response.ContentLength;
+                            int createdSize = 0;
+                            int blockSize = 50 * 1024, readSize;
+                            byte[] bArr = new byte[blockSize];
+                            while ((readSize = responseStream.Read(bArr, 0, blockSize)) > 0)
+                            {
+                                stream.Write(bArr, 0, readSize);
+
+                                createdSize += readSize;
+                                if (progressChanged != null && totalLength != 0)
+                                {
+                                    int progress = (int)(100 * createdSize / totalLength);
+                                    progressChanged(null, new ProgressChangedEventArgs(progress, progress));
+                                }
+                            }
+                            if (progressChanged != null)
+                            {
+                                progressChanged(null, new ProgressChangedEventArgs(100, 100));
+                            }
+                        }
+                    }
+                    response.Close();
+                }
+            }
+            catch (System.Exception ex)
+            {
+                throw new System.Exception(ex.Message);
+            }
+        }
+
+        /// <summary>
+        /// 下载文件
+        /// </summary>
+        /// <param name="url">请求URL</param>
+        /// <param name="requestParams">请求参数</param>
+        /// <param name="filePath">文件路径</param>
+        /// <param name="overWrite">是否覆盖</param>
+        /// <param name="progressChanged">进度通知</param>
+        /// <returns></returns>
+        public AfterDto<int> PostDownloadAsync<T>(string url, object requestParams, string filePath, bool overWrite = false, ProgressChangedEventHandler progressChanged = null)
+        {
+            AfterDto<int> afterDto = null;
+            Task t = new Task(() =>
+            {
+                PostDownload(url, requestParams, filePath, overWrite, progressChanged);
+                afterDto.DoAfter(1);
+            });
+            t.Start();
+            return afterDto;
+        }
+
         #endregion
 
         #region Get请求
