@@ -248,6 +248,8 @@ namespace Jc.Core.Data.Query
             else
             {
                 bool isFieldOp = left is MemberExpression && right is MemberExpression
+                    && ((MemberExpression)left).Expression != null
+                    && ((MemberExpression)right).Expression != null
                     && !((MemberExpression)left).Expression.ToString().StartsWith("value")
                     && !((MemberExpression)right).Expression.ToString().StartsWith("value");
                 object leftVal = AtomExpressionRouter(left);
@@ -306,7 +308,7 @@ namespace Jc.Core.Data.Query
                     if (me != null)
                     {
                         string memberName = me.Member.Name;
-                        if (me.Expression.Type.IsValueType)
+                        if (me.Expression == null || me.Expression.Type.IsValueType)
                         {
                             object value = Expression.Lambda(exp).Compile().DynamicInvoke();
                             return value;
@@ -326,8 +328,8 @@ namespace Jc.Core.Data.Query
                 {
                     MemberExpression me = exp as MemberExpression;
                     string memberName = me.Member.Name;
-                    if (me.Expression.Type.IsValueType)
-                    {
+                    if (me.Expression == null || me.Expression.Type.IsValueType)
+                    {   // DateTime.Now || 值类型
                         object value = Expression.Lambda(exp).Compile().DynamicInvoke();
                         return value;
                     }
