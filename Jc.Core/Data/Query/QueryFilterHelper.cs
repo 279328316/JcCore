@@ -298,57 +298,42 @@ namespace Jc.Core.Data.Query
         /// <returns></returns>
         private object MemberExpressionProvider(Expression exp)
         {
-            if (!exp.ToString().StartsWith("value"))
+            if(! (exp is MemberExpression))
             {
-                if (exp.ToString().ToLower().EndsWith(".value"))
+                throw new Exception($"表达式{exp}不是MemberExpression类型.");
+            }
+            object result = null;
+            MemberExpression me = exp as MemberExpression;
+            string memberName = me.Member.Name;
+            string expStr = exp.ToString();
+            if (expStr.StartsWith("value"))
+            {   //引用其它对象属性类型 如 list.contais(student.Name) , a.HospitalId == hospital.Id 
+                object tempValue = Expression.Lambda(exp).Compile().DynamicInvoke();
+                result = ConvertValue(tempValue);
+            }
+            else
+            {
+                if (memberName == "Value")
                 {   //NullAble属性  levels.Contains(a.ApiLevel.Value)
-                    //throw new Exception("~NullAble属性,请直接使用属性名称.不要使用.Value.");
-                    MemberExpression me = exp as MemberExpression;
-                    me = me.Expression as MemberExpression;
-                    if (me != null)
+                    if (me.Expression != null)
                     {
-                        string memberName = me.Member.Name;
-                        if (me.Expression == null || me.Expression.Type.IsValueType)
-                        {
-                            object value = Expression.Lambda(exp).Compile().DynamicInvoke();
-                            return value;
-                        }
-                        else
-                        {
-                            string fieldName = dtoDbMapping.PiMapDic[memberName].FieldName;
-                            return fieldName;
-                        }
-                    }
-                    else
-                    {
-                        throw new Exception("不支持的方法:" + exp.ToString());
-                    }
-                }
-                else if (exp is MemberExpression)
-                {
-                    MemberExpression me = exp as MemberExpression;
-                    string memberName = me.Member.Name;
-                    if (me.Expression == null || me.Expression.Type.IsValueType)
-                    {   // DateTime.Now || 值类型
-                        object value = Expression.Lambda(exp).Compile().DynamicInvoke();
-                        return value;
-                    }
-                    else
-                    {
-                        string fieldName = dtoDbMapping.PiMapDic[memberName].FieldName;
-                        return fieldName;
+                        result = MemberExpressionProvider(me.Expression);
                     }
                 }
                 else
                 {
-                    throw new Exception("不支持的方法:" + exp.ToString());
+                    if (me.Expression != null && !me.Expression.Type.IsValueType)
+                    {
+                        result = dtoDbMapping.PiMapDic[memberName].FieldName;
+                    }
+                    else
+                    {   // me.Expression == null DateTime.Now Guid.Empty
+                        // me.Expression.Type.IsValueType 值类型
+                        result = Expression.Lambda(exp).Compile().DynamicInvoke();
+                    }
                 }
             }
-            else
-            {   //list.contais(student.Name) 类型
-                object result = Expression.Lambda(exp).Compile().DynamicInvoke();
-                return ConvertValue(result);
-            }
+            return result;
         }
 
         /// <summary>
