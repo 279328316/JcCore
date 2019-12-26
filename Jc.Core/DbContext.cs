@@ -130,11 +130,11 @@ namespace Jc.Core
             }
         }
 
-        
+
         /// <summary>
         /// 关闭非事务DbConnection
         /// </summary>
-        internal void CloseDbConnection(DbConnection connection)
+        internal virtual void CloseDbConnection(DbConnection connection)
         {
             if (connection != null) { try { connection.Close(); connection.Dispose(); } catch { } }
         }

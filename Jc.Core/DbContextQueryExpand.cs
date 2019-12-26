@@ -231,7 +231,7 @@ namespace Jc.Core
         /// <summary>
         /// 关闭非事务DbConnection
         /// </summary>
-        internal void CloseDbConnection(DbCommand dbCmd)
+        internal virtual void CloseDbConnection(DbCommand dbCmd)
         {
             if (dbCmd != null) { CloseDbConnection(dbCmd.Connection); }
         }

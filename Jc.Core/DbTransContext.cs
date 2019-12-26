@@ -45,6 +45,22 @@ namespace Jc.Core
             return transDbConnection;
         }
 
+        internal override void CloseDbConnection(DbCommand dbCmd)
+        {   //如果为事务,取消关闭
+            if (!isTransaction)
+            { 
+                base.CloseDbConnection(dbCmd);
+            }
+        }
+
+        internal override void CloseDbConnection(DbConnection connection)
+        {   //如果为事务,取消关闭
+            if (!isTransaction)
+            {
+                base.CloseDbConnection(connection);
+            }
+        }
+
         /// <summary>
         /// 开启事务
         /// </summary>
