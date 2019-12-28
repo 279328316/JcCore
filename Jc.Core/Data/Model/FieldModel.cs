@@ -141,6 +141,10 @@ namespace Jc.Core.Data.Model
         /// </summary>
         public string IsPkStr
         {
+            get
+            {
+                return isPkStr;
+            }
             set
             {
                 isPkStr = value;
@@ -164,6 +168,10 @@ namespace Jc.Core.Data.Model
         /// </summary>
         public string IsNullAbleStr
         {
+            get
+            {
+                return isNullAbleStr;
+            }
             set
             {
                 isNullAbleStr = value;
@@ -187,6 +195,10 @@ namespace Jc.Core.Data.Model
         /// </summary>
         public string FieldLengthStr
         {
+            get
+            {
+                return fieldLengthStr;
+            }
             set
             {
                 fieldLengthStr = value;

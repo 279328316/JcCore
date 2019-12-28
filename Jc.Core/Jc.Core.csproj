@@ -25,6 +25,12 @@ https://github.com/279328316/JcCore</Description>
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Model\**" />
+    <EmbeddedResource Remove="Model\**" />
+    <None Remove="Model\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Microsoft.Extensions.Caching.Memory" Version="2.1.1" />
     <PackageReference Include="Microsoft.Extensions.Caching.Redis" Version="2.1.1" />
     <PackageReference Include="Microsoft.Extensions.Configuration" Version="3.0.0" />
@@ -38,10 +44,6 @@ https://github.com/279328316/JcCore</Description>
 
   <ItemGroup>
     <ProjectReference Include="..\Jc.Core.Base\Jc.Core.Base.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Model\" />
   </ItemGroup>
 
 </Project>
