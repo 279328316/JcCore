@@ -38,5 +38,14 @@ namespace Jc.Core.UnitTestApp
                 }
             }
         }
+
+
+        [TestMethod]
+        public void PostgresqlCreateTest()
+        {
+            string connectString = "Server=10.10.11.100;Port=5432;Database=PETCT_PUMC;UserId=nice;Password=nice;";
+            DbContext db = DbContext.CreateDbContext(connectString, DatabaseType.PostgreSql);
+            db.ConTest();
+        }
     }
 }

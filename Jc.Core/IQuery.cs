@@ -431,11 +431,19 @@ namespace Jc.Core
         {
             if (!string.IsNullOrEmpty(sort))
             {
-                this.orderByClauseList.Add(new OrderByClause()
+                List<PiMap> piMapList = DtoMappingHelper.GetPiMapList<T>(expr);
+                if (piMapList != null && piMapList.Count > 0)
                 {
-                    FieldName = sort,
-                    Order = order.ToLower() == "desc" ? Sorting.Desc : Sorting.Asc
-                });
+                    PiMap piMap = piMapList.FirstOrDefault(a => a.PiName.ToLower() == sort.ToLower());
+                    if (piMap != null)
+                    {
+                        this.orderByClauseList.Add(new OrderByClause()
+                        {
+                            FieldName = piMap.FieldName,
+                            Order = order.ToLower() == "desc" ? Sorting.Desc : Sorting.Asc
+                        });
+                    }
+                }
             }
             else if (expr != null)
             {
