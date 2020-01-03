@@ -443,6 +443,10 @@ namespace Jc.Core
                             Order = order.ToLower() == "desc" ? Sorting.Desc : Sorting.Asc
                         });
                     }
+                    else
+                    {
+                        throw new Exception($"无效的查询属性{sort}");
+                    }
                 }
             }
             else if (expr != null)
