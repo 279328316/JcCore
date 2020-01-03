@@ -367,276 +367,6 @@ namespace Jc.Core.Data.Query
         }
 
         /// <summary>
-        /// 转换值
-        /// 处理数组类型
-        /// </summary>
-        /// <param name="result"></param>
-        /// <returns></returns>
-        private object ConvertValue(object result)
-        {
-            if (result == null || result is ValueType || result is string 
-                || result is DateTime || result is char)
-            {
-                return result;
-            }
-            //支持数组,List泛型 int,int?,float,float?,double,double?,
-            //long,long?,Guid,Guid?,Datetime,Datetime?,string
-            #region 处理数组类型
-            StringBuilder strBuilder = new StringBuilder();
-            if (result is IEnumerable<int>)
-            {
-                IEnumerable<int> rl = result as IEnumerable<int>;
-                foreach (int r in rl)
-                {
-                    if (strBuilder.Length == 0)
-                    {
-                        strBuilder.Append(r.ToString());
-                    }
-                    else
-                    {
-                        strBuilder.Append("," + r.ToString());
-                    }
-                }
-            }
-            else if (result is IEnumerable<int?>)
-            {
-                IEnumerable<int?> rl = result as IEnumerable<int?>;
-                foreach (int? r in rl)
-                {
-                    if (r == null)
-                    {
-                        continue;
-                        //throw new Exception("可为空查询列表中,不允许有null值.");
-                    }
-                    if (strBuilder.Length == 0)
-                    {
-                        strBuilder.Append(r.ToString());
-                    }
-                    else
-                    {
-                        strBuilder.Append("," + r.ToString());
-                    }
-                }
-            }
-            else if (result is IEnumerable<float>)
-            {
-                IEnumerable<float> rl = result as IEnumerable<float>;
-                foreach (float r in rl)
-                {
-                    if (strBuilder.Length == 0)
-                    {
-                        strBuilder.Append(r.ToString());
-                    }
-                    else
-                    {
-                        strBuilder.Append("," + r.ToString());
-                    }
-                }
-            }
-            else if (result is IEnumerable<float?>)
-            {
-                IEnumerable<float?> rl = result as IEnumerable<float?>;
-                foreach (float? r in rl)
-                {
-                    if (r == null)
-                    {
-                        continue;
-                        //throw new Exception("可为空查询列表中,不允许有null值.");
-                    }
-                    if (strBuilder.Length == 0)
-                    {
-                        strBuilder.Append(r.ToString());
-                    }
-                    else
-                    {
-                        strBuilder.Append("," + r.ToString());
-                    }
-                }
-            }
-            else if (result is IEnumerable<double>)
-            {
-                IEnumerable<double> rl = result as IEnumerable<double>;
-                foreach (double r in rl)
-                {
-                    if (strBuilder.Length == 0)
-                    {
-                        strBuilder.Append(r.ToString());
-                    }
-                    else
-                    {
-                        strBuilder.Append("," + r.ToString());
-                    }
-                }
-            }
-            else if (result is IEnumerable<double?>)
-            {
-                IEnumerable<double?> rl = result as IEnumerable<double?>;
-                foreach (double? r in rl)
-                {
-                    if (r == null)
-                    {
-                        continue;
-                        //throw new Exception("可为空查询列表中,不允许有null值.");
-                    }
-                    if (strBuilder.Length == 0)
-                    {
-                        strBuilder.Append(r.ToString());
-                    }
-                    else
-                    {
-                        strBuilder.Append("," + r.ToString());
-                    }
-                }
-            }
-            else if (result is IEnumerable<long>)
-            {
-                IEnumerable<long> rl = result as IEnumerable<long>;
-                foreach (long r in rl)
-                {
-                    if (strBuilder.Length == 0)
-                    {
-                        strBuilder.Append(r.ToString());
-                    }
-                    else
-                    {
-                        strBuilder.Append("," + r.ToString());
-                    }
-                }
-            }
-            else if (result is IEnumerable<long?>)
-            {
-                IEnumerable<long?> rl = result as IEnumerable<long?>;
-                foreach (long? r in rl)
-                {
-                    if (r == null)
-                    {
-                        continue;
-                        //throw new Exception("可为空查询列表中,不允许有null值.");
-                    }
-                    if (strBuilder.Length == 0)
-                    {
-                        strBuilder.Append(r.ToString());
-                    }
-                    else
-                    {
-                        strBuilder.Append("," + r.ToString());
-                    }
-                }
-            }
-            else if (result is IEnumerable<Guid>)
-            {
-                IEnumerable<Guid> rl = result as IEnumerable<Guid>;
-                foreach (Guid r in rl)
-                {
-                    if (strBuilder.Length == 0)
-                    {
-                        strBuilder.Append(r.ToString());
-                    }
-                    else
-                    {
-                        strBuilder.Append("," + r.ToString());
-                    }
-                }
-            }
-            else if (result is IEnumerable<Guid?>)
-            {
-                IEnumerable<Guid?> rl = result as IEnumerable<Guid?>;
-                foreach (Guid? r in rl)
-                {
-                    if (r == null)
-                    {
-                        continue;
-                        //throw new Exception("可为空查询列表中,不允许有null值.");
-                    }
-                    if (strBuilder.Length == 0)
-                    {
-                        strBuilder.Append(r.ToString());
-                    }
-                    else
-                    {
-                        strBuilder.Append("," + r.ToString());
-                    }
-                }
-            }
-            else if (result is IEnumerable<DateTime>)
-            {
-                IEnumerable<DateTime> rl = result as IEnumerable<DateTime>;
-                foreach (DateTime r in rl)
-                {
-                    if (strBuilder.Length == 0)
-                    {
-                        strBuilder.Append(r.ToString());
-                    }
-                    else
-                    {
-                        strBuilder.Append("," + r.ToString());
-                    }
-                }
-            }
-            else if (result is IEnumerable<DateTime?>)
-            {
-                IEnumerable<DateTime?> rl = result as IEnumerable<DateTime?>;
-                foreach (DateTime? r in rl)
-                {
-                    if (r == null)
-                    {
-                        continue;
-                        //throw new Exception("可为空查询列表中,不允许有null值.");
-                    }
-                    if (strBuilder.Length == 0)
-                    {
-                        strBuilder.Append(r.ToString());
-                    }
-                    else
-                    {
-                        strBuilder.Append("," + r.ToString());
-                    }
-                }
-            }
-            else if (result is IEnumerable<string>)
-            {
-                IEnumerable<string> rl = result as IEnumerable<string>;
-                foreach (string r in rl)
-                {
-                    if (strBuilder.Length == 0)
-                    {
-                        strBuilder.Append(r.ToString());
-                    }
-                    else
-                    {
-                        strBuilder.Append("," + r.ToString());
-                    }
-                }
-            }
-            else if (result is IEnumerable<object>)
-            {
-                IEnumerable<object> rl = result as IEnumerable<object>;
-                foreach (object r in rl)
-                {
-                    if (r == null)
-                    {
-                        continue;
-                        //throw new Exception("可为空查询列表中,不允许有null值.");
-                    }
-                    if (strBuilder.Length == 0)
-                    {
-                        strBuilder.Append(r.ToString());
-                    }
-                    else
-                    {
-                        strBuilder.Append("," + r.ToString());
-                    }
-                }
-            }
-            else
-            {
-                return result;
-            }
-            return strBuilder.ToString();
-            #endregion
-        }
-
-        /// <summary>
         /// 对静态方法或实例方法的调用
         /// </summary>
         /// <param name="exp"></param>
@@ -654,7 +384,6 @@ namespace Jc.Core.Data.Query
             {
                 case "Equals":
                     name = MemberExpressionProvider(mce.Object);
-                    //value = ConstantExpressionProvider(mce.Arguments[0]);
                     value = Expression.Lambda(mce.Arguments[0]).Compile().DynamicInvoke().ToString();
                     op = isNotOprand ? Operand.NotEqual : Operand.Equal;
                     parameterDbType = DbTypeConvertor.GetDbType(value);
@@ -669,12 +398,6 @@ namespace Jc.Core.Data.Query
                             op = isNotOprand ? Operand.NotLike : Operand.Like;
                             parameterDbType = DbTypeConvertor.GetDbType(value);
                         }
-                        //else if (((MemberExpression)mce.Object).Member.MemberType == MemberTypes.Field)
-                        //{   //permIds.Contains(a.Id)
-                        //    name = AtomExpressionRouter(mce.Arguments[0]);
-                        //    value = AtomExpressionRouter(mce.Object);
-                        //    op = Operand.In;
-                        //}
                         else
                         {   //permIds.Contains(a.Id)
                             name = AtomExpressionRouter(mce.Arguments[0]);
@@ -856,36 +579,21 @@ namespace Jc.Core.Data.Query
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="query">查询条件</param>
-        /// <returns></returns>
-        public static QueryFilter GetFilter<T>(Expression<Func<T, bool>> query) where T : class, new()
-        {
-            QueryFilterHelper filterHelper = new QueryFilterHelper();
-            filterHelper.FillFilter(null,query);
-            return filterHelper.filter;
-        }
-
-
-        /// <summary>
-        /// lambda表达式转换sql
-        /// 支持的方法:
-        /// Contains(支持List.Contains字段与字段Contains字符串),
-        /// StartsWith,EndsWith,=,!=,>,>=,小于,小于等于
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
         /// <param name="select">查询属性</param>
-        /// <param name="query">查询条件</param>
         /// <param name="orderByClauseList">排序条件</param>
         /// <param name="unSelect">排除查询属性</param>
         /// <returns></returns>
-        public static QueryFilter GetFilter<T>(Expression<Func<T, object>> select = null,
+        public static QueryFilter GetFilter<T>(
             Expression<Func<T, bool>> query = null,
+            Expression<Func<T, object>> select = null,
             List<OrderByClause> orderByClauseList = null,
             Expression<Func<T, object>> unSelect = null) where T : class, new()
         {
             QueryFilterHelper filterHelper = new QueryFilterHelper();
-            filterHelper.FillFilter(select, query, orderByClauseList, null, unSelect);
+            filterHelper.FillFilter(query, select, orderByClauseList, null, unSelect);
             return filterHelper.filter;
         }
+
         /// <summary>
         /// lambda表达式转换sql
         /// 支持的方法:
@@ -893,14 +601,15 @@ namespace Jc.Core.Data.Query
         /// StartsWith,EndsWith,=,!=,>,>=,小于,小于等于
         /// </summary>
         /// <typeparam name="T"></typeparam>
-        /// <param name="select">查询属性</param>
         /// <param name="query">查询条件</param>
+        /// <param name="select">查询属性</param>
         /// <param name="orderByClauseList">排序条件</param>
         /// <param name="pager">分页条件</param>
         /// <param name="unSelect">排除查询属性</param>
         /// <returns></returns>
-        public static QueryFilter GetPageFilter<T>(Expression<Func<T, object>> select = null,
+        public static QueryFilter GetPageFilter<T>(
             Expression<Func<T, bool>> query = null,
+            Expression<Func<T, object>> select = null,
             List<OrderByClause> orderByClauseList = null, 
             Pager pager = null,
             Expression<Func<T, object>> unSelect = null) where T : class, new()
@@ -914,9 +623,10 @@ namespace Jc.Core.Data.Query
                 throw new Exception("分页查询未指定排序信息");
             }
             QueryFilterHelper filterHelper = new QueryFilterHelper();
-            filterHelper.FillFilter(select, query, orderByClauseList, pager, unSelect);
+            filterHelper.FillFilter(query, select,  orderByClauseList, pager, unSelect);
             return filterHelper.filter;
         }
+
         /// <summary>
         /// lambda表达式转换sql
         /// 支持的方法:
@@ -930,8 +640,9 @@ namespace Jc.Core.Data.Query
         /// <param name="pager"></param>
         /// <param name="unSelect"></param>
         /// <returns></returns>
-        private void FillFilter<T>(Expression<Func<T, object>> select = null,
+        private void FillFilter<T>(
             Expression<Func<T, bool>> query = null,
+            Expression<Func<T, object>> select = null,
             List<OrderByClause> orderByClauseList = null, 
             Pager pager = null,
             Expression<Func<T, object>> unSelect = null) where T : class, new()
@@ -966,7 +677,6 @@ namespace Jc.Core.Data.Query
             #region 处理查询属性
             filter.Select = select;
             filter.UnSelect = unSelect;
-            DtoMappingHelper.GetPiMapList<T>(filter);
             #endregion
         }
     }
