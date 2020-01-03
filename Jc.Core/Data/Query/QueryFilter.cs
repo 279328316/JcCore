@@ -4,6 +4,7 @@ using System.Text;
 using System.Runtime.Serialization;
 using System.Data;
 using System.Linq.Expressions;
+using System.Collections;
 
 namespace Jc.Core.Data.Query
 {
@@ -149,7 +150,7 @@ namespace Jc.Core.Data.Query
         /// <returns></returns>
         public virtual void AddQueryItem(QueryParameter qp)
         {
-            AddQueryItem(qp.FieldName, qp.Conj, qp.Op, qp.ParameterValue, DbType.String);
+            AddQueryItem(qp.FieldName, qp.Conj, qp.Op, qp.ParameterValue, qp.ParameterDbType);
         }
 
         /// <summary>
@@ -247,24 +248,8 @@ namespace Jc.Core.Data.Query
                 case Operand.IsNotNull:
                     whereClause += " " + p.FieldName + " is not null";
                     break;
-                case Operand.In:        //in 需要参数格式 @p1, @p2, @p3,... 较复杂
-                    string[] inStrList = p.ParameterValue?.ToString().Split(',');
-                    if (inStrList != null && inStrList.Length > 0)
-                    {
-                        p.ParameterName = "";
-                        for (int i = 0; i < inStrList.Length; i++)
-                        {
-                            if (!string.IsNullOrEmpty(inStrList[i]))
-                            {
-                                QueryParameter qp = new QueryParameter();
-                                qp.ParameterName += GetParameterName(fieldName);
-                                qp.ParameterValue = inStrList[i];
-                                this.filterParameters.Add(qp);
-                                p.ParameterName += string.IsNullOrEmpty(p.ParameterName)
-                                    ? qp.ParameterName : ("," + qp.ParameterName);
-                            }
-                        }
-                    }
+                case Operand.In:        //in 需要参数格式 @p1, @p2, @p3,...
+                    p.ParameterName = AddInParam(fieldName, value, dbType);
                     if (!string.IsNullOrEmpty(p.ParameterName))
                     {   //判断参数有效 此条件有效
                         whereClause += " " + p.FieldName + " in (" + p.ParameterName + ") ";
@@ -275,24 +260,7 @@ namespace Jc.Core.Data.Query
                     }
                     break;
                 case Operand.NotIn:
-                    string[] notinStrList = p.ParameterValue.ToString().Split(',');
-                    if (notinStrList != null && notinStrList.Length > 0)
-                    {
-                        p.ParameterName = "";
-                        for (int i = 0; i < notinStrList.Length; i++)
-                        {
-                            if (!string.IsNullOrEmpty(notinStrList[i]))
-                            {
-                                QueryParameter qp = new QueryParameter();
-                                qp.ParameterName += GetParameterName(fieldName);
-                                qp.ParameterValue = notinStrList[i];
-                                this.filterParameters.Add(p);
-                                p.ParameterName += string.IsNullOrEmpty(p.ParameterName)
-                                    ? qp.ParameterName : ("," + qp.ParameterName);
-                            }
-                        }
-                        this.filterParameters.Add(p);
-                    }
+                    p.ParameterName = AddInParam(fieldName,value,dbType);
                     if (!string.IsNullOrEmpty(p.ParameterName))
                     {   //判断参数有效 此条件有效
                         whereClause += " " + p.FieldName + " not in (" + p.ParameterName + ") ";
@@ -336,6 +304,36 @@ namespace Jc.Core.Data.Query
                 this.ItemList.Add(p);
                 lastIsConjuction = false;
             }
+        }
+
+        /// <summary>
+        /// 添加In查询参数
+        /// </summary>
+        private string AddInParam(string fieldName, object paramValue, DbType dbType)
+        {
+            string paramName = "";
+            //支持数组,List泛型 int,int?,float,float?,double,double?,
+            //long,long?,Guid,Guid?,Datetime,Datetime?,string
+            if (paramValue != null)
+            {
+                IEnumerable ienumable = paramValue as IEnumerable;
+                IEnumerator enumerator = ienumable.GetEnumerator();
+
+                while (enumerator.MoveNext())
+                {
+                    if (enumerator.Current != null)
+                    {
+                        QueryParameter qp = new QueryParameter();
+                        qp.ParameterName += GetParameterName(fieldName);
+                        qp.ParameterValue = enumerator.Current;
+                        qp.ParameterDbType = dbType;
+                        this.filterParameters.Add(qp);
+                        paramName += string.IsNullOrEmpty(paramName)
+                            ? qp.ParameterName : ("," + qp.ParameterName);
+                    }
+                }
+            }
+            return paramName;
         }
 
         /// <summary>

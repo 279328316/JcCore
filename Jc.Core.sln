@@ -19,7 +19,9 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Jc.Core.UnitTestApp", "Jc.C
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Jc.Core.TestBase", "Jc.Core.TestBase\Jc.Core.TestBase.csproj", "{5BB7D760-6AB7-4E2F-8BDD-D62BDAADB661}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Jc.Core.Base", "Jc.Core.Base\Jc.Core.Base.csproj", "{C1047FCC-6916-403E-B0BB-E0A171326EF0}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Jc.Core.Base", "Jc.Core.Base\Jc.Core.Base.csproj", "{C1047FCC-6916-403E-B0BB-E0A171326EF0}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Jc.Core.LocalTests", "Jc.Core.LocalTests\Jc.Core.LocalTests.csproj", "{8EBA98EE-84FD-49EE-AE5A-625853B2C743}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -63,6 +65,10 @@ Global
 		{C1047FCC-6916-403E-B0BB-E0A171326EF0}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C1047FCC-6916-403E-B0BB-E0A171326EF0}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C1047FCC-6916-403E-B0BB-E0A171326EF0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8EBA98EE-84FD-49EE-AE5A-625853B2C743}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8EBA98EE-84FD-49EE-AE5A-625853B2C743}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8EBA98EE-84FD-49EE-AE5A-625853B2C743}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8EBA98EE-84FD-49EE-AE5A-625853B2C743}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

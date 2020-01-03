@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Data;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
@@ -107,64 +108,55 @@ namespace Jc.Core.Data.Query
         /// <param name="expType"></param>
         /// <param name="isFieldOp">是否两个字段比较</param>
         /// <returns></returns>
-        private Operand GetOperand(ExpressionType expType,bool isFieldOp)
+        private Operand GetOperand(ExpressionType expType, bool isFieldOp)
         {
             Operand operand = Operand.Equal;
-            if (!isFieldOp)
+            switch (expType)
             {
-                switch (expType)
-                {
-                    case ExpressionType.Equal:
-                        operand = Operand.Equal;
-                        break;
-                    case ExpressionType.GreaterThan:
-                        operand = Operand.GreaterThan;
-                        break;
-                    case ExpressionType.GreaterThanOrEqual:
-                        operand = Operand.GreaterThanOrEqual;
-                        break;
-                    case ExpressionType.LessThan:
-                        operand = Operand.LessThan;
-                        break;
-                    case ExpressionType.LessThanOrEqual:
-                        operand = Operand.LessThanOrEqual;
-                        break;
-                    case ExpressionType.NotEqual:
-                        operand = Operand.NotEqual;
-                        break;
-                    default:
-                        throw new Exception("单表达式内部连接类型无效:" + expType.ToString());
-                }
-            }
-            else
-            {
-                switch (expType)
-                {
-                    case ExpressionType.Equal:
-                        operand = Operand.FieldEqual;
-                        break;
-                    case ExpressionType.GreaterThan:
-                        operand = Operand.FieldGreaterThan;
-                        break;
-                    case ExpressionType.GreaterThanOrEqual:
-                        operand = Operand.FieldGreaterThan;
-                        break;
-                    case ExpressionType.LessThan:
-                        operand = Operand.FieldLessThan;
-                        break;
-                    case ExpressionType.LessThanOrEqual:
-                        operand = Operand.FieldLessThanOrEqual;
-                        break;
-                    case ExpressionType.NotEqual:
-                        operand = Operand.FieldNotEqual;
-                        break;
-                    default:
-                        throw new Exception("单表达式内部连接类型无效:" + expType.ToString());
-                }
+                case ExpressionType.Equal:
+                    operand = isFieldOp ? Operand.FieldEqual :Operand.Equal;
+                    break;
+                case ExpressionType.GreaterThan:
+                    operand = isFieldOp ? Operand.FieldGreaterThan : Operand.GreaterThan;
+                    break;
+                case ExpressionType.GreaterThanOrEqual:
+                    operand = isFieldOp ? Operand.FieldGreaterThanOrEqual : Operand.GreaterThanOrEqual;
+                    break;
+                case ExpressionType.LessThan:
+                    operand = isFieldOp ? Operand.FieldLessThan : Operand.LessThan;
+                    break;
+                case ExpressionType.LessThanOrEqual:
+                    operand = isFieldOp ? Operand.FieldLessThanOrEqual : Operand.LessThanOrEqual;
+                    break;
+                case ExpressionType.NotEqual:
+                    operand = isFieldOp ? Operand.FieldNotEqual : Operand.NotEqual;
+                    break;
+                default:
+                    throw new Exception($"不支持的单表达式操作{expType}");
             }
             return operand;
         }
-        
+
+        /// <summary>
+        /// 单一表达式 参数间操作获取
+        /// </summary>
+        /// <param name="expType"></param>
+        /// <returns></returns>
+        private bool IsExpressionConjectionOperand(ExpressionType expType)
+        {
+            bool result = false;
+            switch (expType)
+            {
+                case ExpressionType.And:
+                case ExpressionType.AndAlso:
+                case ExpressionType.Or:
+                case ExpressionType.OrElse:
+                    result = true;
+                    break;
+            }
+            return result;
+        }
+
         /// <summary>
         /// 表达式类型转换 连接类型
         /// </summary>
@@ -201,59 +193,22 @@ namespace Jc.Core.Data.Query
             Expression right = be.Right;
             ExpressionType expType = be.NodeType;
 
-            bool isExpAtom = false;     //当前Expression 是否为原子表单式 原子表达式不用括号
-            isExpAtom = left is MemberExpression || left is ConstantExpression
-                        || left is UnaryExpression;
             if (!(left is BinaryExpression || left is MemberExpression 
                 || left is ConstantExpression || left is MethodCallExpression
                  || left is UnaryExpression))
             {
                 throw new Exception("不支持的表达式类型:" + be.ToString());
             }
-            if (!isExpAtom)
-            {   //多个表达式情况
-                filter.AddLeftParenthesis();
-                if (left is BinaryExpression)
-                {
-                    BinarExpressionProvider(left);
-                }
-                else if (left is MethodCallExpression)
-                {
-                    QueryParameter qp = MethodCallExpressionProvider(left);
-                    filter.AddQueryItem(qp);
-                }
-                else
-                {
-                    string leftStr = AtomExpressionRouter(left)?.ToString();
-                    throw new Exception("不支持的表达式类型:" + left.ToString());
-                }
 
-                filter.AddLogicOperator(GetConjuction(expType));    //表达式连接 ↑左侧表达式处理  ↓右侧表达式处理
-
-                if (right is BinaryExpression)
-                {
-                    BinarExpressionProvider(right);
-                }
-                else if (right is MethodCallExpression)
-                {
-                    QueryParameter qp = MethodCallExpressionProvider(right);
-                    filter.AddQueryItem(qp);
-                }
-                else
-                {
-                    throw new Exception("不支持的表达式类型:" + right.ToString());
-                }
-                filter.AddRightParenthesis();
-            }
-            else
-            {
+            if (!IsExpressionConjectionOperand(expType))
+            {   //如果为非表达式连接操作.作为单表达式处理
                 bool isFieldOp = left is MemberExpression && right is MemberExpression
                     && ((MemberExpression)left).Expression != null
                     && ((MemberExpression)right).Expression != null
                     && !((MemberExpression)left).Expression.ToString().StartsWith("value")
                     && !((MemberExpression)right).Expression.ToString().StartsWith("value");
                 object leftVal = AtomExpressionRouter(left);
-                Operand operand = GetOperand(expType,isFieldOp);
+                Operand operand = GetOperand(expType, isFieldOp);
                 object rightVal = AtomExpressionRouter(right);
                 if (rightVal == null)
                 {   //只有null时使用
@@ -268,7 +223,82 @@ namespace Jc.Core.Data.Query
                 }
                 filter.AddQueryItem(leftVal?.ToString(), Conjuction.And, operand, rightVal);
             }
+            else
+            {   //多个表达式情况
+                filter.AddLeftParenthesis();
+                HandleFilterExpression(left);
+                filter.AddLogicOperator(GetConjuction(expType));    //表达式连接 ↑左侧表达式处理  ↓右侧表达式处理
+                HandleFilterExpression(right);
+                filter.AddRightParenthesis();
+            }
         }
+
+        /// <summary>
+        /// 处理FilterExpression 添加查询条件
+        /// </summary>
+        /// <param name="exp"></param>
+        private void HandleFilterExpression(Expression exp)
+        {
+            if (exp is BinaryExpression)
+            {
+                BinarExpressionProvider(exp);
+            }
+            else if (exp is UnaryExpression)
+            {   //举例:!list.Contains(doctor.Name) !a.IsDeleted !a.IsDeleted.Value 等类型表达式
+                #region UnaryExpression NodeType = Not
+                bool isNotOperand = exp.NodeType == ExpressionType.Not;
+                if (exp.NodeType == ExpressionType.Not)
+                {
+                    UnaryExpression unary = exp as UnaryExpression;
+                    if (unary.Operand is MethodCallExpression)
+                    {   // 举例: !list.Contains(doctor.Name)
+                        QueryParameter qp = MethodCallExpressionProvider(unary.Operand, isNotOperand);
+                        filter.AddQueryItem(qp);
+                    }
+                    else if (unary.Operand is MemberExpression)
+                    {   //!a.IsDeleted !a.IsDeleted.Value
+                        object fieldName = MemberExpressionProvider(unary.Operand);
+                        QueryParameter qp = new QueryParameter()
+                        {
+                            FieldName = fieldName?.ToString(),
+                            Op = isNotOperand ? Operand.NotEqual : Operand.Equal,
+                            ParameterValue = true,
+                            ParameterDbType = DbType.Boolean
+                        };
+                        filter.AddQueryItem(qp);
+                    }
+                }
+                else
+                {
+                    throw new Exception("不支持的表达式类型:" + exp.ToString());
+                }
+                #endregion
+            }
+            else if (exp is MethodCallExpression)
+            {
+                QueryParameter qp = MethodCallExpressionProvider(exp);
+                filter.AddQueryItem(qp);
+            }
+            else if (exp is MemberExpression)
+            {
+                object fieldName = MemberExpressionProvider(exp);
+                QueryParameter qp = new QueryParameter()
+                {
+                    FieldName = fieldName?.ToString(),
+                    Op = Operand.Equal,
+                    ParameterValue = true,
+                    ParameterDbType = DbType.Boolean
+                };
+                filter.AddQueryItem(qp);
+            }
+            else
+            {   //string leftStr = AtomExpressionRouter(left)?.ToString();
+                throw new Exception("不支持的表达式类型:" + exp.ToString());
+            }
+        }
+
+        #region Expression Value Calc Provider 计算表达式值
+
         /// <summary>
         /// 具有常数值的表达式
         /// </summary>
@@ -278,8 +308,9 @@ namespace Jc.Core.Data.Query
         {
             ConstantExpression ce = exp as ConstantExpression;
             object result = ce.Value;
-            return ConvertValue(result);
+            return result;
         }
+
         /// <summary>
         /// lambda 表达式
         /// </summary>
@@ -308,8 +339,7 @@ namespace Jc.Core.Data.Query
             string expStr = exp.ToString();
             if (expStr.StartsWith("value"))
             {   //引用其它对象属性类型 如 list.contais(student.Name) , a.HospitalId == hospital.Id 
-                object tempValue = Expression.Lambda(exp).Compile().DynamicInvoke();
-                result = ConvertValue(tempValue);
+                result = Expression.Lambda(exp).Compile().DynamicInvoke();
             }
             else
             {
@@ -610,12 +640,14 @@ namespace Jc.Core.Data.Query
         /// 对静态方法或实例方法的调用
         /// </summary>
         /// <param name="exp"></param>
+        /// <param name="isNotOprand"></param>
         /// <returns></returns>
-        private QueryParameter MethodCallExpressionProvider(Expression exp)
+        private QueryParameter MethodCallExpressionProvider(Expression exp,bool isNotOprand = false)
         {
             QueryParameter qp = null;
             object name = null;
             object value = null;
+            DbType parameterDbType = DbType.Object;
             Operand op = Operand.Equal;
             MethodCallExpression mce = exp as MethodCallExpression;
             switch (mce.Method.Name)
@@ -624,7 +656,8 @@ namespace Jc.Core.Data.Query
                     name = MemberExpressionProvider(mce.Object);
                     //value = ConstantExpressionProvider(mce.Arguments[0]);
                     value = Expression.Lambda(mce.Arguments[0]).Compile().DynamicInvoke().ToString();
-                    op = Operand.Equal;                    
+                    op = isNotOprand ? Operand.NotEqual : Operand.Equal;
+                    parameterDbType = DbTypeConvertor.GetDbType(value);
                     break;
                 case "Contains":
                     if (mce.Object != null)
@@ -633,7 +666,8 @@ namespace Jc.Core.Data.Query
                         {   // task.Name.Contains("T1"); task.Name.Contains(keywords);
                             name = AtomExpressionRouter(mce.Object);
                             value = AtomExpressionRouter(mce.Arguments[0]);
-                            op = Operand.Like;
+                            op = isNotOprand ? Operand.NotLike : Operand.Like;
+                            parameterDbType = DbTypeConvertor.GetDbType(value);
                         }
                         //else if (((MemberExpression)mce.Object).Member.MemberType == MemberTypes.Field)
                         //{   //permIds.Contains(a.Id)
@@ -645,14 +679,16 @@ namespace Jc.Core.Data.Query
                         {   //permIds.Contains(a.Id)
                             name = AtomExpressionRouter(mce.Arguments[0]);
                             value = AtomExpressionRouter(mce.Object);
-                            op = Operand.In;
+                            parameterDbType = DbTypeConvertor.TypeToDbType(mce.Arguments[0].Type);
+                            op = isNotOprand ? Operand.NotIn : Operand.In;
                         }
                     }
                     else if (mce.Arguments.Count >= 2)
                     {   //int与int?类型 list:List<int?>
                         name = AtomExpressionRouter(mce.Arguments[1]);
                         value = AtomExpressionRouter(mce.Arguments[0]);
-                        op = Operand.In;
+                        parameterDbType = DbTypeConvertor.TypeToDbType(mce.Arguments[1].Type);
+                        op = isNotOprand ? Operand.NotIn : Operand.In;
                     }
                     else
                     {
@@ -664,12 +700,14 @@ namespace Jc.Core.Data.Query
                     //value = ConstantExpressionProvider(mce.Arguments[0]);
                     value = Expression.Lambda(mce.Arguments[0]).Compile().DynamicInvoke().ToString();
                     op = Operand.LeftLike;
+                    parameterDbType = DbTypeConvertor.GetDbType(value);
                     break;
                 case "EndsWith":
                     name = MemberExpressionProvider(mce.Object);
                     //value = ConstantExpressionProvider(mce.Arguments[0]);
                     value = Expression.Lambda(mce.Arguments[0]).Compile().DynamicInvoke().ToString();
                     op = Operand.RightLike;
+                    parameterDbType = DbTypeConvertor.GetDbType(value);
                     break;
                 default:
                     throw new Exception("不支持的方法:" + mce.Method.Name);
@@ -679,7 +717,7 @@ namespace Jc.Core.Data.Query
                 FieldName = name?.ToString(),
                 Op = op,
                 ParameterValue = value,
-                ParameterDbType = DbTypeConvertor.GetDbType(value)
+                ParameterDbType = parameterDbType
             };
             return qp;
         }
@@ -780,6 +818,8 @@ namespace Jc.Core.Data.Query
             }
             return result;
         }
+
+        #endregion
 
         /// <summary>
         /// 值类型转换
@@ -898,24 +938,11 @@ namespace Jc.Core.Data.Query
         {
             dtoDbMapping = DtoMappingHelper.GetDtoMapping<T>();
 
-            #region 处理查询条件            
+            #region 处理查询条件
             if (query != null)
             {
                 Expression exp = query.Body as Expression;
-                if (exp is BinaryExpression)
-                {
-                    BinarExpressionProvider(exp);
-                }
-                else if (exp is MethodCallExpression)
-                {   //举例:list.Contains(doctor.Name) 等类型表达式
-                    QueryParameter qp = MethodCallExpressionProvider(exp);
-                    filter.AddQueryItem(qp);
-                }
-                else
-                {   //暂时封闭其它类型的表达式,待以后完善
-                    throw new Exception("不支持的表达式类型:" + exp.ToString());
-                    //AtomExpressionRouter(exp);
-                }
+                HandleFilterExpression(exp);
             }
             #endregion
 
