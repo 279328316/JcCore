@@ -431,10 +431,10 @@ namespace Jc.Core
         {
             if (!string.IsNullOrEmpty(sort))
             {
-                List<PiMap> piMapList = DtoMappingHelper.GetPiMapList<T>(expr);
+                List<PiMap> piMapList = DtoMappingHelper.GetPiMapList<T>();
                 if (piMapList != null && piMapList.Count > 0)
                 {
-                    PiMap piMap = piMapList.FirstOrDefault(a => a.PiName.ToLower() == sort.ToLower());
+                    PiMap piMap = piMapList.FirstOrDefault(a => a.PiName.ToLower() == sort.ToLower() && a.IsIgnore == false);
                     if (piMap != null)
                     {
                         this.orderByClauseList.Add(new OrderByClause()
