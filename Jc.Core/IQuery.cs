@@ -445,7 +445,7 @@ namespace Jc.Core
                     }
                     else
                     {
-                        throw new Exception($"无效的查询属性{sort}");
+                        throw new Exception($"无效的排序属性{sort}");
                     }
                 }
             }
