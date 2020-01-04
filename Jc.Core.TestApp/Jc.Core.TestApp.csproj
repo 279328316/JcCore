@@ -16,7 +16,6 @@
     <ProjectReference Include="..\Jc.Core.MySql\Jc.Core.MySql.csproj" />
     <ProjectReference Include="..\Jc.Core.PostgreSql\Jc.Core.PostgreSql.csproj" />
     <ProjectReference Include="..\Jc.Core.Sqlite\Jc.Core.Sqlite.csproj" />
-    <ProjectReference Include="..\Jc.Core.TestBase\Jc.Core.TestBase.csproj" />
     <ProjectReference Include="..\Jc.Core\Jc.Core.csproj" />
   </ItemGroup>
 

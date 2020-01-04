@@ -1,9 +1,15 @@
 ﻿using System;
 using Jc.Core;
-using Jc.Core.TestBase;
 
 namespace Jc.Core.TestApp.PetCt
 {
+    public enum SexType
+    {
+        F = 0,
+        M = 1,
+        O = 2
+    }
+
     /// <summary>
     /// 患者信息 Dto
     /// </summary>

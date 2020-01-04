@@ -1,5 +1,4 @@
 ﻿using Jc.Core.TestApp.PetCt;
-using Jc.Core.TestBase;
 using System;
 using System.Collections.Generic;
 using System.Linq;
