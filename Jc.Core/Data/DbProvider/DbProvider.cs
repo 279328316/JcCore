@@ -240,10 +240,10 @@ namespace Jc.Core.Data
                     {   //如果是自增主键 跳过插入
                         continue;
                     }
-                    itemBuilder.Append($"@{piMap.FieldName}{i},");
+                    itemBuilder.Append($"@{piMap.FieldName}_{i},");
                     DbParameter dbParameter = dbCommand.CreateParameter();
                     dbParameter.Direction = ParameterDirection.Input;
-                    dbParameter.ParameterName = $"@{piMap.FieldName}{i}";
+                    dbParameter.ParameterName = $"@{piMap.FieldName}_{i}";
                     dbParameter.Value = GetParameterValue(piMap, list[i]);
                     dbParameter.DbType = piMap.DbType;
                     dbCommand.Parameters.Add(dbParameter);
@@ -371,7 +371,7 @@ namespace Jc.Core.Data
                     }
                     DbParameter dbParameter = dbCommand.CreateParameter();
                     dbParameter.Direction = ParameterDirection.Input;
-                    dbParameter.ParameterName = $"@{piMap.FieldName}{i}";
+                    dbParameter.ParameterName = $"@{piMap.FieldName}_{i}";
                     dbParameter.Value = GetParameterValue(piMap, dto);
                     dbParameter.DbType = piMap.DbType;
                     dbCommand.Parameters.Add(dbParameter);
