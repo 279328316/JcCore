@@ -473,6 +473,14 @@ namespace Jc.Core
         /// <returns></returns>
         public int Count<T>(Expression<Func<T, bool>> where = null) where T : class, new()
         {
+            DtoMapping dtoDbMapping = DtoMappingHelper.GetDtoMapping<T>();
+            if (dtoDbMapping.TableAttr.AutoCreate)
+            {   //如果是自动建表
+                if (!CheckTableExists<T>())
+                {
+                    return 0;
+                }
+            }
             IQuery<T> query = IQuery<T>().FromTable(this.GetSubTableArg<T>());
             return query.Count(where);
         }
