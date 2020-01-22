@@ -45,6 +45,6 @@ namespace Jc.Core
         /// <summary>
         /// 值
         /// </summary>
-        public int Value { get; set; }
+        public int? Value { get; set; }
     }
 }

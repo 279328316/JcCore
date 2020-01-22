@@ -16,8 +16,9 @@ namespace Jc.Core
         /// 将Enum类型转换为 EnumModel
         /// </summary>
         /// <param name="enumType">枚举类型 typeof(enum)</param>
+        /// <param name="addNullItem">添加NullItem</param>
         /// <returns>EnumModel</returns>
-        public static EnumModel GetEnumModel(Type enumType)
+        public static EnumModel GetEnumModel(Type enumType,bool addNullItem = false)
         {
             string enumTypeName = enumType.Name;
             string enumName = enumTypeName.Substring(enumTypeName.LastIndexOf(".") + 1);
@@ -29,7 +30,13 @@ namespace Jc.Core
 
             #region 获取值
             FieldInfo[] fields = enumType.GetFields();
-            
+            if(addNullItem)
+            {
+                enumModel.EnumItems.Add(new EnumItemModel()
+                {
+                    DisplayName = "--请选择--"
+                });
+            }
             foreach (FieldInfo field in fields)
             {
                 if (field.FieldType.IsEnum)
