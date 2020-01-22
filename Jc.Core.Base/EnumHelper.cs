@@ -34,7 +34,7 @@ namespace Jc.Core
             {
                 enumModel.EnumItems.Add(new EnumItemModel()
                 {
-                    DisplayName = "--请选择--"
+                    DisplayName = ""
                 });
             }
             foreach (FieldInfo field in fields)
