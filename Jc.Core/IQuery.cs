@@ -49,10 +49,12 @@ namespace Jc.Core
         /// Ctor
         /// </summary>
         /// <param name="dbContext">dbContext</param>
-        public IQuery(DbContext dbContext)
+        /// <param name="subTableArg">分表参数</param>
+        public IQuery(DbContext dbContext, string subTableArg = null)
         {
             ExHelper.ThrowIfNull(dbContext, "IQuery初始化失败,dbContext对象不能为空.");
             this.dbContext = dbContext;
+            this.subTableArg = subTableArg;
         }
         #endregion
 

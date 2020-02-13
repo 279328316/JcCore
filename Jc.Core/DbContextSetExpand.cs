@@ -171,7 +171,7 @@ namespace Jc.Core
                         dtoDbMapping.PkMap.PropertyType == typeof(long?))
                         && (pkValue == null || (long)pkValue == 0))
                     {
-                        dbCommand.CommandText += ";" + dbProvider.GetAutoIdDbCommand().CommandText;
+                        dbCommand.CommandText = $"{dbCommand.CommandText};{dbProvider.GetAutoIdDbCommand().CommandText}";
                         object valueObj = dbCommand.ExecuteScalar();
                         if (valueObj == null || valueObj == DBNull.Value)
                         {
@@ -232,109 +232,105 @@ namespace Jc.Core
             if (useTransaction)
             {
                 #region Use Transaction
-                using (DbConnection dbConnection = GetDbConnection())
+                DbConnection dbConnection = GetDbConnection();                
+                DbTransaction transaction = dbConnection.BeginTransaction();
+                int i = 0;
+                T curItem;
+                try
                 {
-                    DbTransaction transaction = dbConnection.BeginTransaction();
-                    int i = 0;
-                    T curItem;
-                    try
+                    List<T> curOpList = new List<T>();
+                    for (i = 0; i < list.Count; i++)
                     {
-                        List<T> curOpList = new List<T>();
-                        for (i = 0; i < list.Count; i++)
+                        #region 设置Id
+                        curItem = list[i];
+                        object pkValue = dtoDbMapping.PkMap.Pi.GetValue(list[i]);
+                        if (dtoDbMapping.PkMap.PropertyType == typeof(int) || dtoDbMapping.PkMap.PropertyType == typeof(int?))
+                        {   //自增Id
+                        }
+                        else if (dtoDbMapping.PkMap.PropertyType == typeof(long) || dtoDbMapping.PkMap.PropertyType == typeof(long?))
                         {
-                            #region 设置Id
-                            curItem = list[i];
-                            object pkValue = dtoDbMapping.PkMap.Pi.GetValue(list[i]);
-                            if (dtoDbMapping.PkMap.PropertyType == typeof(int) || dtoDbMapping.PkMap.PropertyType == typeof(int?))
-                            {   //自增Id
-                            }
-                            else if (dtoDbMapping.PkMap.PropertyType == typeof(long) || dtoDbMapping.PkMap.PropertyType == typeof(long?))
-                            {
-                            }
-                            else if (dtoDbMapping.PkMap.PropertyType == typeof(Guid) || dtoDbMapping.PkMap.PropertyType == typeof(Guid?))
-                            {   //Guid Id
-                                if (pkValue == null || (Guid)pkValue == Guid.Empty)
-                                {   //生成Guid
-                                    dtoDbMapping.PkMap.Pi.SetValue(list[i], Guid.NewGuid());
-                                }
-                            }
-                            #endregion
-
-                            curOpList.Add(list[i]);
-                            if ((i + 1) % perOpAmount == 0 || i == list.Count - 1)
-                            {
-                                using (DbCommand dbCommand = dbProvider.GetInsertDbCmd(curOpList, piMapList, this.GetSubTableArg<T>()))
-                                {
-                                    dbCommand.Connection = dbConnection;
-                                    dbCommand.Transaction = transaction;
-                                    rowCount += dbCommand.ExecuteNonQuery();
-                                }
-                                curOpList.Clear();
-                                if (progress != null)
-                                {
-                                    progress.Report((i + 1) * 1.0 / list.Count);
-                                }
+                        }
+                        else if (dtoDbMapping.PkMap.PropertyType == typeof(Guid) || dtoDbMapping.PkMap.PropertyType == typeof(Guid?))
+                        {   //Guid Id
+                            if (pkValue == null || (Guid)pkValue == Guid.Empty)
+                            {   //生成Guid
+                                dtoDbMapping.PkMap.Pi.SetValue(list[i], Guid.NewGuid());
                             }
                         }
-                        transaction.Commit();
-                        CloseDbConnection(dbConnection);
+                        #endregion
+
+                        curOpList.Add(list[i]);
+                        if ((i + 1) % perOpAmount == 0 || i == list.Count - 1)
+                        {
+                            using (DbCommand dbCommand = dbProvider.GetInsertDbCmd(curOpList, piMapList, this.GetSubTableArg<T>()))
+                            {
+                                dbCommand.Connection = dbConnection;
+                                dbCommand.Transaction = transaction;
+                                rowCount += dbCommand.ExecuteNonQuery();
+                            }
+                            curOpList.Clear();
+                            if (progress != null)
+                            {
+                                progress.Report((i + 1) * 1.0 / list.Count);
+                            }
+                        }
                     }
-                    catch (Exception ex)
-                    {
-                        transaction.Rollback();
-                        CloseDbConnection(dbConnection);
-                        throw ex;
-                    }
+                    transaction.Commit();
+                    CloseDbConnection(dbConnection);
                 }
+                catch (Exception ex)
+                {
+                    transaction.Rollback();
+                    CloseDbConnection(dbConnection);
+                    throw ex;
+                }                
                 #endregion
             }
             else
             {
                 #region Not Use Transaction
-                using (DbConnection dbConnection = GetDbConnection())
+                DbConnection dbConnection = GetDbConnection();                
+                int i = 0;
+                T curItem;
+                try
                 {
-                    int i = 0;
-                    T curItem;
-                    try
+                    List<T> curOpList = new List<T>();
+                    for (i = 0; i < list.Count; i++)
                     {
-                        List<T> curOpList = new List<T>();
-                        for (i = 0; i < list.Count; i++)
-                        {
-                            #region 设置Id
-                            curItem = list[i];
-                            object pkValue = dtoDbMapping.PkMap.Pi.GetValue(list[i]);
-                            if (dtoDbMapping.PkMap.PropertyType == typeof(Guid) || dtoDbMapping.PkMap.PropertyType == typeof(Guid?))
-                            {   //Guid Id
-                                if (pkValue == null || (Guid)pkValue == Guid.Empty)
-                                {   //生成Guid
-                                    dtoDbMapping.PkMap.Pi.SetValue(list[i], Guid.NewGuid());
-                                }
-                            }
-                            #endregion
-
-                            curOpList.Add(list[i]);
-                            if ((i + 1) % perOpAmount == 0 || i == list.Count - 1)
-                            {
-                                using (DbCommand dbCommand = dbProvider.GetInsertDbCmd(curOpList, piMapList, this.GetSubTableArg<T>()))
-                                {
-                                    dbCommand.Connection = dbConnection;
-                                    rowCount += dbCommand.ExecuteNonQuery();
-                                }
-                                curOpList.Clear();
-                                if (progress != null)
-                                {
-                                    progress.Report((i + 1) * 1.0 / list.Count);
-                                }
+                        #region 设置Id
+                        curItem = list[i];
+                        object pkValue = dtoDbMapping.PkMap.Pi.GetValue(list[i]);
+                        if (dtoDbMapping.PkMap.PropertyType == typeof(Guid) || dtoDbMapping.PkMap.PropertyType == typeof(Guid?))
+                        {   //Guid Id
+                            if (pkValue == null || (Guid)pkValue == Guid.Empty)
+                            {   //生成Guid
+                                dtoDbMapping.PkMap.Pi.SetValue(list[i], Guid.NewGuid());
                             }
                         }
-                        CloseDbConnection(dbConnection);
+                        #endregion
+
+                        curOpList.Add(list[i]);
+                        if ((i + 1) % perOpAmount == 0 || i == list.Count - 1)
+                        {
+                            using (DbCommand dbCommand = dbProvider.GetInsertDbCmd(curOpList, piMapList, this.GetSubTableArg<T>()))
+                            {
+                                dbCommand.Connection = dbConnection;
+                                rowCount += dbCommand.ExecuteNonQuery();
+                            }
+                            curOpList.Clear();
+                            if (progress != null)
+                            {
+                                progress.Report((i + 1) * 1.0 / list.Count);
+                            }
+                        }
                     }
-                    catch (Exception ex)
-                    {
-                        CloseDbConnection(dbConnection);
-                        throw ex;
-                    }
+                    CloseDbConnection(dbConnection);
                 }
+                catch (Exception ex)
+                {
+                    CloseDbConnection(dbConnection);
+                    throw ex;
+                }                
                 #endregion 
             }
             return rowCount;
@@ -423,75 +419,71 @@ namespace Jc.Core
             if (useTransaction)
             {
                 #region Use Transaction
-                using (DbConnection dbConnection = GetDbConnection())
+                DbConnection dbConnection = GetDbConnection();                
+                DbTransaction transaction = dbConnection.BeginTransaction();
+                try
                 {
-                    DbTransaction transaction = dbConnection.BeginTransaction();
-                    try
+                    List<T> curOpList = new List<T>();
+                    for (int i = 0; i < list.Count; i++)
                     {
-                        List<T> curOpList = new List<T>();
-                        for (int i = 0; i < list.Count; i++)
+                        curOpList.Add(list[i]);
+                        if ((i + 1) % perOpAmount == 0 || i == list.Count - 1)
                         {
-                            curOpList.Add(list[i]);
-                            if ((i + 1) % perOpAmount == 0 || i == list.Count - 1)
+                            using (DbCommand dbCommand = dbProvider.GetUpdateDbCmd(curOpList, piMapList, this.GetSubTableArg<T>()))
                             {
-                                using (DbCommand dbCommand = dbProvider.GetUpdateDbCmd(curOpList, piMapList, this.GetSubTableArg<T>()))
-                                {
-                                    dbCommand.Connection = dbConnection;
-                                    dbCommand.Transaction = transaction;
-                                    rowCount += dbCommand.ExecuteNonQuery();
-                                }
-                                curOpList.Clear();
-                                if (progress != null)
-                                {
-                                    progress.Report((i + 1) * 1.0 / list.Count);
-                                }
+                                dbCommand.Connection = dbConnection;
+                                dbCommand.Transaction = transaction;
+                                rowCount += dbCommand.ExecuteNonQuery();
+                            }
+                            curOpList.Clear();
+                            if (progress != null)
+                            {
+                                progress.Report((i + 1) * 1.0 / list.Count);
                             }
                         }
-                        transaction.Commit();
-                        CloseDbConnection(dbConnection);
                     }
-                    catch (Exception ex)
-                    {
-                        transaction.Rollback();
-                        CloseDbConnection(dbConnection);
-                        throw ex;
-                    }
+                    transaction.Commit();
+                    CloseDbConnection(dbConnection);
                 }
+                catch (Exception ex)
+                {
+                    transaction.Rollback();
+                    CloseDbConnection(dbConnection);
+                    throw ex;
+                }                
                 #endregion
             }
             else
             {
                 #region Not Use Transaction
-                using (DbConnection dbConnection = GetDbConnection())
+                DbConnection dbConnection = GetDbConnection();                
+                try
                 {
-                    try
+                    List<T> curOpList = new List<T>();
+                    for (int i = 0; i < list.Count; i++)
                     {
-                        List<T> curOpList = new List<T>();
-                        for (int i = 0; i < list.Count; i++)
+                        curOpList.Add(list[i]);
+                        if ((i + 1) % perOpAmount == 0 || i == list.Count - 1)
                         {
-                            curOpList.Add(list[i]);
-                            if ((i + 1) % perOpAmount == 0 || i == list.Count - 1)
+                            using (DbCommand dbCommand = dbProvider.GetUpdateDbCmd(curOpList, piMapList, this.GetSubTableArg<T>()))
                             {
-                                using (DbCommand dbCommand = dbProvider.GetUpdateDbCmd(curOpList, piMapList, this.GetSubTableArg<T>()))
-                                {
-                                    dbCommand.Connection = dbConnection;
-                                    rowCount += dbCommand.ExecuteNonQuery();
-                                }
-                                curOpList.Clear();
-                                if (progress != null)
-                                {
-                                    progress.Report((i + 1) * 1.0 / list.Count);
-                                }
+                                dbCommand.Connection = dbConnection;
+                                rowCount += dbCommand.ExecuteNonQuery();
+                            }
+                            curOpList.Clear();
+                            if (progress != null)
+                            {
+                                progress.Report((i + 1) * 1.0 / list.Count);
                             }
                         }
-                        CloseDbConnection(dbConnection);
                     }
-                    catch (Exception ex)
-                    {
-                        CloseDbConnection(dbConnection);
-                        throw ex;
-                    }
+                    CloseDbConnection(dbConnection);
                 }
+                catch (Exception ex)
+                {
+                    CloseDbConnection(dbConnection);
+                    throw ex;
+                }                
                 #endregion 
             }
             return rowCount;

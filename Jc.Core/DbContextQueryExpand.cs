@@ -31,7 +31,7 @@ namespace Jc.Core
         /// <returns></returns>
         public virtual IQuery<T> IQuery<T>() where T : class, new()
         {            
-            IQuery<T> iquery = new IQuery<T>(this);
+            IQuery<T> iquery = new IQuery<T>(this,GetSubTableArg<T>());
             return iquery;
         }
 
