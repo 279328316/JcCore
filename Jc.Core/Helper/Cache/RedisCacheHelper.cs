@@ -82,14 +82,14 @@ namespace Jc.Core.Helper
         /// </summary>
         /// <param name="key">缓存Key</param>
         /// <returns></returns>
-        public T Get<T>(string key)
+        public T Get<T>(string key) where T :class
         {
             ExHelper.ThrowIfNull(key, "Key参数无效");
             string value = cache.StringGet(GetKeyForRedis(key));
 
-            if (!string.IsNullOrEmpty(value))
+            if (string.IsNullOrEmpty(value))
             {
-                return default(T);
+                return null;
             }
             return JsonConvert.DeserializeObject<T>(value);
         }

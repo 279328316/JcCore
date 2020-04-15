@@ -42,7 +42,7 @@ namespace Jc.Core.Helper
         /// </summary>
         /// <param name="key">缓存Key</param>
         /// <returns></returns>
-        public T Get<T>(string key)
+        public T Get<T>(string key) where T : class
         {
             ExHelper.ThrowIfNull(key, "Key参数无效");
             return (T)cache.Get(key);

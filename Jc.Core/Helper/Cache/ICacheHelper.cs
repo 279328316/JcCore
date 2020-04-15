@@ -33,7 +33,7 @@ namespace Jc.Core.Helper
         /// </summary>
         /// <param name="key">Key</param>
         /// <returns>T</returns>
-        T Get<T>(string key);
+        T Get<T>(string key) where T : class;
         
         /// <summary>
         /// 设置缓存对象
