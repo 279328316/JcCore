@@ -278,6 +278,31 @@ namespace Jc.Core
 
         }
 
+        /// <summary>
+        /// 获取首行记录对象
+        /// </summary>
+        /// <param name="where">查询条件</param>
+        /// <param name="sortExpr">排序属性</param>
+        /// <param name="order">排序方向</param>
+        /// <param name="select">查询属性</param>
+        /// <returns></returns>
+        public T FirstOrDefault<T>(Expression<Func<T, bool>> where = null, Expression<Func<T, object>> sortExpr = null, Sorting order = Sorting.Asc, Expression<Func<T, object>> select = null) where T : class, new()
+        {
+            IQuery<T> query = IQuery<T>().FromTable(this.GetSubTableArg<T>());
+            if (sortExpr != null)
+            {
+                if (order == Sorting.Asc)
+                {
+                    query.OrderBy(sortExpr);
+                }
+                else
+                {
+                    query.OrderByDesc(sortExpr);
+                }
+            }
+            return query.Select(select).Where(where).FirstOrDefault();
+        }
+
 
         /// <summary>
         /// 根据Id获取数据
