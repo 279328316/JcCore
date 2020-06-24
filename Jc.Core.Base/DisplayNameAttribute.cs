@@ -12,14 +12,31 @@ namespace Jc.Core
     /// </summary>
     public class DisplayNameAttribute : Attribute
     {
+        private string name;
+
         /// <summary>
         /// 显示名称
         /// </summary>
-        public string DisplayName { get; set; }
+        public string DisplayName 
+        { 
+            get { return name; } 
+            set { name = value; } 
+        }
+
+        /// <summary>
+        /// 显示名称
+        /// </summary>
+        public string Name
+        {
+            get { return name; }
+            set { name = value; }
+        }
+
 
         public DisplayNameAttribute()
         {
         }
+
         public DisplayNameAttribute(string displayName)
         {
             this.DisplayName = displayName;
