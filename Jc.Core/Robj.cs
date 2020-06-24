@@ -84,6 +84,11 @@ namespace Jc.Core
         NeedLogin = 2000,
 
         /// <summary>
+        /// 尚未注册
+        /// </summary>
+        NeedRegister = 2100,
+
+        /// <summary>
         /// 程序异常
         /// </summary>
         Exception = 3000,
