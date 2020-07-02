@@ -119,9 +119,9 @@ namespace Jc.Core
                         }
                         else if (rangeMax)
                         {
-                            operand = Operand.LessThanOrEqual;
                             if (piMap.PropertyType == typeof(DateTime) || piMap.PropertyType == typeof(DateTime?))
                             {
+                                operand = Operand.LessThan;
                                 DateTime dt;
                                 if (DateTime.TryParse(queryItemVal, out dt))
                                 {
@@ -134,6 +134,7 @@ namespace Jc.Core
                             }
                             else
                             {
+                                operand = Operand.LessThanOrEqual;
                                 itemValue = queryItemVal;
                             }
                         }
