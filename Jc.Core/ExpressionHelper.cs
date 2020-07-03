@@ -92,7 +92,7 @@ namespace Jc.Core
             if (value is List<string>)
             {   //(1)构造List<int?> 类型 (2)创建list (3)(list as IList).Add(objValue);
                 //(4)创建lambdaExp 使用Contains方法
-                Type leftListType = Type.GetType(string.Format($"System.Collections.Generic.List`1[{left.Type}]"));
+                Type leftListType = Type.GetType(string.Format($"System.Collections.Generic.List`1[[{left.Type.AssemblyQualifiedName}]]"));
                 List<string> valueStrList = value as List<string>;
                 var list = Activator.CreateInstance(leftListType);
                 for (int i = 0; i < valueStrList.Count; i++)
@@ -109,6 +109,11 @@ namespace Jc.Core
                     if (leftType == typeof(string))
                     {   // 如果为string类型.不需要转换
                         (list as IList).Add(valueStrList[i]);
+                    }
+                    else if(leftType.IsEnum)
+                    {   //枚举类型
+                        var objValue = Enum.Parse(leftType, valueStrList[i]);
+                        (list as IList).Add(objValue);
                     }
                     else
                     {   //如果非string类型.调用Parse方法.

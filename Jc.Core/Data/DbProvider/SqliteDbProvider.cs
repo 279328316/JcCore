@@ -252,7 +252,7 @@ namespace Jc.Core.Data
                 {
                     strBuilder.Append(" primary key ");
 
-                    if (fieldType == "integer")
+                    if (fieldType == "integer" || fieldType== "long")
                     {
                         strBuilder.Append(" autoincrement ");
                     }
