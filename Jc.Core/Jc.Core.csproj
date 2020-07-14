@@ -10,7 +10,7 @@ author:279328316@qq.com</PackageReleaseNotes>
 https://github.com/279328316/JcCore</Description>
     <AssemblyVersion>1.0.0.1</AssemblyVersion>
     <FileVersion>1.0.0.1</FileVersion>
-    <Version>1.1.2.5</Version>
+    <Version>1.1.2.6</Version>
     <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
   </PropertyGroup>
 
@@ -31,6 +31,7 @@ https://github.com/279328316/JcCore</Description>
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="Jc.Core.Base" Version="1.1.2.6" />
     <PackageReference Include="Microsoft.Extensions.Caching.Memory" Version="2.1.1" />
     <PackageReference Include="Microsoft.Extensions.Caching.Redis" Version="2.1.1" />
     <PackageReference Include="Microsoft.Extensions.Configuration" Version="3.0.0" />
@@ -40,10 +41,6 @@ https://github.com/279328316/JcCore</Description>
     <PackageReference Include="System.Reflection.Emit.ILGeneration" Version="4.3.0" />
     <PackageReference Include="System.Reflection.Emit.Lightweight" Version="4.3.0" />
     <PackageReference Include="System.Text.Encoding.CodePages" Version="4.5.1" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\Jc.Core.Base\Jc.Core.Base.csproj" />
   </ItemGroup>
 
 </Project>
