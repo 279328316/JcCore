@@ -22,6 +22,12 @@ namespace Jc.Core.Helper
         TimeSpan DefaultSlidingExpireTime { get; set; }
 
         /// <summary>
+        /// 多级缓存滑动过期时间
+        /// 默认时间:10min
+        /// </summary>
+        TimeSpan MCacheSlidingExpireTime { get; set; }
+
+        /// <summary>
         /// 根据Key获取缓存对象
         /// </summary>
         /// <param name="key">Key</param>
@@ -60,5 +66,50 @@ namespace Jc.Core.Helper
         /// 异步清空缓存
         /// </summary>
         Task ClearAsync();
+
+                
+        #region Multi Level Cache
+
+        /// <summary>
+        /// 根据Key获取缓存对象
+        /// 多级缓存,先查询 内存缓存 => Redis缓存
+        /// </summary>
+        /// <param name="key">Key</param>
+        /// <returns>Cached item</returns>
+        object MGet(string key);
+
+        /// <summary>
+        /// 根据Key获取缓存对象
+        /// 多级缓存,先查询 内存缓存 => Redis缓存
+        /// </summary>
+        /// <param name="key">Key</param>
+        /// <returns>T</returns>
+        T MGet<T>(string key) where T : class;
+
+        /// <summary>
+        /// 设置缓存对象
+        /// 如未设置滑动过期时间与相对过期时间,则使用默认滑动过期时间
+        /// 多级缓存,内存缓存 => Redis缓存等
+        /// 在分布式情况下,可能会出现部分应用内存缓存未及时移除问题
+        /// 所以主要用于缓存,数据量大,使用频繁,但不经常修改的数据
+        /// 允许缓存数据出现一定时间的脏读情况
+        /// </summary>
+        /// <param name="key">Key</param>
+        /// <param name="value">Value</param>
+        /// <param name="slidingExpireTime">Sliding expire time</param>
+        /// <param name="absoluteExpireTime">Absolute expire time</param>
+        void MSet(string key, object value, TimeSpan? slidingExpireTime = null, TimeSpan? absoluteExpireTime = null);
+
+        /// <summary>
+        /// 多级缓存 移除缓存
+        /// </summary>
+        /// <param name="key">Key</param>
+        void MRemove(string key);
+
+        /// <summary>
+        /// 多级缓存 清空缓存
+        /// </summary>
+        void MClear();
+        #endregion
     }
 }

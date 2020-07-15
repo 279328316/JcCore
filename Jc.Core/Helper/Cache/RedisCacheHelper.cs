@@ -11,30 +11,66 @@ using System.Threading.Tasks;
 
 namespace Jc.Core.Helper
 {
+    /// <summary>
+    /// RedisCache Helper
+    /// </summary>
     public class RedisCacheHelper : ICacheHelper
     {
-        protected IDatabase cache;
+        private IDatabase cache;
 
         private ConnectionMultiplexer connection;
 
         private readonly string instance;
 
+        /// <summary>
+        /// 缓存名称
+        /// </summary>
         public string Name { get { return "Redis"; } }
 
+        /// <summary>
+        /// 默认滑动过期时间
+        /// 默认时间:60min
+        /// </summary>
         public TimeSpan DefaultSlidingExpireTime { get; set; }
+
+        /// <summary>
+        /// 多级缓存滑动过期时间
+        /// 默认时间:10min
+        /// </summary>
+        public TimeSpan MCacheSlidingExpireTime { get; set; }
 
         /// <summary>
         /// Ctor
         /// </summary>
         /// <param name="options"></param>
         /// <param name="database"></param>
-        public RedisCacheHelper(RedisCacheOptions options, int database = 0)
+        /// <param name="defaultSlidingExpireTime">默认滑动过期时间 默认60分钟</param>
+        /// <param name="mCacheSlidingExpireTime">多级缓存滑动过期时间 默认10分钟</param>
+        public RedisCacheHelper(RedisCacheOptions options, int database = 0, TimeSpan? defaultSlidingExpireTime = null, TimeSpan? mCacheSlidingExpireTime = null)
         {
             connection = ConnectionMultiplexer.Connect(options.Configuration);
             cache = connection.GetDatabase(database);
             instance = options.InstanceName;
 
-            DefaultSlidingExpireTime = TimeSpan.FromHours(1);
+            if (defaultSlidingExpireTime != null)
+            {
+                DefaultSlidingExpireTime = defaultSlidingExpireTime.Value;
+            }
+            else
+            {
+                DefaultSlidingExpireTime = TimeSpan.FromHours(1);
+            }
+
+            if (mCacheSlidingExpireTime != null)
+            {
+                MCacheSlidingExpireTime = mCacheSlidingExpireTime.Value;
+            }
+            else
+            {
+                MCacheSlidingExpireTime = TimeSpan.FromMinutes(10);
+            }
+            //多级缓存使用
+            MemoryCacheHelper = new MemoryCacheHelper(MCacheSlidingExpireTime);
         }
 
         /// <summary>
@@ -99,8 +135,8 @@ namespace Jc.Core.Helper
         /// </summary>
         /// <param name="key">缓存Key</param>
         /// <param name="value">缓存Value</param>
-        /// <param name="expiresSliding">滑动过期时长（如果在过期时间内有操作，则以当前时间点延长过期时间,Redis中无效）</param>
-        /// <param name="expiressAbsoulte">绝对过期时长</param>
+        /// <param name="slidingExpireTime">滑动过期时长（如果在过期时间内有操作，则以当前时间点延长过期时间,Redis中无效）</param>
+        /// <param name="absoluteExpireTime">绝对过期时长</param>
         /// <returns></returns>
         public void Set(string key, object value, TimeSpan? slidingExpireTime = null, TimeSpan? absoluteExpireTime = null)
         {
@@ -133,6 +169,9 @@ namespace Jc.Core.Helper
             cache.KeyDelete(GetKeyForRedis(key));
         }
 
+        /// <summary>
+        /// Dispose
+        /// </summary>
         public void Dispose()
         {
             if (connection != null)
@@ -174,5 +213,86 @@ namespace Jc.Core.Helper
                 redis.call('del', unpack(keys, i, math.min(i+4999, #keys)))
                 end", values: new RedisValue[] { prefix });
         }
+
+
+        #region 多级缓存
+
+        private MemoryCacheHelper MemoryCacheHelper { get; set; }
+        
+        /// <summary>
+        /// 根据Key获取缓存对象
+        /// 多级缓存,内存缓存 => Redis缓存
+        /// </summary>
+        /// <param name="key">Key</param>
+        /// <returns>Cached item</returns>
+        public object MGet(string key)
+        {
+            object result = MemoryCacheHelper.Get(key);
+            if (result == null)
+            {
+                result = Get(key);
+                if (result != null)
+                {
+                    MemoryCacheHelper.Set(key, result);
+                }
+            }
+            return result;
+        }
+
+
+        /// <summary>
+        /// 根据Key获取缓存对象
+        /// 多级缓存,内存缓存 => Redis缓存
+        /// </summary>
+        /// <param name="key">Key</param>
+        /// <returns>T</returns>
+        public T MGet<T>(string key) where T : class
+        {
+            T result = MemoryCacheHelper.Get<T>(key);
+            if (result == null)
+            {
+                result = Get<T>(key);
+                if (result != null)
+                {
+                    MemoryCacheHelper.Set(key, result);
+                }
+            }
+            return result;
+        }
+
+        /// <summary>
+        /// 设置缓存对象
+        /// 如未设置滑动过期时间与相对过期时间,则使用默认滑动过期时间
+        /// 多级缓存,内存缓存 => Redis缓存
+        /// </summary>
+        /// <param name="key">Key</param>
+        /// <param name="value">Value</param>
+        /// <param name="slidingExpireTime">Sliding expire time</param>
+        /// <param name="absoluteExpireTime">Absolute expire time</param>
+        public void MSet(string key, object value, TimeSpan? slidingExpireTime = null, TimeSpan? absoluteExpireTime = null)
+        {
+            MemoryCacheHelper.Set(key, value);
+            Set(key, value, slidingExpireTime, absoluteExpireTime);
+        }
+
+        /// <summary>
+        /// 多级缓存 移除缓存
+        /// </summary>
+        /// <param name="key"></param>
+        public void MRemove(string key)
+        {
+            MemoryCacheHelper.Remove(key);
+            Remove(key);
+        }
+
+        /// <summary>
+        /// 多级缓存 清空缓存
+        /// </summary>
+        public void MClear()
+        {
+            MemoryCacheHelper.Clear();
+            Clear();
+        }
+        #endregion
     }
 }

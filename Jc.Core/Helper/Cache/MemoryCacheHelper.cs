@@ -8,21 +8,43 @@ using System.Threading.Tasks;
 
 namespace Jc.Core.Helper
 {
+    /// <summary>
+    /// 内存缓存Helper
+    /// </summary>
     public class MemoryCacheHelper : ICacheHelper
     {
-        protected IMemoryCache cache;
+        private IMemoryCache cache;
 
+        /// <summary>
+        /// 缓存名称
+        /// </summary>
         public string Name { get { return "MomoryCache"; } }
 
+        /// <summary>
+        /// 默认滑动过期时间
+        /// 默认时间:60min
+        /// </summary>
         public TimeSpan DefaultSlidingExpireTime { get; set; }
+
+        /// <summary>
+        /// 多级缓存滑动过期时间
+        /// 默认时间:10min
+        /// </summary>
+        public TimeSpan MCacheSlidingExpireTime { get; set; }
 
         /// <summary>
         /// Ctor
         /// </summary>
-        /// <param name="name"></param>
-        public MemoryCacheHelper()
+        public MemoryCacheHelper(TimeSpan? defaultSlidingExpireTime = null)
         {
-            DefaultSlidingExpireTime = TimeSpan.FromHours(1);
+            if (defaultSlidingExpireTime != null)
+            {
+                DefaultSlidingExpireTime = defaultSlidingExpireTime.Value;
+            }
+            else
+            {
+                DefaultSlidingExpireTime = TimeSpan.FromHours(1);
+            }
             cache = new MemoryCache(new OptionsWrapper<MemoryCacheOptions>(new MemoryCacheOptions()));
         }
 
@@ -53,8 +75,8 @@ namespace Jc.Core.Helper
         /// </summary>
         /// <param name="key">缓存Key</param>
         /// <param name="value">缓存Value</param>
-        /// <param name="expiresSliding">滑动过期时长（如果在过期时间内有操作，则以当前时间点延长过期时间）</param>
-        /// <param name="expiressAbsoulte">绝对过期时长</param>
+        /// <param name="slidingExpireTime">滑动过期时长（如果在过期时间内有操作，则以当前时间点延长过期时间）</param>
+        /// <param name="absoluteExpireTime">绝对过期时长</param>
         /// <returns></returns>
         public void Set(string key, object value, TimeSpan? slidingExpireTime = null, TimeSpan? absoluteExpireTime = null)
         {
@@ -117,5 +139,62 @@ namespace Jc.Core.Helper
         {
             cache.Dispose();
         }
+
+        #region 多级缓存
+
+        /// <summary>
+        /// 根据Key获取缓存对象
+        /// 多级缓存,内存缓存时,同Get(key)方法
+        /// </summary>
+        /// <param name="key">Key</param>
+        /// <returns>Cached item</returns>
+        public object MGet(string key)
+        {
+            return Get(key);
+        }
+
+
+        /// <summary>
+        /// 根据Key获取缓存对象
+        /// 多级缓存,内存缓存时,同Get(key)方法
+        /// </summary>
+        /// <param name="key">Key</param>
+        /// <returns>T</returns>
+        public T MGet<T>(string key) where T : class
+        {
+            return Get<T>(key);
+        }
+
+        /// <summary>
+        /// 设置缓存对象
+        /// 如未设置滑动过期时间与相对过期时间,则使用默认滑动过期时间
+        /// 多级缓存,内存缓存同Set方法
+        /// </summary>
+        /// <param name="key">Key</param>
+        /// <param name="value">Value</param>
+        /// <param name="slidingExpireTime">Sliding expire time</param>
+        /// <param name="absoluteExpireTime">Absolute expire time</param>
+        public void MSet(string key, object value, TimeSpan? slidingExpireTime = null, TimeSpan? absoluteExpireTime = null)
+        {
+            Set(key,value,slidingExpireTime,absoluteExpireTime);
+        }
+
+        /// <summary>
+        /// 多级缓存 移除缓存
+        /// </summary>
+        /// <param name="key"></param>
+        public void MRemove(string key)
+        {
+            Remove(key);
+        }
+
+        /// <summary>
+        /// 多级缓存 清空缓存
+        /// </summary>
+        public void MClear()
+        {
+            Clear();
+        }
+        #endregion
     }
 }
