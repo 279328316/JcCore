@@ -84,13 +84,13 @@ namespace Jc.Core.Helper
             ExHelper.ThrowIfNull(key, "Value参数无效");
 
             MemoryCacheEntryOptions options = new MemoryCacheEntryOptions();
-            if (slidingExpireTime.HasValue)
+            if (absoluteExpireTime.HasValue)
+            {
+                options.SetAbsoluteExpiration(absoluteExpireTime.Value);
+            }
+            else if (slidingExpireTime.HasValue)
             {
                 options.SetSlidingExpiration(slidingExpireTime.Value);
-            }
-            else if (absoluteExpireTime.HasValue)
-            {
-                options.SetSlidingExpiration(absoluteExpireTime.Value);
             }
             else
             {
@@ -176,7 +176,7 @@ namespace Jc.Core.Helper
         /// <param name="absoluteExpireTime">Absolute expire time</param>
         public void MSet(string key, object value, TimeSpan? slidingExpireTime = null, TimeSpan? absoluteExpireTime = null)
         {
-            Set(key,value,slidingExpireTime,absoluteExpireTime);
+            Set(key, value, slidingExpireTime, absoluteExpireTime);
         }
 
         /// <summary>

@@ -67,7 +67,8 @@ namespace Jc.Core.Helper
         /// </summary>
         Task ClearAsync();
 
-                
+
+        // 主要用于缓存,数据量大,使用频繁,但不经常修改的数据
         #region Multi Level Cache
 
         /// <summary>
@@ -90,9 +91,7 @@ namespace Jc.Core.Helper
         /// 设置缓存对象
         /// 如未设置滑动过期时间与相对过期时间,则使用默认滑动过期时间
         /// 多级缓存,内存缓存 => Redis缓存等
-        /// 在分布式情况下,可能会出现部分应用内存缓存未及时移除问题
-        /// 所以主要用于缓存,数据量大,使用频繁,但不经常修改的数据
-        /// 允许缓存数据出现一定时间的脏读情况
+        /// 主要用于缓存,数据量大,使用频繁,但不经常修改的数据
         /// </summary>
         /// <param name="key">Key</param>
         /// <param name="value">Value</param>

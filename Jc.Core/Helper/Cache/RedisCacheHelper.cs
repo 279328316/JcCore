@@ -69,6 +69,11 @@ namespace Jc.Core.Helper
             {
                 MCacheSlidingExpireTime = TimeSpan.FromMinutes(10);
             }
+            if (MCacheSlidingExpireTime.CompareTo(DefaultSlidingExpireTime)>0)
+            {
+                MCacheSlidingExpireTime = DefaultSlidingExpireTime;
+            }
+
             //多级缓存使用
             MemoryCacheHelper = new MemoryCacheHelper(MCacheSlidingExpireTime);
         }
@@ -129,7 +134,7 @@ namespace Jc.Core.Helper
             }
             return JsonConvert.DeserializeObject<T>(value);
         }
-
+        
         /// <summary>
         /// 添加缓存
         /// </summary>
@@ -227,13 +232,17 @@ namespace Jc.Core.Helper
         /// <returns>Cached item</returns>
         public object MGet(string key)
         {
-            object result = MemoryCacheHelper.Get(key);
-            if (result == null)
-            {
-                result = Get(key);
-                if (result != null)
+            object result = null;
+            if (Exists(key))
+            {   //远程缓存检查key是否存在 自二级缓存获取数据
+                result = MemoryCacheHelper.Get(key);
+                if (result == null)
                 {
-                    MemoryCacheHelper.Set(key, result);
+                    result = Get(key);
+                    if (result != null)
+                    {   //写入二级缓存
+                        MemoryCacheHelper.MSet(key, result);
+                    }
                 }
             }
             return result;
@@ -248,13 +257,17 @@ namespace Jc.Core.Helper
         /// <returns>T</returns>
         public T MGet<T>(string key) where T : class
         {
-            T result = MemoryCacheHelper.Get<T>(key);
-            if (result == null)
-            {
-                result = Get<T>(key);
-                if (result != null)
+            T result = null;
+            if (Exists(key))
+            {   //远程缓存检查key是否存在 自二级缓存获取数据
+                result = MemoryCacheHelper.Get<T>(key);
+                if (result == null)
                 {
-                    MemoryCacheHelper.Set(key, result);
+                    result = Get<T>(key);
+                    if (result != null)
+                    {   //写入二级缓存
+                        MemoryCacheHelper.MSet(key, result);
+                    }
                 }
             }
             return result;
@@ -271,7 +284,15 @@ namespace Jc.Core.Helper
         /// <param name="absoluteExpireTime">Absolute expire time</param>
         public void MSet(string key, object value, TimeSpan? slidingExpireTime = null, TimeSpan? absoluteExpireTime = null)
         {
-            MemoryCacheHelper.Set(key, value);
+            TimeSpan expireTime = new TimeSpan(DateTime.Now.Add(MCacheSlidingExpireTime).Ticks);
+            if (absoluteExpireTime.HasValue)
+            {
+                if (expireTime.CompareTo(absoluteExpireTime.Value)>0)
+                {
+                    expireTime = absoluteExpireTime.Value;
+                }
+            }
+            MemoryCacheHelper.Set(key, value, null, expireTime);
             Set(key, value, slidingExpireTime, absoluteExpireTime);
         }
 
