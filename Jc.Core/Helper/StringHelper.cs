@@ -170,7 +170,7 @@ namespace Jc.Core.Helper
             byte[] strArray = Encoding.UTF8.GetBytes(str);
             using (MemoryStream output = new MemoryStream())
             {
-                using (GZipStream compressor = new GZipStream(output, CompressionMode.DeCompress))
+                using (GZipStream compressor = new GZipStream(output, CompressionMode.Decompress))
                 {
                     compressor.Write(strArray, 0, str.Length);
                 }
