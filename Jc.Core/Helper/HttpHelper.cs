@@ -586,6 +586,7 @@ namespace Jc.Core.Helper
             request.Method = "GET";
             #region 设置请求Header
             request.UserAgent = UserAgent;
+            request.AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate;
 
             if (Headers != null && Headers.Count > 0)
             {
@@ -639,6 +640,7 @@ namespace Jc.Core.Helper
             }
 
             request.UserAgent = UserAgent;
+            request.AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate;
 
             if (Headers != null && Headers.Count > 0)
             {
@@ -704,7 +706,8 @@ namespace Jc.Core.Helper
             }
 
             request.UserAgent = UserAgent;
-
+            request.AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate;
+            
             if (Headers != null && Headers.Count > 0)
             {
                 foreach (string key in Headers.AllKeys)

@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
+using System.IO.Compression;
 using System.Linq;
 using System.Text;
 
@@ -83,6 +85,98 @@ namespace Jc.Core.Helper
                 temp = temp[0].ToString().ToUpper() + temp.Substring(1, temp.Length - 1);
             }
             return temp;
+        }
+
+        /// <summary>
+        /// 压缩字符串
+        /// </summary>
+        /// <param name="str">待压缩字符串</param>
+        /// <returns>压缩后的字符串</returns>
+        public static string DeflateCompress(string str)
+        {
+            if (string.IsNullOrEmpty(str))
+            {
+                return str;
+            }
+            byte[] strArray = Encoding.UTF8.GetBytes(str);
+            using (MemoryStream output = new MemoryStream())
+            {
+                using (DeflateStream compressor = new DeflateStream(output, CompressionMode.Compress))
+                {
+                    compressor.Write(strArray, 0, str.Length);
+                }
+                byte[] outputArray = output.ToArray();
+                return Encoding.UTF8.GetString(outputArray);
+            }
+        }
+
+        /// <summary>
+        /// 解压缩字符串
+        /// </summary>
+        /// <param name="str">待解压缩字符串</param>
+        /// <returns>解压缩后的字符串</returns>
+        public static string DeflateDeCompress(string str)
+        {
+            if (string.IsNullOrEmpty(str))
+            {
+                return str;
+            }
+            byte[] strArray = Encoding.UTF8.GetBytes(str);
+            using (MemoryStream output = new MemoryStream())
+            {
+                using (DeflateStream compressor = new DeflateStream(output, CompressionMode.Decompress))
+                {
+                    compressor.Write(strArray, 0, str.Length);
+                }
+                byte[] outputArray = output.ToArray();
+                return Encoding.UTF8.GetString(outputArray);
+            }
+        }
+
+        /// <summary>
+        /// GZip压缩字符串
+        /// </summary>
+        /// <param name="str">待压缩字符串</param>
+        /// <returns>压缩后的字符串</returns>
+        public static string GZipCompress(string str)
+        {
+            if (string.IsNullOrEmpty(str))
+            {
+                return str;
+            }
+            byte[] strArray = Encoding.UTF8.GetBytes(str);
+            using (MemoryStream output = new MemoryStream())
+            {
+                using (GZipStream compressor = new GZipStream(output, CompressionMode.Compress))
+                {
+                    compressor.Write(strArray, 0, str.Length);
+                }
+                byte[] outputArray = output.ToArray();
+                return Encoding.UTF8.GetString(outputArray);
+            }
+        }
+
+        /// <summary>
+        /// GZip解压缩字符串
+        /// </summary>
+        /// <param name="str">待解压缩字符串</param>
+        /// <returns>解压缩后的字符串</returns>
+        public static string GZipDeCompress(string str)
+        {
+            if (string.IsNullOrEmpty(str))
+            {
+                return str;
+            }
+            byte[] strArray = Encoding.UTF8.GetBytes(str);
+            using (MemoryStream output = new MemoryStream())
+            {
+                using (GZipStream compressor = new GZipStream(output, CompressionMode.DeCompress))
+                {
+                    compressor.Write(strArray, 0, str.Length);
+                }
+                byte[] outputArray = output.ToArray();
+                return Encoding.UTF8.GetString(outputArray);
+            }
         }
     }
 }
