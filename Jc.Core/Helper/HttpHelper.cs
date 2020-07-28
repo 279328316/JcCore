@@ -764,9 +764,13 @@ namespace Jc.Core.Helper
                     {
                         for (int i = 0; i < fileList.Count; i++)
                         {
+                            if (string.IsNullOrEmpty(fileList[i]))
+                            {
+                                continue;
+                            }
                             if (!File.Exists(fileList[i]))
                             {
-                                throw new Exception($"文件不存在:{fileList[i]}");
+                                throw new Exception($"上传文件不存在:{fileList[i]}");
                             }
                             string strPostHeader = string.Format(fileFormdataTemplate, fileList[i]);
                             byte[] postHeaderBytes = Encoding.UTF8.GetBytes(strPostHeader);
