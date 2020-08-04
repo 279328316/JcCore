@@ -38,9 +38,23 @@ namespace Jc.Core.Helper
         /// 根据Key获取缓存对象
         /// </summary>
         /// <param name="key">Key</param>
+        /// <returns>Cached item</returns>
+        Task<object> GetAsync(string key);
+
+        /// <summary>
+        /// 根据Key获取缓存对象
+        /// </summary>
+        /// <param name="key">Key</param>
         /// <returns>T</returns>
         T Get<T>(string key) where T : class;
-        
+
+        /// <summary>
+        /// 根据Key获取缓存对象
+        /// </summary>
+        /// <param name="key">Key</param>
+        /// <returns>T</returns>
+        Task<T> GetAsync<T>(string key) where T : class;
+
         /// <summary>
         /// 设置缓存对象
         /// 如未设置滑动过期时间与相对过期时间,则使用默认滑动过期时间
@@ -50,13 +64,29 @@ namespace Jc.Core.Helper
         /// <param name="slidingExpireTime">Sliding expire time</param>
         /// <param name="absoluteExpireTime">Absolute expire time</param>
         void Set(string key, object value, TimeSpan? slidingExpireTime = null, TimeSpan? absoluteExpireTime = null);
-        
+
+        /// <summary>
+        /// 设置缓存对象
+        /// 如未设置滑动过期时间与相对过期时间,则使用默认滑动过期时间
+        /// </summary>
+        /// <param name="key">Key</param>
+        /// <param name="value">Value</param>
+        /// <param name="slidingExpireTime">Sliding expire time</param>
+        /// <param name="absoluteExpireTime">Absolute expire time</param>
+        Task SetAsync(string key, object value, TimeSpan? slidingExpireTime = null, TimeSpan? absoluteExpireTime = null);
+
         /// <summary>
         /// 移除缓存
         /// </summary>
         /// <param name="key">Key</param>
         void Remove(string key);
-                
+
+        /// <summary>
+        /// 移除缓存
+        /// </summary>
+        /// <param name="key">Key</param>
+        Task RemoveAsync(string key);
+
         /// <summary>
         /// 清空缓存
         /// </summary>

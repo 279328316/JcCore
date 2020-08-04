@@ -3,15 +3,10 @@
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <RuntimeIdentifier>win10-x64</RuntimeIdentifier>
-    <TargetFramework>netcoreapp3.0</TargetFramework>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="log4net" Version="2.0.8" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\Jc.Core.Base\Jc.Core.Base.csproj" />
     <ProjectReference Include="..\Jc.Core.MsSql\Jc.Core.MsSql.csproj" />
     <ProjectReference Include="..\Jc.Core.MySql\Jc.Core.MySql.csproj" />
     <ProjectReference Include="..\Jc.Core.PostgreSql\Jc.Core.PostgreSql.csproj" />

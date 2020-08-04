@@ -64,10 +64,32 @@ namespace Jc.Core.Helper
         /// </summary>
         /// <param name="key">缓存Key</param>
         /// <returns></returns>
+        public async Task<object> GetAsync(string key)
+        {
+            object result = await Task.Run(() => { return Get(key); });
+            return result;
+        }
+
+        /// <summary>
+        /// 获取缓存
+        /// </summary>
+        /// <param name="key">缓存Key</param>
+        /// <returns></returns>
         public T Get<T>(string key) where T : class
         {
             ExHelper.ThrowIfNull(key, "Key参数无效");
             return (T)cache.Get(key);
+        }
+
+        /// <summary>
+        /// 获取缓存
+        /// </summary>
+        /// <param name="key">缓存Key</param>
+        /// <returns></returns>
+        public async Task<T> GetAsync<T>(string key) where T : class
+        {
+            T result = await Task.Run(() => { return Get<T>(key); });
+            return result;
         }
 
         /// <summary>
@@ -98,6 +120,19 @@ namespace Jc.Core.Helper
             }
             cache.Set(key, value, options);
         }
+        
+        /// <summary>
+        /// 添加缓存
+        /// </summary>
+        /// <param name="key">缓存Key</param>
+        /// <param name="value">缓存Value</param>
+        /// <param name="slidingExpireTime">滑动过期时长（如果在过期时间内有操作，则以当前时间点延长过期时间）</param>
+        /// <param name="absoluteExpireTime">绝对过期时长</param>
+        /// <returns></returns>
+        public async Task SetAsync(string key, object value, TimeSpan? slidingExpireTime = null, TimeSpan? absoluteExpireTime = null)
+        {
+            await Task.Run(() => { Set(key,value,slidingExpireTime,absoluteExpireTime); });
+        }
 
         /// <summary>
         /// 删除缓存
@@ -111,6 +146,16 @@ namespace Jc.Core.Helper
                 throw new ArgumentNullException(nameof(key));
             }
             cache.Remove(key);
+        }
+
+        /// <summary>
+        /// 删除缓存
+        /// </summary>
+        /// <param name="key">缓存Key</param>
+        /// <returns></returns>
+        public async Task RemoveAsync(string key)
+        {
+            await Task.Run(()=>{ Remove(key); });
         }
 
         /// <summary>
@@ -195,6 +240,7 @@ namespace Jc.Core.Helper
         {
             Clear();
         }
+
         #endregion
     }
 }

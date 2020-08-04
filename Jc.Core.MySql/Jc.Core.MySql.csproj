@@ -10,7 +10,7 @@
 author:279328316@qq.com</PackageReleaseNotes>
     <AssemblyVersion>1.0.0.1</AssemblyVersion>
     <FileVersion>1.0.0.1</FileVersion>
-    <Version>1.1.2.6</Version>
+    <Version>1.1.2.7</Version>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
@@ -24,7 +24,7 @@ author:279328316@qq.com</PackageReleaseNotes>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="MySql.Data" Version="8.0.18" />
+    <PackageReference Include="MySql.Data" Version="8.0.21" />
   </ItemGroup>
 
   <ItemGroup>

@@ -1,6 +1,6 @@
 ﻿
 using Jc.Core;
-using Microsoft.Extensions.Caching.Redis;
+using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using StackExchange.Redis;
 using System;
@@ -11,6 +11,45 @@ using System.Threading.Tasks;
 
 namespace Jc.Core.Helper
 {
+    /// <summary>
+    /// Configuration options for RedisCache
+    /// </summary>
+    public class RedisCacheOptions : IOptions<RedisCacheOptions>
+    {
+        /// <summary>
+        /// Ctor
+        /// </summary>
+        public RedisCacheOptions()
+        {
+        }
+
+        /// <summary>
+        /// The configuration used to connect to Redis
+        /// </summary>
+        public string Configuration { get; set; }
+        
+        /// <summary>
+        /// The configuration used to connect to Redis. This is preferred over Configuration.
+        /// </summary>
+        public ConfigurationOptions ConfigurationOptions { get; set; }
+
+        /// <summary>
+        /// The Redis instance name
+        /// </summary>
+        public string InstanceName { get; set; }
+
+        /// <summary>
+        /// Value
+        /// </summary>
+        public RedisCacheOptions Value
+        {
+            get
+            {
+                return this;
+            }
+        }
+    }
+
     /// <summary>
     /// RedisCache Helper
     /// </summary>
@@ -35,7 +74,7 @@ namespace Jc.Core.Helper
 
         /// <summary>
         /// 多级缓存滑动过期时间
-        /// 默认时间:10min
+        /// 默认时间:1min
         /// </summary>
         public TimeSpan MCacheSlidingExpireTime { get; set; }
 
@@ -48,7 +87,8 @@ namespace Jc.Core.Helper
         /// <param name="mCacheSlidingExpireTime">多级缓存滑动过期时间 默认10分钟</param>
         public RedisCacheHelper(RedisCacheOptions options, int database = 0, TimeSpan? defaultSlidingExpireTime = null, TimeSpan? mCacheSlidingExpireTime = null)
         {
-            connection = ConnectionMultiplexer.Connect(options.Configuration);
+            string configuration = $"{options.Configuration},allowAdmin=true,syncTimeout=600000,connectRetry=3,connectTimeout=600000,keepAlive=180";
+            connection = ConnectionMultiplexer.Connect(configuration);
             cache = connection.GetDatabase(database);
             instance = options.InstanceName;
 
@@ -67,7 +107,7 @@ namespace Jc.Core.Helper
             }
             else
             {
-                MCacheSlidingExpireTime = TimeSpan.FromMinutes(10);
+                MCacheSlidingExpireTime = TimeSpan.FromMinutes(1);
             }
             if (MCacheSlidingExpireTime.CompareTo(DefaultSlidingExpireTime)>0)
             {
@@ -100,6 +140,18 @@ namespace Jc.Core.Helper
         }
 
         /// <summary>
+        /// 验证缓存项是否存在
+        /// </summary>
+        /// <param name="key">缓存Key</param>
+        /// <returns></returns>
+        public async Task<bool> ExistsAsync(string key)
+        {
+            ExHelper.ThrowIfNull(key, "Key参数无效");
+            bool result = await cache.KeyExistsAsync(GetKeyForRedis(key));
+            return result;
+        }
+
+        /// <summary>
         /// 获取缓存
         /// </summary>
         /// <param name="key">缓存Key</param>
@@ -111,6 +163,26 @@ namespace Jc.Core.Helper
                 throw new ArgumentNullException(nameof(key));
             }
             var value = cache.StringGet(GetKeyForRedis(key));
+            if (!value.HasValue)
+            {
+                return null;
+            }
+            return JsonConvert.DeserializeObject(value);
+        }
+
+
+        /// <summary>
+        /// 获取缓存
+        /// </summary>
+        /// <param name="key">缓存Key</param>
+        /// <returns></returns>
+        public async Task<object> GetAsync(string key)
+        {
+            if (key == null)
+            {
+                throw new ArgumentNullException(nameof(key));
+            }
+            RedisValue value = await cache.StringGetAsync(GetKeyForRedis(key));
             if (!value.HasValue)
             {
                 return null;
@@ -136,6 +208,23 @@ namespace Jc.Core.Helper
         }
         
         /// <summary>
+        /// 获取缓存
+        /// </summary>
+        /// <param name="key">缓存Key</param>
+        /// <returns></returns>
+        public async Task<T> GetAsync<T>(string key) where T :class
+        {
+            ExHelper.ThrowIfNull(key, "Key参数无效");
+            string value = await cache.StringGetAsync(GetKeyForRedis(key));
+
+            if (string.IsNullOrEmpty(value))
+            {
+                return null;
+            }
+            return JsonConvert.DeserializeObject<T>(value);
+        }
+
+        /// <summary>
         /// 添加缓存
         /// </summary>
         /// <param name="key">缓存Key</param>
@@ -160,6 +249,33 @@ namespace Jc.Core.Helper
             cache.StringSet(GetKeyForRedis(key), Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(value)), absoluteExpireTime.Value);
         }
 
+
+        /// <summary>
+        /// 添加缓存
+        /// </summary>
+        /// <param name="key">缓存Key</param>
+        /// <param name="value">缓存Value</param>
+        /// <param name="slidingExpireTime">滑动过期时长（如果在过期时间内有操作，则以当前时间点延长过期时间,Redis中无效）</param>
+        /// <param name="absoluteExpireTime">绝对过期时长</param>
+        /// <returns></returns>
+        public async Task SetAsync(string key, object value, TimeSpan? slidingExpireTime = null, TimeSpan? absoluteExpireTime = null)
+        {
+            ExHelper.ThrowIfNull(key, "Key参数无效");
+            if (!absoluteExpireTime.HasValue)
+            {
+                if (slidingExpireTime.HasValue)
+                {
+                    absoluteExpireTime = new TimeSpan(DateTime.Now.Add(slidingExpireTime.Value).Ticks);
+                }
+                else
+                {
+                    absoluteExpireTime = new TimeSpan(DateTime.Now.Add(DefaultSlidingExpireTime).Ticks);
+                }
+            }
+            await cache.StringSetAsync(GetKeyForRedis(key), Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(value)), absoluteExpireTime.Value);
+        }
+
+
         /// <summary>
         /// 删除缓存
         /// </summary>
@@ -172,6 +288,20 @@ namespace Jc.Core.Helper
                 throw new ArgumentNullException(nameof(key));
             }
             cache.KeyDelete(GetKeyForRedis(key));
+        }
+
+        /// <summary>
+        /// 删除缓存
+        /// </summary>
+        /// <param name="key">缓存Key</param>
+        /// <returns></returns>
+        public async Task RemoveAsync(string key)
+        {
+            if (key == null)
+            {
+                throw new ArgumentNullException(nameof(key));
+            }
+            await cache.KeyDeleteAsync(GetKeyForRedis(key));
         }
 
         /// <summary>
@@ -196,10 +326,9 @@ namespace Jc.Core.Helper
         /// 异步清空缓存
         /// </summary>
         /// <returns></returns>
-        public Task ClearAsync()
+        public async Task ClearAsync()
         {
-            Clear();
-            return Task.FromResult(0);
+            await KeyDeleteWithPrefixAsync(GetKeyForRedis("*"));
         }
 
         /// <summary>
@@ -219,6 +348,22 @@ namespace Jc.Core.Helper
                 end", values: new RedisValue[] { prefix });
         }
 
+        /// <summary>
+        /// 根据prefix删除
+        /// </summary>
+        /// <param name="prefix"></param>
+        private async Task KeyDeleteWithPrefixAsync(string prefix)
+        {
+            if (string.IsNullOrWhiteSpace(prefix))
+            {
+                throw new ArgumentException("Prefix cannot be empty", nameof(cache));
+            }
+            await cache.ScriptEvaluateAsync(@"
+                local keys = redis.call('keys', ARGV[1]) 
+                for i=1,#keys,5000 do 
+                redis.call('del', unpack(keys, i, math.min(i+4999, #keys)))
+                end", values: new RedisValue[] { prefix });
+        }
 
         #region 多级缓存
 
@@ -266,7 +411,8 @@ namespace Jc.Core.Helper
                     result = Get<T>(key);
                     if (result != null)
                     {   //写入二级缓存
-                        MemoryCacheHelper.MSet(key, result);
+                        TimeSpan expireTime = new TimeSpan(DateTime.Now.Add(MCacheSlidingExpireTime).Ticks);
+                        MemoryCacheHelper.Set(key, result, null, expireTime);
                     }
                 }
             }
