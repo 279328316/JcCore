@@ -743,7 +743,7 @@ namespace Jc.Core.Helper
 
             #region 上传数据 文件
 
-            if (requestParams != null || (fileList != null && fileList.Count > 0))
+            if (requestParams!=null || fileList != null && fileList.Count > 0)
             {
                 using (Stream stream = request.GetRequestStream())
                 {
@@ -784,10 +784,10 @@ namespace Jc.Core.Helper
                                 stream.Write(buffur, 0, buffur.Length);
                             }
                         }
+                        //结尾加上结束分隔符
+                        byte[] endBoundaryBytes = Encoding.UTF8.GetBytes("\r\n--" + boundary + "--\r\n");
+                        stream.Write(endBoundaryBytes, 0, endBoundaryBytes.Length);  
                     }
-                    //结尾加上结束分隔符
-                    byte[] endBoundaryBytes = Encoding.UTF8.GetBytes("\r\n--" + boundary + "--\r\n");
-                    stream.Write(endBoundaryBytes, 0, endBoundaryBytes.Length);
                 }
             }
             #endregion
