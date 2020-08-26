@@ -25,6 +25,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Jc.Core.Excel.LocalTests", 
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Jc.Core.TestApp", "Jc.Core.TestApp\Jc.Core.TestApp.csproj", "{BE05C7B6-2282-4D04-8ADB-AAA0A75DFAE7}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Jc.Core.AntChain", "Jc.Core.AntChain\Jc.Core.AntChain.csproj", "{DECAF24D-7358-423F-826F-26D8C62DBA9E}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -75,6 +77,10 @@ Global
 		{BE05C7B6-2282-4D04-8ADB-AAA0A75DFAE7}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{BE05C7B6-2282-4D04-8ADB-AAA0A75DFAE7}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{BE05C7B6-2282-4D04-8ADB-AAA0A75DFAE7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DECAF24D-7358-423F-826F-26D8C62DBA9E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DECAF24D-7358-423F-826F-26D8C62DBA9E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DECAF24D-7358-423F-826F-26D8C62DBA9E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DECAF24D-7358-423F-826F-26D8C62DBA9E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
