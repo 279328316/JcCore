@@ -10,7 +10,6 @@ namespace Jc.Core.AntChain
 {
     /// <summary>
     /// AntChainHelper
-    /// 依赖HttpHelper与JsonHelper
     /// </summary>
     public class AntChainHelper
     {

@@ -26,6 +26,10 @@ namespace Jc.Core.Excel
         /// </summary>
         Number,
         /// <summary>
+        /// 图像
+        /// </summary>
+        Image,
+        /// <summary>
         /// 对象
         /// </summary>
         Object

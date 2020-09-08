@@ -49,6 +49,11 @@ namespace Jc.Core.Excel
         /// 字段格式
         /// </summary>
         public string FieldFormat { get; set; }
+
+        /// <summary>
+        /// 超链接属性名
+        /// </summary>
+        public string HyperLink { get; set; }
         #endregion
 
         #region Ctor
@@ -60,24 +65,17 @@ namespace Jc.Core.Excel
         {
         }
 
-        /// <summary>
-        /// Ctor
-        /// </summary>
-        public FieldMap(string piName, string fieldText)
-        {
-            this.FieldText = fieldText;
-            this.PiName = piName;
-        }
 
         /// <summary>
         /// Ctor
         /// </summary>
-        public FieldMap(string piName, string fieldText, FieldType type, string format)
+        public FieldMap(string piName, string fieldText, FieldType type = FieldType.String, string format = null,string hyperLink = null)
         {
             this.FieldText = fieldText;
             this.PiName = piName;
             this.FieldType = type;
             this.FieldFormat = format;
+            this.HyperLink = hyperLink;
         }
 
         /// <summary>
@@ -100,16 +98,6 @@ namespace Jc.Core.Excel
         /// <summary>
         /// 字段序号列Map
         /// </summary>
-        public FieldRowIndexMap()
-        {
-            IsRowIndex = true;
-            PiName = "RowIndex";
-            FieldText = "序号";
-        }
-
-        /// <summary>
-        /// 字段序号列Map
-        /// </summary>
         public FieldRowIndexMap(string fieldText = "序号")
         {
             IsRowIndex = true;
@@ -127,41 +115,23 @@ namespace Jc.Core.Excel
         /// <summary>
         /// Ctor
         /// </summary>
-        public FieldMap(Expression<Func<T, object>> exp, int columnIndex)
-        {
-            this.ColumnIndex = columnIndex;
-            this.PiName = GetPropertyName(exp);
-        }
-
-        /// <summary>
-        /// Ctor
-        /// </summary>
-        public FieldMap(Expression<Func<T,object>> exp, string fieldText)
+        public FieldMap(Expression<Func<T, object>> exp, string fieldText, Expression<Func<T, object>> hyperLinkExp = null)
         {
             this.FieldText = fieldText;
             this.PiName = GetPropertyName(exp);
+            this.HyperLink = hyperLinkExp != null ? GetPropertyName(hyperLinkExp) : null;
         }
 
         /// <summary>
         /// Ctor
         /// </summary>
-        public FieldMap(Expression<Func<T, object>> exp, int columnIndex, FieldType type, string format)
-        {
-            this.ColumnIndex = columnIndex;
-            this.PiName = GetPropertyName(exp);
-            this.FieldType = type;
-            this.FieldFormat = format;
-        }
-
-        /// <summary>
-        /// Ctor
-        /// </summary>
-        public FieldMap(Expression<Func<T, object>> exp, string fieldText, FieldType type, string format)
+        public FieldMap(Expression<Func<T, object>> exp, string fieldText, FieldType type = FieldType.String, string format = null, Expression<Func<T, object>> hyperLinkExp = null)
         {
             this.FieldText = fieldText;
             this.PiName = GetPropertyName(exp);
             this.FieldType = type;
             this.FieldFormat = format;
+            this.HyperLink = hyperLinkExp != null ? GetPropertyName(hyperLinkExp) : null;
         }
 
 
@@ -191,8 +161,9 @@ namespace Jc.Core.Excel
             else
             {
                 throw new Exception($"不支持的 Expression {exp.ToString()}");
-            }            
+            }
             return piName;
         }
     }
+
 }

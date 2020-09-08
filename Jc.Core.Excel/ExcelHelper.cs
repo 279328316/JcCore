@@ -1,4 +1,5 @@
-﻿using NPOI.SS.UserModel;
+﻿using NPOI.HSSF.UserModel;
+using NPOI.SS.UserModel;
 using NPOI.XSSF.UserModel;
 using System;
 using System.Collections.Generic;
@@ -128,10 +129,10 @@ namespace Jc.Core.Excel
                         for (int i = 0; i < exportFields.Count; i++)
                         {
                             FieldMap map = exportFields[i];
-
+                            ICell cell = row.CreateCell(i);
                             if (map.IsRowIndex)
                             {
-                                row.CreateCell(i).SetCellValue(m + 1);
+                                cell.SetCellValue(m + 1);
                                 continue;
                             }
 
@@ -176,7 +177,31 @@ namespace Jc.Core.Excel
                                     cellValue = piValue.ToString();
                                 }
                             }
-                            row.CreateCell(i).SetCellValue(cellValue);
+                            cell.SetCellValue(cellValue);
+
+                            #region 处理超级链接
+                            if (!string.IsNullOrEmpty(map.HyperLink))
+                            {
+                                if (map.HyperLink.ToLower().StartsWith("http"))
+                                {   //创建URL链接
+                                    HSSFHyperlink hssfHyperlink = new HSSFHyperlink(HyperlinkType.Url) { Address = map.HyperLink };
+                                    cell.Hyperlink = hssfHyperlink;
+                                }
+                                else
+                                {
+                                    PropertyInfo hyPi = piList.FirstOrDefault(a => a.Name == map.HyperLink);
+                                    if (hyPi != null)
+                                    {
+                                        object hyPiValue = hyPi.GetValue(dataList[m]);
+                                        if (hyPiValue != null)
+                                        {   //创建URL链接
+                                            HSSFHyperlink hssfHyperlink = new HSSFHyperlink(HyperlinkType.Url) { Address = hyPiValue.ToString() };
+                                            cell.Hyperlink = hssfHyperlink;
+                                        }
+                                    }
+                                }
+                            }
+                            #endregion
                         }
                     }
                     #endregion
