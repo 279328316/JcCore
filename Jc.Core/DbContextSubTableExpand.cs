@@ -22,7 +22,7 @@ namespace Jc.Core
     public partial class DbContext
     {
         //分表参数列表 对象类型,分表参数
-        internal List<KeyValueObj<Type, string>> subTableArgList = null;
+        internal List<KeyValuePair<Type, string>> subTableArgList = null;
 
         #region Methods
 
@@ -36,8 +36,8 @@ namespace Jc.Core
             string subTableArg = null;
             if (this.subTableArgList != null)
             {
-                KeyValueObj<Type, string> subTableKv = subTableArgList.FirstOrDefault(kv => kv.Key == typeof(T));
-                if (subTableKv != null)
+                KeyValuePair<Type, string> subTableKv = subTableArgList.FirstOrDefault(kv => kv.Key == typeof(T));
+                if (subTableKv.Key != null)
                 {
                     subTableArg = subTableKv.Value;
                 }
@@ -54,7 +54,7 @@ namespace Jc.Core
         public DbContext GetSubTableDbContext()
         {
             DbContext subTableDbContext = new DbContext(this.ConnectString, this.DbType);
-            subTableDbContext.subTableArgList = new List<KeyValueObj<Type, string>>();
+            subTableDbContext.subTableArgList = new List<KeyValuePair<Type, string>>();
             return subTableDbContext;
         }
 
@@ -84,7 +84,7 @@ namespace Jc.Core
             {
                 throw new Exception("分表参数不能为空");
             }
-            this.subTableArgList.Add(new KeyValueObj<Type, string>(typeof(T), subTableArg.ToString()));
+            this.subTableArgList.Add(new KeyValuePair<Type, string>(typeof(T), subTableArg.ToString()));
             return this;
         }
 
@@ -126,8 +126,8 @@ namespace Jc.Core
             {
                 throw new Exception("非SubTableDbContext,不能进行此操作");
             }
-            KeyValueObj<Type, string> kvObj = subTableArgList.FirstOrDefault(a => a.Key == typeof(T));
-            if (kvObj == null)
+            KeyValuePair<Type, string> kvObj = subTableArgList.FirstOrDefault(a => a.Key == typeof(T));
+            if (kvObj.Key == null)
             {
                 throw new Exception($"不存在类型{typeof(T).Name}的分表参数");
             }

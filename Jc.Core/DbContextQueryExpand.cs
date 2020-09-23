@@ -12,7 +12,7 @@ using System.Collections.Specialized;
 using Jc.Core.Data.Model;
 using Jc.Core.Data.Query;
 using Microsoft.Extensions.Primitives;
-using Newtonsoft.Json;
+using System.Text.Json;
 
 namespace Jc.Core
 {
@@ -81,7 +81,7 @@ namespace Jc.Core
                             List<string> valueList;
                             if (queryItemVal.StartsWith("[") && queryItemVal.EndsWith("]"))
                             {
-                                valueList = JsonConvert.DeserializeObject<List<string>>(queryItemVal);
+                                valueList = JsonSerializer.Deserialize<List<string>>(queryItemVal);
                             }
                             else
                             {

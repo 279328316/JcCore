@@ -9,6 +9,7 @@ using Microsoft.CSharp;
 using System.IO;
 using System.Linq.Expressions;
 using System.Collections;
+using Jc.Core.Data;
 
 namespace Jc.Core
 {

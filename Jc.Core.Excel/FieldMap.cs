@@ -115,7 +115,7 @@ namespace Jc.Core.Excel
         /// <summary>
         /// Ctor
         /// </summary>
-        public FieldMap(Expression<Func<T, object>> exp, string fieldText, Expression<Func<T, object>> hyperLinkExp = null)
+        public FieldMap(Expression<Func<T, object>> exp, string fieldText, Expression<Func<T, object>> hyperLinkExp)
         {
             this.FieldText = fieldText;
             this.PiName = GetPropertyName(exp);

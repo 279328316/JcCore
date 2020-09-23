@@ -32,11 +32,12 @@ namespace Jc.Core.Data
             #region Set ConnectString
             if (!connectString.Contains(";"))
             {   //使用;判断是否为数据库名称or连接串
-                if (ConfigHelper.GetConnectString(connectString) == null)
+                string dbConnectString = ConfigHelper.GetConnectString(connectString);
+                if (string.IsNullOrEmpty(dbConnectString))
                 {
                     throw new Exception($"DbServer[{connectString}]配置无效.请检查.");
                 }
-                connectString = ConfigHelper.GetConnectString(connectString);
+                connectString = dbConnectString;
             }
             #endregion 
 

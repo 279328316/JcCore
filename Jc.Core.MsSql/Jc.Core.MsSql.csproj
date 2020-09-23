@@ -8,7 +8,7 @@
     <PackageReleaseNotes>Jc.Core .net 开源Orm框架 For MsSql
 简单好用的.net开源Orm框架
 author:279328316@qq.com</PackageReleaseNotes>
-    <Version>1.1.2.8</Version>
+    <Version>1.1.2.9</Version>
     <AssemblyVersion>1.0.0.1</AssemblyVersion>
     <FileVersion>1.0.0.1</FileVersion>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>

@@ -25,7 +25,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Jc.Core.Excel.LocalTests", 
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Jc.Core.TestApp", "Jc.Core.TestApp\Jc.Core.TestApp.csproj", "{BE05C7B6-2282-4D04-8ADB-AAA0A75DFAE7}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Jc.Core.AntChain", "Jc.Core.AntChain\Jc.Core.AntChain.csproj", "{DECAF24D-7358-423F-826F-26D8C62DBA9E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Jc.Core.AntChain", "Jc.Core.AntChain\Jc.Core.AntChain.csproj", "{DECAF24D-7358-423F-826F-26D8C62DBA9E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Jc.Core.Cache", "Jc.Core.Cache\Jc.Core.Cache.csproj", "{473027E8-29D1-4BDF-912B-BC8DBFAA25F4}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Jc.Core.Util", "Jc.Core.Util\Jc.Core.Util.csproj", "{976F7355-CE72-41E6-A8BF-EA735583FDE3}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -81,6 +85,14 @@ Global
 		{DECAF24D-7358-423F-826F-26D8C62DBA9E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{DECAF24D-7358-423F-826F-26D8C62DBA9E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{DECAF24D-7358-423F-826F-26D8C62DBA9E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{473027E8-29D1-4BDF-912B-BC8DBFAA25F4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{473027E8-29D1-4BDF-912B-BC8DBFAA25F4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{473027E8-29D1-4BDF-912B-BC8DBFAA25F4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{473027E8-29D1-4BDF-912B-BC8DBFAA25F4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{976F7355-CE72-41E6-A8BF-EA735583FDE3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{976F7355-CE72-41E6-A8BF-EA735583FDE3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{976F7355-CE72-41E6-A8BF-EA735583FDE3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{976F7355-CE72-41E6-A8BF-EA735583FDE3}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

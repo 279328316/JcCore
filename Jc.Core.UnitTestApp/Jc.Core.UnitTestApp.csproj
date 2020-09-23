@@ -187,6 +187,10 @@
       <Project>{1bb6f1d9-a900-429a-a675-992180074469}</Project>
       <Name>Jc.Core.Sqlite</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Jc.Core.Util\Jc.Core.Util.csproj">
+      <Project>{976F7355-CE72-41E6-A8BF-EA735583FDE3}</Project>
+      <Name>Jc.Core.Util</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Jc.Core\Jc.Core.csproj">
       <Project>{5a37603f-40ac-4bed-b27c-6d4e5e2b0475}</Project>
       <Name>Jc.Core</Name>

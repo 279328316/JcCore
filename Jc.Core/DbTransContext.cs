@@ -11,6 +11,7 @@ using System.Runtime.Serialization;
 
 using System.Linq.Expressions;
 using System.Data.Common;
+using Jc.Core.Data;
 
 namespace Jc.Core
 {
@@ -27,14 +28,14 @@ namespace Jc.Core
         private DbTransaction dbTransaction;//事务使用
 
         internal DbTransContext(string connectString, DatabaseType dbType = DatabaseType.MsSql,
-                                List<KeyValueObj<Type,string>> subTableArgList = null) :base(connectString,dbType)
+                                List<KeyValuePair<Type,string>> subTableArgList = null) :base(connectString,dbType)
         {
             if (subTableArgList != null)
             {   //使用新List,防止变量污染
-                this.subTableArgList = new List<KeyValueObj<Type, string>>();
+                this.subTableArgList = new List<KeyValuePair<Type, string>>();
                 for (int i = 0; i < subTableArgList.Count; i++)
                 {
-                    this.subTableArgList.Add(new KeyValueObj<Type, string>(subTableArgList[i].Key, subTableArgList[i].Value));
+                    this.subTableArgList.Add(new KeyValuePair<Type, string>(subTableArgList[i].Key, subTableArgList[i].Value));
                 }
             }
             BeginTrans();
