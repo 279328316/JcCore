@@ -152,7 +152,7 @@ namespace Jc.Core.Excel
                                     {
                                         cellValue = ((DateTime)piValue).ToString(map.FieldFormat);
                                     }
-                                    if (map.FieldType == FieldType.Boolean)
+                                    else if (map.FieldType == FieldType.Boolean)
                                     {
                                         if (!string.IsNullOrEmpty(map.FieldFormat) && map.FieldFormat.IndexOf('|') != -1)
                                         {
@@ -164,12 +164,12 @@ namespace Jc.Core.Excel
                                         }
                                         else
                                         {
-                                            cellValue = piValue.ToString();
+                                            cellValue = string.Format(map.FieldFormat,piValue);
                                         }
                                     }
                                     else
                                     {
-                                        cellValue = piValue.ToString();
+                                        cellValue = string.Format(map.FieldFormat, piValue);
                                     }
                                 }
                                 else
