@@ -1,5 +1,4 @@
-﻿using Jc.Core.Helper;
-using Jc.Core.TestApp.Test;
+﻿using Jc.Core.TestApp.Test;
 using System;
 using System.Collections.Generic;
 using System.Linq;

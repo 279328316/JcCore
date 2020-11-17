@@ -1,5 +1,4 @@
-﻿using Jc.Core.Helper;
-using Jc.Core.Util;
+﻿using Jc.Core.Util;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
