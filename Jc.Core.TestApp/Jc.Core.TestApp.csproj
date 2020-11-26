@@ -11,10 +11,9 @@
     <ProjectReference Include="..\Jc.Core.MySql\Jc.Core.MySql.csproj" />
     <ProjectReference Include="..\Jc.Core.PostgreSql\Jc.Core.PostgreSql.csproj" />
     <ProjectReference Include="..\Jc.Core.Sqlite\Jc.Core.Sqlite.csproj" />
-    <ProjectReference Include="..\Jc.Core.Util\Jc.Core.Util.csproj" />
     <ProjectReference Include="..\Jc.Core\Jc.Core.csproj" />
+    <ProjectReference Include="..\Jc.Util\Jc.Util.csproj" />
     <PackageReference Include="log4net" Version="2.0.8" />
-    <PackageReference Include="Microsoft.NETCore.Targets" Version="3.0.0" PrivateAssets="all" />
   </ItemGroup>
 
   <ItemGroup>

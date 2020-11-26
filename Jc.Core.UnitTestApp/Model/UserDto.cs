@@ -1,4 +1,5 @@
 ﻿using System;
+using Jc.Base;
 using Jc.Core;
 
 namespace Jc.Core.UnitTestApp
