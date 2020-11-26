@@ -12,6 +12,7 @@ using System.Runtime.Serialization;
 using System.Linq.Expressions;
 using System.Data.Common;
 using Jc.Core.Data.Query;
+using Jc.Base;
 
 namespace Jc.Core
 {

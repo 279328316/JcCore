@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Jc.Base;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -129,7 +130,10 @@ namespace Jc.Core.Data.Query
             string tableName = TableAttr?.Name;
             if (!string.IsNullOrEmpty(tableName) && tableName.Contains("{0}"))
             {
-                ExHelper.ThrowIfNull(subTableArg, $"对象{EntityType.Name},分表参数不能为空,请使用分表DbContext.调用GetSubTableDbContext获取分表DbContext");
+                if (string.IsNullOrEmpty(subTableArg))
+                {
+                    throw new Exception($"对象{EntityType.Name},分表参数不能为空,请使用分表DbContext.调用GetSubTableDbContext获取分表DbContext");
+                }
                 tableName = string.Format(tableName, subTableArg);
             }
             else if(string.IsNullOrEmpty(tableName))

@@ -7,6 +7,7 @@ using System.Reflection;
 using System.Data;
 using System.Linq;
 using Jc.Core.Data.Query;
+using Jc.Base;
 
 namespace Jc.Core.Data
 {
@@ -38,7 +39,10 @@ namespace Jc.Core.Data
                     throw new Exception($"加载{className}访问模块失败.请检查是否已添加{assemblyName}引用.");
                 }
                 IDbCreator dbCreator = assembly.CreateInstance($"{assemblyName}.{className}") as IDbCreator;
-                ExHelper.ThrowIfNull(dbCreator, $"加载{className}失败.");
+                if (dbCreator == null)
+                {
+                    throw new Exception($"加载{className}失败.");
+                }
                 mySqlCreator = dbCreator;
             }
             this.dbCreator = mySqlCreator;

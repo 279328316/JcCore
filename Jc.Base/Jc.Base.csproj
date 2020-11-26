@@ -1,0 +1,12 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <Description>简单好用的.net开源Orm框架
+https://github.com/279328316/JcCore</Description>
+    <Version>1.1.2.10</Version>
+  </PropertyGroup>
+
+</Project>

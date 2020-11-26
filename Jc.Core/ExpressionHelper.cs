@@ -145,8 +145,15 @@ namespace Jc.Core
                         {
                             leftType = leftType.GenericTypeArguments[0];
                         }
-                        MethodInfo miParse = leftType.GetMethod("Parse", new Type[] { typeof(string) });
-                        objValue = miParse.Invoke(null, new object[] { value });
+                        if (leftType.IsEnum)
+                        {
+                            objValue = Enum.Parse(leftType, value.ToString());
+                        }
+                        else
+                        {
+                            MethodInfo miParse = leftType.GetMethod("Parse", new Type[] { typeof(string) });
+                            objValue = miParse.Invoke(null, new object[] { value });
+                        }
                     }
                     else
                     {

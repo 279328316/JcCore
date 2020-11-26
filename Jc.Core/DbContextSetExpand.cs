@@ -31,12 +31,15 @@ namespace Jc.Core
         /// <param name="select">查询属性</param>
         public int Set<T>(T dto,Expression<Func<T, object>> select = null) where T : class, new()
         {
-            ExHelper.ThrowIfNull(dto, "操作对象不能为空.");
+            if (dto == null)
+            {
+                throw new Exception("操作对象不能为空.");
+            }
             int rowCount = 0;
             DtoMapping dtoDbMapping = DtoMappingHelper.GetDtoMapping<T>();
             object pkValue = dtoDbMapping.PkMap.Pi.GetValue(dto);
-
-            if (ExHelper.IsNullOrEmpty(pkValue))
+            
+            if (CheckIsNullOrEmpty(pkValue))
             {
                 rowCount = Add(dto, select);
             }
@@ -70,7 +73,7 @@ namespace Jc.Core
             for (int i = 0; i < list.Count; i++)
             {
                 object pkValue = dtoDbMapping.PkMap.Pi.GetValue(list[i]);
-                if (ExHelper.IsNullOrEmpty(pkValue))
+                if (CheckIsNullOrEmpty(pkValue))
                 {
                     addList.Add(list[i]);
                 }
@@ -107,15 +110,10 @@ namespace Jc.Core
         /// <param name="select">查询属性</param>
         /// <param name="useTransaction">使用事务操作 默认false</param>
         /// <param name="progress">进度通知</param>
-        public AfterDto<int> SetListSync<T>(List<T> list, Expression<Func<T, object>> select = null, bool useTransaction = false, IProgress<double> progress = null) where T : class, new()
+        public async Task<int> SetListSync<T>(List<T> list, Expression<Func<T, object>> select = null, bool useTransaction = false, IProgress<double> progress = null) where T : class, new()
         {
-            AfterDto<int> after = new AfterDto<int>();
-            Task t = new Task(() => {
-                int rowCount = SetList(list, select, useTransaction, progress);
-                after.DoAfter(rowCount);
-            });
-            t.Start();
-            return after;
+            int rowCount = await Task.Run(() => { return SetList(list, select, useTransaction, progress); });
+            return rowCount;
         }
         
         /// <summary>
@@ -126,8 +124,10 @@ namespace Jc.Core
         /// <param name="select">查询属性</param>
         public int Add<T>(T dto, Expression<Func<T, object>> select = null) where T : class, new()
         {
-            ExHelper.ThrowIfNull(dto, "操作对象不能为空.");
-
+            if (dto == null)
+            {
+                throw new Exception("待保存对象不能为空");
+            }
             int rowCount = 0;
             DtoMapping dtoDbMapping = DtoMappingHelper.GetDtoMapping<T>();
             List<PiMap> piMapList = DtoMappingHelper.GetPiMapList<T>(select);
@@ -344,15 +344,10 @@ namespace Jc.Core
         /// <param name="select">查询属性</param>
         /// <param name="useTransaction">使用事务操作 默认false</param>
         /// <param name="progress">进度通知</param>
-        public AfterDto<int> AddListSync<T>(List<T> list, Expression<Func<T, object>> select = null, bool useTransaction = false, IProgress<double> progress = null) where T : class, new()
+        public async Task<int> AddListSync<T>(List<T> list, Expression<Func<T, object>> select = null, bool useTransaction = false, IProgress<double> progress = null) where T : class, new()
         {
-            AfterDto<int> after = new AfterDto<int>();
-            Task t = new Task(()=> {
-                int rowCount = AddList(list,select, useTransaction, progress);
-                after.DoAfter(rowCount);
-            });
-            t.Start();
-            return after;
+            int rowCount = await Task.Run(() => { return AddList(list, select, useTransaction, progress); });
+            return rowCount;
         }
         
         /// <summary>
@@ -363,7 +358,10 @@ namespace Jc.Core
         /// <param name="select">更新属性</param>
         public int Update<T>(T dto,Expression<Func<T, object>> select = null) where T : class, new()
         {
-            ExHelper.ThrowIfNull(dto, "操作对象不能为空.");
+            if (dto == null)
+            {
+                throw new Exception("待更新对象不能为空.");
+            }
             int rowCount = 0;
 
             DtoMapping dtoDbMapping = DtoMappingHelper.GetDtoMapping<T>();
@@ -497,17 +495,11 @@ namespace Jc.Core
         /// <param name="select">查询属性</param>
         /// <param name="useTransaction">使用事务操作 默认false</param>
         /// <param name="progress">进度通知</param>
-        public AfterDto<int> UpdateListSync<T>(List<T> list, Expression<Func<T, object>> select = null, bool useTransaction = false, IProgress<double> progress = null) where T : class, new()
+        public async Task<int> UpdateListSync<T>(List<T> list, Expression<Func<T, object>> select = null, bool useTransaction = false, IProgress<double> progress = null) where T : class, new()
         {
-            AfterDto<int> after = new AfterDto<int>();
-            Task t = new Task(() => {
-                int rowCount = UpdateList(list, select, useTransaction, progress);
-                after.DoAfter(rowCount);
-            });
-            t.Start();
-            return after;
+            int rowCount = await Task.Run(() => { return UpdateList(list, select, useTransaction, progress); });
+            return rowCount;
         }
-
 
         /// <summary>
         /// 根据Id删除数据
@@ -544,8 +536,10 @@ namespace Jc.Core
         /// <param name="dto">对象</param>
         public int Delete<T>(T dto) where T : class, new()
         {
-            ExHelper.ThrowIfNull(dto, "操作对象不能为空.");
-
+            if (dto == null)
+            {
+                throw new Exception("待删除对象不能为空");
+            }
             int rowCount = 0;
             using (DbCommand dbCommand = dbProvider.GetDeleteDbCmd<T>(dto, this.GetSubTableArg<T>()))
             {
@@ -574,7 +568,10 @@ namespace Jc.Core
         /// <param name="where">删除条件</param>
         public int Delete<T>(Expression<Func<T, bool>> where) where T : class, new()
         {
-            ExHelper.ThrowIfNull(where, "删除条件对象不能为空.");
+            if (where == null)
+            {
+                throw new Exception("删除条件不能为空");
+            }
             int rowCount = 0;
             QueryFilter filter = QueryFilterHelper.GetFilter(where);
             using (DbCommand dbCommand = dbProvider.GetDeleteDbCmd<T>(filter, this.GetSubTableArg<T>()))
@@ -645,6 +642,63 @@ namespace Jc.Core
                     throw ex;
                 }
             }
+        }
+
+        /// <summary>
+        /// Obj IsNullOrEmpty
+        /// 默认严格模式下string.Empty,Guid.Empty,int 0,ICollection.Count 0 都会被作为false
+        /// </summary>
+        /// <param name="obj">对象</param>
+        /// <param name="isStrict">严格模式</param>
+        /// <returns></returns>
+        private bool CheckIsNullOrEmpty(object obj, bool isStrict = true)
+        {
+            bool result = false;
+            if (obj == null)
+            {
+                result = true;
+            }
+            else if (isStrict)
+            {
+                Type type = obj.GetType();
+                if (type == typeof(string))
+                {
+                    if (string.IsNullOrEmpty(obj.ToString()))
+                    {
+                        result = true;
+                    }
+                }
+                else if (type == typeof(Guid) || type == typeof(Guid?))
+                {
+                    if (((Guid)obj) == Guid.Empty)
+                    {
+                        result = true;
+                    }
+                }
+                else if (type == typeof(int) || type == typeof(int?))
+                {
+                    if (((int)obj) == 0)
+                    {
+                        result = true;
+                    }
+                }
+                else if (type == typeof(long) || type == typeof(long?))
+                {
+                    if (((long)obj) == 0)
+                    {
+                        result = true;
+                    }
+                }
+                else if (obj is ICollection)
+                {
+                    ICollection collection = obj as ICollection;
+                    if (collection.Count <= 0)
+                    {
+                        result = true;
+                    }
+                }
+            }
+            return result;
         }
         #endregion
     }

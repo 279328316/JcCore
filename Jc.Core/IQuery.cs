@@ -52,7 +52,10 @@ namespace Jc.Core
         /// <param name="subTableArg">分表参数</param>
         public IQuery(DbContext dbContext, string subTableArg = null)
         {
-            ExHelper.ThrowIfNull(dbContext, "IQuery初始化失败,dbContext对象不能为空.");
+            if (dbContext == null)
+            {
+                throw new Exception("IQuery初始化失败,dbContext对象不能为空.");
+            }
             this.dbContext = dbContext;
             this.subTableArg = subTableArg;
         }

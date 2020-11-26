@@ -8,7 +8,7 @@ using System.ComponentModel;
 using System.Runtime.Serialization;
 using System.Diagnostics;
 
-namespace Jc.Core
+namespace Jc.Base
 {
     /// <summary>
     /// 返回结果对象
@@ -73,6 +73,11 @@ namespace Jc.Core
     /// </summary>
     public enum RCode
     {
+        /// <summary>
+        /// 默认
+        /// </summary>
+        Default = 0,
+
         /// <summary>
         /// 成功
         /// </summary>
