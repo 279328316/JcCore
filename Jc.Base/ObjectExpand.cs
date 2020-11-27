@@ -5,7 +5,7 @@ using System.Linq.Expressions;
 using System.Reflection;
 using System.Collections;
 
-namespace Jc.Base
+namespace Jc.Core
 {
     /// <summary>
     /// Object 扩展

@@ -13,7 +13,7 @@
     <ProjectReference Include="..\Jc.Core.Sqlite\Jc.Core.Sqlite.csproj" />
     <ProjectReference Include="..\Jc.Core\Jc.Core.csproj" />
     <ProjectReference Include="..\Jc.Util\Jc.Util.csproj" />
-    <PackageReference Include="log4net" Version="2.0.8" />
+    <PackageReference Include="log4net" Version="2.0.12" />
   </ItemGroup>
 
   <ItemGroup>

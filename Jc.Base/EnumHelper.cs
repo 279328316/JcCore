@@ -5,7 +5,7 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Jc.Base
+namespace Jc.Core
 {
     /// <summary>
     /// Enum操作Helper

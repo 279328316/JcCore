@@ -1,12 +1,10 @@
-﻿
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Reflection;
 using System.Linq;
 using System.Text;
 using System.Linq.Expressions;
 using System.Configuration;
-using Jc.Base;
 
 namespace Jc.Core.Data.Query
 {

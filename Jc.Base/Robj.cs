@@ -8,7 +8,7 @@ using System.ComponentModel;
 using System.Runtime.Serialization;
 using System.Diagnostics;
 
-namespace Jc.Base
+namespace Jc.Core
 {
     /// <summary>
     /// 返回结果对象

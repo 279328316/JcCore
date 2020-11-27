@@ -6,7 +6,6 @@ using System.Linq;
 using System.IO;
 using Jc.Core.Data.Query;
 using System.Reflection;
-using Jc.Base;
 
 namespace Jc.Core.Data
 {
