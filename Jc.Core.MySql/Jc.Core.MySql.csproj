@@ -10,7 +10,7 @@
 author:279328316@qq.com</PackageReleaseNotes>
     <AssemblyVersion>1.0.0.1</AssemblyVersion>
     <FileVersion>1.0.0.1</FileVersion>
-    <Version>1.1.2.12</Version>
+    <Version>1.1.2.13</Version>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
@@ -24,8 +24,8 @@ author:279328316@qq.com</PackageReleaseNotes>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Jc.Core" Version="1.1.2.10" />
-    <PackageReference Include="MySql.Data" Version="8.0.22" />
+    <PackageReference Include="Jc.Core" Version="1.1.2.12" />
+    <PackageReference Include="MySql.Data" Version="8.0.18" />
     <PackageReference Include="SSH.NET" Version="2020.0.0-beta1" />
   </ItemGroup>
 
