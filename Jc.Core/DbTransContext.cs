@@ -27,8 +27,10 @@ namespace Jc.Core
 
         private DbTransaction dbTransaction;//事务使用
 
+        private IsolationLevel? isolationLevel = null;
+
         internal DbTransContext(string connectString, DatabaseType dbType = DatabaseType.MsSql,
-                                List<KeyValuePair<Type,string>> subTableArgList = null) :base(connectString,dbType)
+                                List<KeyValuePair<Type,string>> subTableArgList = null, IsolationLevel? level = null) :base(connectString,dbType)
         {
             if (subTableArgList != null)
             {   //使用新List,防止变量污染
@@ -38,6 +40,7 @@ namespace Jc.Core
                     this.subTableArgList.Add(new KeyValuePair<Type, string>(subTableArgList[i].Key, subTableArgList[i].Value));
                 }
             }
+            this.isolationLevel = level;
             BeginTrans();
         }
 
@@ -68,7 +71,14 @@ namespace Jc.Core
         private void BeginTrans()
         {
             this.transDbConnection = this.DbProvider.CreateDbConnection();
-            dbTransaction = transDbConnection.BeginTransaction();
+            if (isolationLevel == null)
+            {
+                dbTransaction = transDbConnection.BeginTransaction();
+            }
+            else
+            {
+                dbTransaction = transDbConnection.BeginTransaction(isolationLevel.Value);
+            }
             isTransaction = true;
         }
 
