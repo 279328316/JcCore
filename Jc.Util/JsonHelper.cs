@@ -47,7 +47,7 @@ namespace Jc.Util
                     setting = new JsonSerializerSettings();
                     setting.DateFormatString = "yyyy-MM-dd HH:mm:ss";//日期字符串格式化
                     setting.NullValueHandling = NullValueHandling.Ignore;//忽略空值
-                    setting.ReferenceLoopHandling = ReferenceLoopHandling.Ignore;//忽略空值
+                    setting.ReferenceLoopHandling = ReferenceLoopHandling.Ignore;//忽略循环
                     setting.ContractResolver = new CamelCasePropertyNamesContractResolver();
                 }
                 result = JsonConvert.SerializeObject(obj, setting);

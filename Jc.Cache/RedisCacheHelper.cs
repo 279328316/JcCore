@@ -1,6 +1,7 @@
 ﻿
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Serialization;
 using StackExchange.Redis;
 using System;
 using System.Collections.Generic;
@@ -253,14 +254,18 @@ namespace Jc.Cache
             {
                 if (slidingExpireTime.HasValue)
                 {
-                    absoluteExpireTime = new TimeSpan(DateTime.Now.Add(slidingExpireTime.Value).Ticks);
+                    absoluteExpireTime = slidingExpireTime;
                 }
                 else
                 {
-                    absoluteExpireTime = new TimeSpan(DateTime.Now.Add(DefaultSlidingExpireTime).Ticks);
+                    absoluteExpireTime = DefaultSlidingExpireTime;
                 }
             }
-            cache.StringSet(GetKeyForRedis(key), Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(value)), absoluteExpireTime.Value);
+            JsonSerializerSettings setting = new JsonSerializerSettings();
+            setting.NullValueHandling = NullValueHandling.Ignore;//忽略空值
+            setting.ReferenceLoopHandling = ReferenceLoopHandling.Ignore;//忽略循环
+            setting.ContractResolver = new CamelCasePropertyNamesContractResolver();
+            cache.StringSet(GetKeyForRedis(key), Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(value, setting)), absoluteExpireTime.Value);
         }
 
 
@@ -282,14 +287,20 @@ namespace Jc.Cache
             {
                 if (slidingExpireTime.HasValue)
                 {
-                    absoluteExpireTime = new TimeSpan(DateTime.Now.Add(slidingExpireTime.Value).Ticks);
+                    absoluteExpireTime = slidingExpireTime;
                 }
                 else
                 {
-                    absoluteExpireTime = new TimeSpan(DateTime.Now.Add(DefaultSlidingExpireTime).Ticks);
+                    absoluteExpireTime = DefaultSlidingExpireTime;
                 }
             }
-            await cache.StringSetAsync(GetKeyForRedis(key), Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(value)), absoluteExpireTime.Value);
+
+            JsonSerializerSettings setting = new JsonSerializerSettings();
+            setting.NullValueHandling = NullValueHandling.Ignore;//忽略空值
+            setting.ReferenceLoopHandling = ReferenceLoopHandling.Ignore;//忽略循环
+            setting.ContractResolver = new CamelCasePropertyNamesContractResolver();
+
+            await cache.StringSetAsync(GetKeyForRedis(key), Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(value, setting)), absoluteExpireTime.Value);
         }
 
 
