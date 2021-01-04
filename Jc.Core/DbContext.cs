@@ -109,6 +109,16 @@ namespace Jc.Core
         }
 
         /// <summary>
+        /// 设置DbCommand DbConnection
+        /// </summary>
+        /// <returns></returns>
+        internal virtual void SetDbConnection(DbCommand dbCommand)
+        {
+            DbConnection dbConnection = dbProvider.CreateDbConnection();
+            dbCommand.Connection = dbConnection;
+        }
+
+        /// <summary>
         /// 连接测试
         /// </summary>
         /// <returns>robj</returns>
@@ -136,7 +146,17 @@ namespace Jc.Core
         /// </summary>
         internal virtual void CloseDbConnection(DbConnection connection)
         {
-            if (connection != null) { try { connection.Close(); connection.Dispose(); } catch { } }
+            if (connection != null)
+            { 
+                try 
+                { 
+                    connection.Close();
+                    connection.Dispose();
+                } 
+                catch(Exception ex)
+                { 
+                }
+            }
         }
 
         #endregion

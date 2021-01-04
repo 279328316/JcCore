@@ -154,7 +154,7 @@ namespace Jc.Core
             {
                 try
                 {
-                    dbCommand.Connection = GetDbConnection();
+                    SetDbConnection(dbCommand); // 添加记录
                     if ((dtoDbMapping.PkMap.PropertyType == typeof(int)
                         || dtoDbMapping.PkMap.PropertyType == typeof(int?))
                         && (pkValue == null || (int)pkValue == 0))
@@ -330,7 +330,7 @@ namespace Jc.Core
                 {
                     CloseDbConnection(dbConnection);
                     throw ex;
-                }                
+                }
                 #endregion 
             }
             return rowCount;
@@ -370,7 +370,7 @@ namespace Jc.Core
             {
                 try
                 {
-                    dbCommand.Connection = GetDbConnection();
+                    SetDbConnection(dbCommand); // 更新记录
                     rowCount = dbCommand.ExecuteNonQuery();
                     if (rowCount <= 0)
                     {
@@ -512,7 +512,7 @@ namespace Jc.Core
             {
                 try
                 {
-                    dbCommand.Connection = GetDbConnection();
+                    SetDbConnection(dbCommand); // 删除记录
                     rowCount = dbCommand.ExecuteNonQuery();
                     if (rowCount <= 0)
                     {
@@ -545,7 +545,7 @@ namespace Jc.Core
             {
                 try
                 {
-                    dbCommand.Connection = GetDbConnection();
+                    SetDbConnection(dbCommand); // 删除记录
                     rowCount = dbCommand.ExecuteNonQuery();
                     if (rowCount <= 0)
                     {
@@ -578,7 +578,7 @@ namespace Jc.Core
             {
                 try
                 {
-                    dbCommand.Connection = GetDbConnection();
+                    SetDbConnection(dbCommand); // 删除记录
                     rowCount = dbCommand.ExecuteNonQuery();
                     if (rowCount <= 0)
                     {
@@ -632,7 +632,7 @@ namespace Jc.Core
             {
                 try
                 {
-                    dbCommand.Connection = GetDbConnection();
+                    SetDbConnection(dbCommand); // 创建表
                     dbCommand.ExecuteNonQuery();
                     CloseDbConnection(dbCommand);
                 }

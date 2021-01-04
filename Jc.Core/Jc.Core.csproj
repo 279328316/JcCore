@@ -26,6 +26,7 @@ https://github.com/279328316/JcCore</Description>
 
   <ItemGroup>
     <PackageReference Include="Jc.Base" Version="1.1.2.12" />
+    <PackageReference Include="log4net" Version="2.0.12" />
     <PackageReference Include="Microsoft.Extensions.Configuration" Version="5.0.0" />
     <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="5.0.0" />
     <PackageReference Include="System.Configuration.ConfigurationManager" Version="5.0.0" />

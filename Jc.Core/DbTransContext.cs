@@ -29,6 +29,13 @@ namespace Jc.Core
 
         private IsolationLevel? isolationLevel = null;
 
+        /// <summary>
+        /// TransDb使用分表参数时,先创建分表DbContext
+        /// </summary>
+        /// <param name="connectString"></param>
+        /// <param name="dbType"></param>
+        /// <param name="subTableArgList"></param>
+        /// <param name="level"></param>
         internal DbTransContext(string connectString, DatabaseType dbType = DatabaseType.MsSql,
                                 List<KeyValuePair<Type,string>> subTableArgList = null, IsolationLevel? level = null) :base(connectString,dbType)
         {
@@ -66,6 +73,19 @@ namespace Jc.Core
         }
 
         /// <summary>
+        /// 设置DbCommand DbConnection
+        /// </summary>
+        /// <returns></returns>
+        internal override void SetDbConnection(DbCommand dbCommand)
+        {
+            base.SetDbConnection(dbCommand);
+            if(isTransaction)
+            {
+                dbCommand.Transaction = dbTransaction;
+            }
+        }
+
+        /// <summary>
         /// 开启事务
         /// </summary>
         private void BeginTrans()
@@ -90,9 +110,7 @@ namespace Jc.Core
             if (isTransaction)
             {
                 dbTransaction.Rollback();
-                dbTransaction.Dispose();
-                if (transDbConnection != null) { try { transDbConnection.Close(); } catch { } }
-                isTransaction = false;
+                this.CloseTransDbConnection(); 
             }
             else
             {
@@ -108,16 +126,27 @@ namespace Jc.Core
             if (isTransaction)
             {
                 dbTransaction.Commit();
-                dbTransaction.Dispose();
-                if (transDbConnection != null) { try { transDbConnection.Close(); } catch { } }
-                isTransaction = false;
+                this.CloseTransDbConnection();
             }
             else
             {
                 throw new Exception("未开启事务,无法提交.");
             }
         }
-        
+
+        /// <summary>
+        /// 关闭连接
+        /// </summary>
+        private void CloseTransDbConnection()
+        {
+            dbTransaction.Dispose();
+            if (transDbConnection != null)
+            {
+                transDbConnection.Close();
+            }
+            isTransaction = false;
+        }
+
         /// <summary>
         /// 关闭连接
         /// </summary>

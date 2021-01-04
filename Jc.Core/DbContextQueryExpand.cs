@@ -187,7 +187,7 @@ namespace Jc.Core
             {
                 try
                 {
-                    dbCommand.Connection = GetDbConnection();
+                    SetDbConnection(dbCommand); // 执行Sql
                     rowCount = dbCommand.ExecuteNonQuery();
                     CloseDbConnection(dbCommand);
                 }
