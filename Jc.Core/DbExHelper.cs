@@ -10,19 +10,19 @@ using System.IO;
 using System.Linq.Expressions;
 using System.Collections;
 
-namespace Jc.Util
+namespace Jc.Core
 {
     /// <summary>
     /// 异常处理Helper
     /// </summary>
-    public class ExHelper
+    internal class DbExHelper
     {
         /// <summary>
         /// 抛出异常
         /// <param name="msg">异常消息</param>
         /// <param name="innerException">内部异常</param>
         /// </summary>
-        public static void Throw(string msg = "异常", Exception innerException = null)
+        internal static void Throw(string msg = "异常", Exception innerException = null)
         {
             throw new Exception(msg, innerException);
         }
@@ -33,7 +33,7 @@ namespace Jc.Util
         /// <param name="throwIf">抛出异常条件</param>
         /// <param name="msg">异常消息</param>
         /// <returns></returns>
-        public static void ThrowIf(bool throwIf, string msg = "异常")
+        internal static void ThrowIf(bool throwIf, string msg = "异常")
         {
             if (throwIf)
             {
@@ -49,7 +49,7 @@ namespace Jc.Util
         /// <param name="msg">异常消息</param>
         /// <param name="isStrict">严格模式 true</param>
         /// <returns></returns>
-        public static void ThrowIfNull(object obj,string msg = "异常", bool isStrict = true)
+        internal static void ThrowIfNull(object obj,string msg = "异常", bool isStrict = true)
         {
             if (IsNullOrEmpty(obj,isStrict))
             {
@@ -64,7 +64,7 @@ namespace Jc.Util
         /// <param name="msg">异常消息</param>
         /// <param name="isStrict">默认严格模式下string.Empty,Guid.Empty,int 0,ICollection.Count 0 都会被作为false</param>
         /// <returns></returns>
-        public static void ThrowIfNotNull(object obj, string msg = "异常", bool isStrict = true)
+        internal static void ThrowIfNotNull(object obj, string msg = "异常", bool isStrict = true)
         {
             if (!IsNullOrEmpty(obj,isStrict))
             {
@@ -79,7 +79,7 @@ namespace Jc.Util
         /// <param name="obj">对象</param>
         /// <param name="isStrict">严格模式</param>
         /// <returns></returns>
-        public static bool IsNullOrEmpty(object obj, bool isStrict = true)
+        internal static bool IsNullOrEmpty(object obj, bool isStrict = true)
         {
             bool result = false;
             if (obj == null)
@@ -128,14 +128,14 @@ namespace Jc.Util
             }
             return result;
         }
-    
+
         /// <summary>
         /// 获取Exception详细异常
         /// </summary>
         /// <param name="ex"></param>
         /// <param name="withStackTrace"></param>
         /// <returns></returns>
-        public static string GetExceptionMsg(Exception ex,bool withStackTrace = true)
+        internal static string GetExceptionMsg(Exception ex,bool withStackTrace = true)
         {
             if(ex.InnerException != null)
             {

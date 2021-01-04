@@ -154,7 +154,8 @@ namespace Jc.Core
                     connection.Dispose();
                 } 
                 catch(Exception ex)
-                { 
+                {
+                    DbLogHelper.Error($"CloseDbConnection Error:{DbExHelper.GetExceptionMsg(ex)}");
                 }
             }
         }
