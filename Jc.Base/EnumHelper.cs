@@ -45,13 +45,14 @@ namespace Jc.Core
                     string key = GetDisplayName(field);
                     EnumItemModel enumItem = new EnumItemModel()
                     {
-                        Name = enumName,
+                        Name = field.Name,
                         DisplayName = GetDisplayName(field),
                         Value = value
                     };
                     enumModel.EnumItems.Add(enumItem);
                 }
             }
+            enumModel.EnumItems.Sort((a,b)=> { return a.Value - b.Value; });
             #endregion
             return enumModel;
         }
