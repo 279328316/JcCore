@@ -12,7 +12,6 @@ namespace Jc.Core
     /// </summary>
     public class LogHelper
     {
-        private static object loggerLock = new object();
         private static ILog logger;
         private static ILog errorLogger;
 
@@ -83,7 +82,7 @@ namespace Jc.Core
         /// 记录日志
         /// </summary>
         /// <param name="msg"></param>
-        internal static void WriteLog(string msg)
+        public static void WriteLog(string msg)
         {
             Info(msg);
         }
@@ -92,7 +91,7 @@ namespace Jc.Core
         /// 记录日志
         /// </summary>
         /// <param name="msg"></param>
-        internal static void Info(string msg)
+        public static void Info(string msg)
         {
             if (Logger != null)
             {
@@ -111,7 +110,7 @@ namespace Jc.Core
         /// 记录日志
         /// </summary>
         /// <param name="msg"></param>
-        internal static void Warn(string msg)
+        public static void Warn(string msg)
         {
             if (Logger != null)
             {
@@ -130,7 +129,7 @@ namespace Jc.Core
         /// 记录日志
         /// </summary>
         /// <param name="msg"></param>
-        internal static void Error(string msg)
+        public static void Error(string msg)
         {
             if (ErrorLogger != null)
             {
