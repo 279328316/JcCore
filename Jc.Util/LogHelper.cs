@@ -1,11 +1,13 @@
 ﻿using log4net;
+using log4net.Config;
 using log4net.Repository;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 
-namespace Jc.Core
+namespace Jc.Util
 {
     /// <summary>
     /// Log Helper
@@ -46,7 +48,7 @@ namespace Jc.Core
         }
 
         /// <summary>
-        /// 初始化DbLogger
+        /// 初始化Logger
         /// </summary>
         public static void SetLogger(string repositoryName,string loggerName)
         {
@@ -58,7 +60,7 @@ namespace Jc.Core
         }
 
         /// <summary>
-        /// 初始化DbErrorLogger
+        /// 初始化ErrorLogger
         /// </summary>
         public static void SetErrorLogger(string repositoryName, string errorLoggerName)
         {
@@ -78,6 +80,37 @@ namespace Jc.Core
             ErrorLogger = errorLogger;
         }
 
+        /// <summary>
+        /// 初始化Logger
+        /// </summary>
+        public static void InitLogger(string logConfigPath,string repositoryName, string loggerName, string errorLoggerName = null)
+        {
+            if (logger == null)
+            {
+                ILoggerRepository repository = GetLogRepository(logConfigPath, repositoryName);
+                logger = LogManager.GetLogger(repository.Name, loggerName);
+            }
+            if (errorLogger == null && !string.IsNullOrEmpty(errorLoggerName))
+            {
+                ILoggerRepository repository = GetLogRepository(logConfigPath, repositoryName);
+                errorLogger = LogManager.GetLogger(repository.Name, errorLoggerName);
+            }
+        }
+
+        /// <summary>
+        /// 获取LogRepository
+        /// </summary>
+        /// <returns></returns>
+        private static ILoggerRepository GetLogRepository(string logConfigPath,string repositoryName)
+        {
+            ILoggerRepository repository = LogManager.GetAllRepositories().FirstOrDefault(a => a.Name == repositoryName);
+            if (repository == null)
+            {
+                repository = LogManager.CreateRepository(repositoryName);
+                XmlConfigurator.Configure(repository, new FileInfo(logConfigPath));
+            }
+            return repository;
+        }
         /// <summary>
         /// 记录日志
         /// </summary>
