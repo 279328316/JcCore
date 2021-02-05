@@ -65,7 +65,7 @@ namespace Jc.Core
             ILoggerRepository repository = LogManager.GetAllRepositories().FirstOrDefault(a => a.Name == repositoryName);
             if (repository != null)
             {
-                Logger = LogManager.GetLogger(repository.Name, errorLoggerName);
+                ErrorLogger = LogManager.GetLogger(repository.Name, errorLoggerName);
             }
         }
 
