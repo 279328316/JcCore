@@ -71,9 +71,9 @@ namespace Jc.Core
         }
 
         /// <summary>
-        /// 初始化DbLogger
+        /// 初始化Logger
         /// </summary>
-        public static void InitDbLogger(ILog logger,ILog errorLogger = null)
+        public static void InitLogger(ILog logger,ILog errorLogger = null)
         {
             Logger = logger;
             ErrorLogger = errorLogger;
