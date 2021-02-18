@@ -25,6 +25,7 @@ namespace Jc.Core.TestApp.Test
                 PhoneNo = $"133810{i}".PadRight(11, '0'),
                 Sex = (Sex)Enum.Parse(typeof(Sex), (i % 2).ToString()),
                 Birthday = DateTime.Now.AddYears(-1).AddHours(-1 * i),
+                WeChatOpenId = $"WeChatOpenId{i}",
                 IsDelete = i % 2 == 0 ? true : false,
                 UserStatus = i % 2,
                 AddUser = Guid.NewGuid(),

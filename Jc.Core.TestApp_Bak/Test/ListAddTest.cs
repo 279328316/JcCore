@@ -36,6 +36,7 @@ namespace Jc.Core.TestApp.Test
                     PhoneNo = $"133810{i}".PadRight(11,'0'),
                     Sex = (Sex)Enum.Parse(typeof(Sex),(i%2).ToString()),
                     Birthday = DateTime.Now.AddYears(-1).AddHours(-1*i),
+                    WeChatOpenId = $"WeChatOpenId{i}",
                     IsDelete = i % 2 == 0 ? true : false,
                     UserStatus = i % 2,
                     AddUser = Guid.NewGuid(),
@@ -76,6 +77,7 @@ namespace Jc.Core.TestApp.Test
                 users[i].PhoneNo = $"133810{i}".PadRight(11, '0');                
                 users[i].Sex = (Sex)Enum.Parse(typeof(Sex), (i % 2).ToString());
                 users[i].Birthday = DateTime.Now.AddYears(-1).AddHours(-1 * i);
+                users[i].WeChatOpenId = $"WeChatOpenId{i}";
                 users[i].IsDelete = i % 2 == 0 ? true : false;
                 users[i].UserStatus = i % 2;
                 users[i].LastUpdateUser = Guid.NewGuid();

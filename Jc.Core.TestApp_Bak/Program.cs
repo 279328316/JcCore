@@ -11,7 +11,7 @@ namespace Jc.Core.TestApp
         {
             Console.WriteLine("测试即将开始,请按任意键继续.");
             Console.ReadKey();
-            MySqlTest test = new MySqlTest();
+            DbContextTest test = new DbContextTest();
             test.Test();
             List<KeyValuePair<Type, string>> list = new List<KeyValuePair<Type, string>>();
             KeyValuePair<Type, string> kv = list.FirstOrDefault();
