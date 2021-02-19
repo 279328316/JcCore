@@ -161,8 +161,20 @@ namespace Jc.Core.Data
         {
             DbCommand dbCommand = CreateDbCommand();
             DtoMapping dtoDbMapping = DtoMappingHelper.GetDtoMapping<T>();
-            subTableArg = dtoDbMapping.GetTableName(subTableArg);
-            dbCommand.CommandText = $"Select id from dbo.sysobjects where id = object_id(N'[dbo].[{subTableArg}]')";
+            string tableName = dtoDbMapping.GetTableName(subTableArg);
+            dbCommand.CommandText = $"Select id from dbo.sysobjects where id = object_id(N'[dbo].[{tableName}]')";
+            return dbCommand;
+        }
+
+        /// <summary>
+        /// 获取检查表是否存在DbCommand
+        /// </summary>
+        /// <param name="tableName">表名称</param>
+        /// <returns></returns>
+        public override DbCommand GetCheckTableExistsDbCommand(string tableName)
+        {
+            DbCommand dbCommand = CreateDbCommand();
+            dbCommand.CommandText = $"Select id from dbo.sysobjects where id = object_id(N'[dbo].[{tableName}]')";
             return dbCommand;
         }
 

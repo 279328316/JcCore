@@ -26,9 +26,9 @@ namespace Jc.Core
         /// 已自动开启事务
         /// </summary>
         /// <returns></returns>
-        public DbTransContext GetTransDbContext(IsolationLevel? level = null)
+        public TransactionDbContext GetTransactionDbContext(IsolationLevel? level = null)
         {
-            DbTransContext dbContext = new DbTransContext(this.ConnectString, this.DbType, this.subTableArgList, level);
+            TransactionDbContext dbContext = new TransactionDbContext(this.ConnectString, this.DbType, level);
             return dbContext;
         }
     }

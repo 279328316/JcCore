@@ -223,6 +223,18 @@ namespace Jc.Core.Data
             dbCommand.CommandText = $"Select * from information_schema.tables where table_schema='public' and table_type='BASE TABLE' and table_name='{tableName}';";
             return dbCommand;
         }
+        
+        /// <summary>
+        /// 获取检查表是否存在DbCommand
+        /// </summary>
+        /// <param name="tableName">表名称</param>
+        /// <returns></returns>
+        public override DbCommand GetCheckTableExistsDbCommand(string tableName)
+        {
+            DbCommand dbCommand = CreateDbCommand();
+            dbCommand.CommandText = $"Select * from information_schema.tables where table_schema='public' and table_type='BASE TABLE' and table_name='{tableName}';";
+            return dbCommand;
+        }
 
         /// <summary>
         /// 获取建表Sql

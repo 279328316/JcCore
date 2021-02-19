@@ -124,9 +124,16 @@ namespace Jc.Core.Data
         /// 获取检查表是否存在DbCommand
         /// </summary>
         /// <typeparam name="T"></typeparam>
-        /// <param name="tableName">表名称,如果为空,则使用T对应表名称</param>
+        /// <param name="subTableArg">表名称,如果为空,则使用T对应表名称</param>
         /// <returns></returns>
-        public abstract DbCommand GetCheckTableExistsDbCommand<T>(string tableName = null);
+        public abstract DbCommand GetCheckTableExistsDbCommand<T>(string subTableArg = null);
+
+        /// <summary>
+        /// 获取检查表是否存在DbCommand
+        /// </summary>
+        /// <param name="tableName">表名称</param>
+        /// <returns></returns>
+        public abstract DbCommand GetCheckTableExistsDbCommand(string tableName);
 
         /// <summary>
         /// 获取建表DbCommand

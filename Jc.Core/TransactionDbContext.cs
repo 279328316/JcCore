@@ -19,7 +19,7 @@ namespace Jc.Core
     /// 事务DbContext
     /// 事务需要明确提交或撤回
     /// </summary>
-    public sealed class DbTransContext : DbContext
+    public sealed class TransactionDbContext : SubTableDbContext
     {
         internal bool isTransaction = false; //是否为事务
 
@@ -30,23 +30,15 @@ namespace Jc.Core
         private IsolationLevel? isolationLevel = null;
 
         /// <summary>
-        /// TransDb使用分表参数时,先创建分表DbContext
+        /// TransDb使用分表参数时,
+        /// 先创建TransactionDbContext,使用AddSubTableArg添加分表参数
         /// </summary>
-        /// <param name="connectString"></param>
-        /// <param name="dbType"></param>
-        /// <param name="subTableArgList"></param>
-        /// <param name="level"></param>
-        internal DbTransContext(string connectString, DatabaseType dbType = DatabaseType.MsSql,
-                                List<KeyValuePair<Type,string>> subTableArgList = null, IsolationLevel? level = null) :base(connectString,dbType)
+        /// <param name="connectString">connectString</param>
+        /// <param name="dbType">DatabaseType</param>
+        /// <param name="level">IsolationLevel</param>
+        internal TransactionDbContext(string connectString, DatabaseType dbType = DatabaseType.MsSql,
+                                                IsolationLevel? level = null) :base(connectString,dbType)
         {
-            if (subTableArgList != null)
-            {   //使用新List,防止变量污染
-                this.subTableArgList = new List<KeyValuePair<Type, string>>();
-                for (int i = 0; i < subTableArgList.Count; i++)
-                {
-                    this.subTableArgList.Add(new KeyValuePair<Type, string>(subTableArgList[i].Key, subTableArgList[i].Value));
-                }
-            }
             this.isolationLevel = level;
             BeginTrans();
         }
@@ -150,7 +142,7 @@ namespace Jc.Core
         /// <summary>
         /// 关闭连接
         /// </summary>
-        ~DbTransContext()
+        ~TransactionDbContext()
         {
             if (isTransaction)
             {

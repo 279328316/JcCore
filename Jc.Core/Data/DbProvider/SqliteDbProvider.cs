@@ -191,6 +191,18 @@ namespace Jc.Core.Data
             dbCommand.CommandText = $"select *  from sqlite_master where type='table' and name = '{tableName}';";
             return dbCommand;
         }
+        
+        /// <summary>
+        /// 获取检查表是否存在DbCommand
+        /// </summary>
+        /// <param name="tableName">表名称</param>
+        /// <returns></returns>
+        public override DbCommand GetCheckTableExistsDbCommand(string tableName)
+        {
+            DbCommand dbCommand = CreateDbCommand();
+            dbCommand.CommandText = $"select *  from sqlite_master where type='table' and name = '{tableName}';";
+            return dbCommand;
+        }
 
         /// <summary>
         /// 获取建表Sql

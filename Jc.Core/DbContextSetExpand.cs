@@ -21,8 +21,14 @@ namespace Jc.Core
     /// </summary>
     public partial class DbContext
     {
+        #region Static Cache
+        // 表是否已存在,缓存
+        private static Dictionary<string, bool> tableExistsDic = new Dictionary<string, bool>();
+
+        #endregion
+
         #region SetMethods
-        
+
         /// <summary>
         /// 保存or更新数据对象
         /// </summary>
@@ -39,7 +45,7 @@ namespace Jc.Core
             DtoMapping dtoDbMapping = DtoMappingHelper.GetDtoMapping<T>();
             object pkValue = dtoDbMapping.PkMap.Pi.GetValue(dto);
             
-            if (CheckIsNullOrEmpty(pkValue))
+            if (CheckIsNullOrEmpty(pkValue, dtoDbMapping.PkMap.PropertyType))
             {
                 rowCount = Add(dto, select);
             }
@@ -51,16 +57,48 @@ namespace Jc.Core
         }
 
         /// <summary>
-        /// 批量保存数据
+        /// 批量插入或批量更新记录,不能同时插入和更新数据
+        /// 以第一条数据主键属性值判断,插入或更新
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="list">实体对象</param>
         /// <param name="select">查询属性</param>
-        /// <param name="useTransaction">使用事务操作 默认false</param>
+        /// <param name="useTransaction">使用事务操作 默认true</param>
         /// <param name="progress">保存进度</param>
-        public int SetList<T>(List<T> list, Expression<Func<T, object>> select = null, bool useTransaction = false, IProgress<double> progress = null) where T : class, new()
+        public int SetList<T>(List<T> list, Expression<Func<T, object>> select = null, bool useTransaction = true, IProgress<double> progress = null) where T : class, new()
         {
             if(list==null || list.Count<=0)
+            {
+                return 0;
+            }
+            int rowCount = 0;
+            DtoMapping dtoDbMapping = DtoMappingHelper.GetDtoMapping<T>();
+
+            object pkValue = dtoDbMapping.PkMap.Pi.GetValue(list[0]);
+            if (CheckIsNullOrEmpty(pkValue, dtoDbMapping.PkMap.PropertyType))
+            {
+                rowCount = AddList(list, select, useTransaction, progress);
+            }
+            else
+            {
+                rowCount = UpdateList(list, select, useTransaction, progress);
+            }
+            return rowCount;
+        }
+
+
+        /// <summary>
+        /// 批量保存数据
+        /// 批量操作数据为插入和更新操作的数据List
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="list">实体对象</param>
+        /// <param name="select">查询属性</param>
+        /// <param name="useTransaction">使用事务操作 默认true</param>
+        /// <param name="progress">保存进度</param>
+        private int SetList_Bak<T>(List<T> list, Expression<Func<T, object>> select = null, bool useTransaction = true, IProgress<double> progress = null) where T : class, new()
+        {
+            if (list == null || list.Count <= 0)
             {
                 return 0;
             }
@@ -73,7 +111,7 @@ namespace Jc.Core
             for (int i = 0; i < list.Count; i++)
             {
                 object pkValue = dtoDbMapping.PkMap.Pi.GetValue(list[i]);
-                if (CheckIsNullOrEmpty(pkValue))
+                if (CheckIsNullOrEmpty(pkValue, dtoDbMapping.PkMap.PropertyType))
                 {
                     addList.Add(list[i]);
                 }
@@ -84,7 +122,7 @@ namespace Jc.Core
             }
             #endregion
 
-            if(useTransaction)
+            if (useTransaction)
             {
                 if (addList.Count > 0 && updateList.Count > 0)
                 {
@@ -108,9 +146,9 @@ namespace Jc.Core
         /// <typeparam name="T"></typeparam>
         /// <param name="list">实体对象 List</param>
         /// <param name="select">查询属性</param>
-        /// <param name="useTransaction">使用事务操作 默认false</param>
+        /// <param name="useTransaction">使用事务操作 默认true</param>
         /// <param name="progress">进度通知</param>
-        public async Task<int> SetListSync<T>(List<T> list, Expression<Func<T, object>> select = null, bool useTransaction = false, IProgress<double> progress = null) where T : class, new()
+        public async Task<int> SetListSync<T>(List<T> list, Expression<Func<T, object>> select = null, bool useTransaction = true, IProgress<double> progress = null) where T : class, new()
         {
             int rowCount = await Task.Run(() => { return SetList(list, select, useTransaction, progress); });
             return rowCount;
@@ -205,9 +243,9 @@ namespace Jc.Core
         /// <typeparam name="T"></typeparam>
         /// <param name="list">实体对象 List</param>
         /// <param name="select">查询属性</param>
-        /// <param name="useTransaction">使用事务操作 默认false</param>
+        /// <param name="useTransaction">使用事务操作 默认true</param>
         /// <param name="progress">进度通知</param>
-        public int AddList<T>(List<T> list, Expression<Func<T, object>> select = null,bool useTransaction = false, IProgress<double> progress = null) where T : class, new()
+        public int AddList<T>(List<T> list, Expression<Func<T, object>> select = null,bool useTransaction = true, IProgress<double> progress = null) where T : class, new()
         {
             if (list == null || list.Count <= 0)
             {
@@ -342,9 +380,9 @@ namespace Jc.Core
         /// <typeparam name="T"></typeparam>
         /// <param name="list">实体对象 List</param>
         /// <param name="select">查询属性</param>
-        /// <param name="useTransaction">使用事务操作 默认false</param>
+        /// <param name="useTransaction">使用事务操作 默认true</param>
         /// <param name="progress">进度通知</param>
-        public async Task<int> AddListSync<T>(List<T> list, Expression<Func<T, object>> select = null, bool useTransaction = false, IProgress<double> progress = null) where T : class, new()
+        public async Task<int> AddListSync<T>(List<T> list, Expression<Func<T, object>> select = null, bool useTransaction = true, IProgress<double> progress = null) where T : class, new()
         {
             int rowCount = await Task.Run(() => { return AddList(list, select, useTransaction, progress); });
             return rowCount;
@@ -393,9 +431,9 @@ namespace Jc.Core
         /// <typeparam name="T"></typeparam>
         /// <param name="list">实体对象</param>
         /// <param name="select">更新属性</param>
-        /// <param name="useTransaction">使用事务操作 默认false</param>
+        /// <param name="useTransaction">使用事务操作 默认true</param>
         /// <param name="progress">进度通知</param>
-        public int UpdateList<T>(List<T> list, Expression<Func<T, object>> select = null, bool useTransaction = false, IProgress<double> progress = null) where T : class, new()
+        public int UpdateList<T>(List<T> list, Expression<Func<T, object>> select = null, bool useTransaction = true, IProgress<double> progress = null) where T : class, new()
         {
             if (list == null || list.Count <= 0)
             {
@@ -493,9 +531,9 @@ namespace Jc.Core
         /// <typeparam name="T"></typeparam>
         /// <param name="list">实体对象 List</param>
         /// <param name="select">查询属性</param>
-        /// <param name="useTransaction">使用事务操作 默认false</param>
+        /// <param name="useTransaction">使用事务操作 默认true</param>
         /// <param name="progress">进度通知</param>
-        public async Task<int> UpdateListSync<T>(List<T> list, Expression<Func<T, object>> select = null, bool useTransaction = false, IProgress<double> progress = null) where T : class, new()
+        public async Task<int> UpdateListSync<T>(List<T> list, Expression<Func<T, object>> select = null, bool useTransaction = true, IProgress<double> progress = null) where T : class, new()
         {
             int rowCount = await Task.Run(() => { return UpdateList(list, select, useTransaction, progress); });
             return rowCount;
@@ -594,7 +632,7 @@ namespace Jc.Core
             }
             return rowCount;
         }
-        
+
         /// <summary>
         /// 检查表是否已存在
         /// </summary>
@@ -603,7 +641,15 @@ namespace Jc.Core
         public bool CheckTableExists<T>() where T : class, new()
         {
             bool result = false;
-            using (DbCommand dbCommand = dbProvider.GetCheckTableExistsDbCommand<T>(this.GetSubTableArg<T>()))
+            string subTableArg = this.GetSubTableArg<T>();
+            DtoMapping dtoDbMapping = DtoMappingHelper.GetDtoMapping<T>();
+            string tableName = dtoDbMapping.GetTableName(subTableArg);
+            if (tableExistsDic.ContainsKey(tableName))
+            {
+                result = true;
+                return result;
+            }
+            using (DbCommand dbCommand = dbProvider.GetCheckTableExistsDbCommand(tableName))
             {
                 try
                 {
@@ -611,6 +657,17 @@ namespace Jc.Core
                     DbDataReader dr = dbCommand.ExecuteReader();
                     result = dr.HasRows;
                     CloseDbConnection(dbCommand);
+
+                    if(result == true)
+                    {
+                        lock (tableExistsDic)
+                        {
+                            if (!tableExistsDic.ContainsKey(tableName))
+                            {
+                                tableExistsDic.Add(tableName, true);
+                            }
+                        }
+                    }
                 }
                 catch (Exception ex)
                 {
@@ -649,9 +706,10 @@ namespace Jc.Core
         /// 默认严格模式下string.Empty,Guid.Empty,int 0,ICollection.Count 0 都会被作为false
         /// </summary>
         /// <param name="obj">对象</param>
+        /// <param name="objType">对象类型</param>
         /// <param name="isStrict">严格模式</param>
         /// <returns></returns>
-        private bool CheckIsNullOrEmpty(object obj, bool isStrict = true)
+        private bool CheckIsNullOrEmpty(object obj,Type objType, bool isStrict = true)
         {
             bool result = false;
             if (obj == null)
@@ -660,7 +718,7 @@ namespace Jc.Core
             }
             else if (isStrict)
             {
-                Type type = obj.GetType();
+                Type type = objType;
                 if (type == typeof(string))
                 {
                     if (string.IsNullOrEmpty(obj.ToString()))
