@@ -59,6 +59,29 @@ namespace Jc.Core
             return subTableDbContext;
         }
 
+        /// <summary>
+        /// 设置分表dbContext
+        /// 需要为操作对象设置可变表名称
+        /// 如TableAttr的Name为Data{0}.tablePfx参数为2000.则表名称为Data2000
+        /// </summary>
+        /// <typeparam name="T">操作对象类型</typeparam>
+        /// <param name="subTableArg">分表参数</param>
+        /// <returns>返回subTableDbContext.只能用于指定分表操作.</returns>
+        public virtual SubTableDbContext SubTable<T>(object subTableArg)
+        {
+            SubTableDbContext subTableDbContext = null;
+            if (this is SubTableDbContext)
+            {
+                subTableDbContext = (SubTableDbContext)this;
+                subTableDbContext.AddSubTableArg<T>(subTableArg);
+            }
+            else
+            {
+                subTableDbContext = new SubTableDbContext(this.ConnectString, this.DbType);
+                subTableDbContext.AddSubTableArg<T>(subTableArg);
+            }
+            return subTableDbContext;
+        }
         #endregion 
     }
 }
