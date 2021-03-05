@@ -176,5 +176,49 @@ namespace Jc.Util
                 }
             }
         }
+
+        /// <summary>
+        /// 记录日志
+        /// </summary>
+        /// <param name="msg"></param>
+        /// <param name="ex">异常信息</param>
+        public static void Error(string msg,Exception ex)
+        {
+            if (ErrorLogger != null)
+            {
+                try
+                {
+                    if (string.IsNullOrEmpty(msg))
+                    {
+                        msg = "";
+                    }
+                    msg += $"{ex.Message}\r\n{ex.StackTrace}";
+                    if (ex.InnerException != null)
+                    {
+                        ex = GetOriginalException(ex.InnerException);
+                        msg += $"{ex.Message}\r\n{ex.StackTrace}";
+                    }
+                    ErrorLogger.Error(msg);
+                }
+                catch (Exception ex1)
+                {
+
+                }
+            }
+        }
+
+        /// <summary>
+        /// 获取Original Exception
+        /// </summary>
+        /// <param name="ex"></param>
+        /// <returns></returns>
+        private static Exception GetOriginalException(Exception ex)
+        {
+            while (ex.InnerException != null)
+            {
+                return GetOriginalException(ex.InnerException);
+            }
+            return ex;
+        }
     }
 }
