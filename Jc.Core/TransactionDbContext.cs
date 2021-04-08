@@ -138,18 +138,5 @@ namespace Jc.Core
             }
             isTransaction = false;
         }
-
-        /// <summary>
-        /// 关闭连接
-        /// </summary>
-        ~TransactionDbContext()
-        {
-            if (isTransaction)
-            {
-                //RollbackTrans();
-                throw new Exception("未正确处理的事务,需要明确提交或撤回.");
-            }
-        }
-
     }
 }

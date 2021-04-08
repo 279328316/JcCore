@@ -267,7 +267,8 @@ namespace Jc.Core
             }
             //因为参数有2100的限制
             int perOpAmount = 2000/ piMapList.Count; //每次添加Amount
-            if (useTransaction)
+            bool isTransactionDbContext = this is TransactionDbContext;
+            if (useTransaction && !isTransactionDbContext)
             {
                 #region Use Transaction
                 DbConnection dbConnection = GetDbConnection();                
@@ -452,7 +453,8 @@ namespace Jc.Core
             //因为参数有2100的限制 待更新字段 + 主键
             int perOpAmount = 2000 / (piMapList.Count + 1); //每次更新Amount
 
-            if (useTransaction)
+            bool isTransactionDbContext = this is TransactionDbContext;
+            if (useTransaction && !isTransactionDbContext)
             {
                 #region Use Transaction
                 DbConnection dbConnection = GetDbConnection();                
