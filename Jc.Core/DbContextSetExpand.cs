@@ -267,11 +267,11 @@ namespace Jc.Core
             }
             //因为参数有2100的限制
             int perOpAmount = 2000/ piMapList.Count; //每次添加Amount
-            bool isTransactionDbContext = this is TransactionDbContext;
-            if (useTransaction && !isTransactionDbContext)
+
+            if (useTransaction && !isTransaction)
             {
                 #region Use Transaction
-                DbConnection dbConnection = GetDbConnection();                
+                DbConnection dbConnection = GetDbConnection();
                 DbTransaction transaction = dbConnection.BeginTransaction();
                 int i = 0;
                 T curItem;
@@ -322,53 +322,52 @@ namespace Jc.Core
                     transaction.Rollback();
                     CloseDbConnection(dbConnection);
                     throw ex;
-                }                
+                }
                 #endregion
             }
             else
             {
                 #region Not Use Transaction
-                DbConnection dbConnection = GetDbConnection();                
                 int i = 0;
                 T curItem;
-                try
+                List<T> curOpList = new List<T>();
+                for (i = 0; i < list.Count; i++)
                 {
-                    List<T> curOpList = new List<T>();
-                    for (i = 0; i < list.Count; i++)
-                    {
-                        #region 设置Id
-                        curItem = list[i];
-                        object pkValue = dtoDbMapping.PkMap.Pi.GetValue(list[i]);
-                        if (dtoDbMapping.PkMap.PropertyType == typeof(Guid) || dtoDbMapping.PkMap.PropertyType == typeof(Guid?))
-                        {   //Guid Id
-                            if (pkValue == null || (Guid)pkValue == Guid.Empty)
-                            {   //生成Guid
-                                dtoDbMapping.PkMap.Pi.SetValue(list[i], Guid.NewGuid());
-                            }
-                        }
-                        #endregion
-
-                        curOpList.Add(list[i]);
-                        if ((i + 1) % perOpAmount == 0 || i == list.Count - 1)
-                        {
-                            using (DbCommand dbCommand = dbProvider.GetInsertDbCmd(curOpList, piMapList, this.GetSubTableArg<T>()))
-                            {
-                                dbCommand.Connection = dbConnection;
-                                rowCount += dbCommand.ExecuteNonQuery();
-                            }
-                            curOpList.Clear();
-                            if (progress != null)
-                            {
-                                progress.Report((i + 1) * 1.0 / list.Count);
-                            }
+                    #region 设置Id
+                    curItem = list[i];
+                    object pkValue = dtoDbMapping.PkMap.Pi.GetValue(list[i]);
+                    if (dtoDbMapping.PkMap.PropertyType == typeof(Guid) || dtoDbMapping.PkMap.PropertyType == typeof(Guid?))
+                    {   //Guid Id
+                        if (pkValue == null || (Guid)pkValue == Guid.Empty)
+                        {   //生成Guid
+                            dtoDbMapping.PkMap.Pi.SetValue(list[i], Guid.NewGuid());
                         }
                     }
-                    CloseDbConnection(dbConnection);
-                }
-                catch (Exception ex)
-                {
-                    CloseDbConnection(dbConnection);
-                    throw ex;
+                    #endregion
+
+                    curOpList.Add(list[i]);
+                    if ((i + 1) % perOpAmount == 0 || i == list.Count - 1)
+                    {
+                        using (DbCommand dbCommand = dbProvider.GetInsertDbCmd(curOpList, piMapList, this.GetSubTableArg<T>()))
+                        {
+                            try
+                            {
+                                SetDbConnection(dbCommand);
+                                rowCount += dbCommand.ExecuteNonQuery();
+                                CloseDbConnection(dbCommand);
+                            }
+                            catch (Exception ex)
+                            { 
+                                CloseDbConnection(dbCommand);
+                                throw ex;
+                            }
+                        }
+                        curOpList.Clear();
+                        if (progress != null)
+                        {
+                            progress.Report((i + 1) * 1.0 / list.Count);
+                        }
+                    }
                 }
                 #endregion 
             }
@@ -453,8 +452,7 @@ namespace Jc.Core
             //因为参数有2100的限制 待更新字段 + 主键
             int perOpAmount = 2000 / (piMapList.Count + 1); //每次更新Amount
 
-            bool isTransactionDbContext = this is TransactionDbContext;
-            if (useTransaction && !isTransactionDbContext)
+            if (useTransaction && !isTransaction)
             {
                 #region Use Transaction
                 DbConnection dbConnection = GetDbConnection();                
@@ -494,34 +492,32 @@ namespace Jc.Core
             else
             {
                 #region Not Use Transaction
-                DbConnection dbConnection = GetDbConnection();                
-                try
+                List<T> curOpList = new List<T>();
+                for (int i = 0; i < list.Count; i++)
                 {
-                    List<T> curOpList = new List<T>();
-                    for (int i = 0; i < list.Count; i++)
+                    curOpList.Add(list[i]);
+                    if ((i + 1) % perOpAmount == 0 || i == list.Count - 1)
                     {
-                        curOpList.Add(list[i]);
-                        if ((i + 1) % perOpAmount == 0 || i == list.Count - 1)
+                        using (DbCommand dbCommand = dbProvider.GetUpdateDbCmd(curOpList, piMapList, this.GetSubTableArg<T>()))
                         {
-                            using (DbCommand dbCommand = dbProvider.GetUpdateDbCmd(curOpList, piMapList, this.GetSubTableArg<T>()))
+                            try
                             {
-                                dbCommand.Connection = dbConnection;
+                                SetDbConnection(dbCommand);
                                 rowCount += dbCommand.ExecuteNonQuery();
                             }
-                            curOpList.Clear();
-                            if (progress != null)
+                            catch (Exception ex)
                             {
-                                progress.Report((i + 1) * 1.0 / list.Count);
+                                CloseDbConnection(dbCommand);
+                                throw ex;
                             }
                         }
+                        curOpList.Clear();
+                        if (progress != null)
+                        {
+                            progress.Report((i + 1) * 1.0 / list.Count);
+                        }
                     }
-                    CloseDbConnection(dbConnection);
                 }
-                catch (Exception ex)
-                {
-                    CloseDbConnection(dbConnection);
-                    throw ex;
-                }                
                 #endregion 
             }
             return rowCount;

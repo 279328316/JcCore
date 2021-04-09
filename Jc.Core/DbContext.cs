@@ -22,6 +22,8 @@ namespace Jc.Core
     {
         internal DbProvider dbProvider;    //DbProvider
 
+        internal bool isTransaction = false; //是否为事务
+        
         /// <summary>
         /// Ctor
         /// <param name="connectString">数据库连接串或数据库名称</param>

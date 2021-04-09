@@ -21,8 +21,6 @@ namespace Jc.Core
     /// </summary>
     public sealed class TransactionDbContext : SubTableDbContext
     {
-        internal bool isTransaction = false; //是否为事务
-
         internal DbConnection transDbConnection;  //dbConnection
 
         private DbTransaction dbTransaction;//事务使用
@@ -70,10 +68,15 @@ namespace Jc.Core
         /// <returns></returns>
         internal override void SetDbConnection(DbCommand dbCommand)
         {
-            base.SetDbConnection(dbCommand);
-            if(isTransaction)
+            if (isTransaction)
             {
+                dbCommand.Connection = transDbConnection;
                 dbCommand.Transaction = dbTransaction;
+            }
+            else
+            {
+                //base.SetDbConnection(dbCommand);
+                throw new Exception("事务连接已关闭");
             }
         }
 
