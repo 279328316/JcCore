@@ -541,6 +541,10 @@ namespace Jc.Util
                     reader.Close();
                     reader.Dispose();
                 }
+                for(int i=0;i<response.Cookies.Count;i++)
+                {
+                    Cookies.Add(response.Cookies[i]);
+                }
             }
             catch (System.Exception ex)
             {
@@ -646,6 +650,10 @@ namespace Jc.Util
             {
                 foreach (string key in Headers.AllKeys)
                 {
+                    if (request.Headers.AllKeys.Contains(key))
+                    {
+                        request.Headers.Remove(key);
+                    }
                     request.Headers.Add(key, Headers[key]);
                 }
             }
