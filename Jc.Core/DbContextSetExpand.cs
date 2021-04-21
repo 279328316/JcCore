@@ -651,9 +651,12 @@ namespace Jc.Core
             {
                 try
                 {
-                    dbCommand.Connection = GetDbConnection();
-                    DbDataReader dr = dbCommand.ExecuteReader();
-                    result = dr.HasRows;
+                    SetDbConnection(dbCommand);
+                    using (DbDataReader dr = dbCommand.ExecuteReader())
+                    {
+                        result = dr.HasRows;
+                        dr.Close();
+                    }
                     CloseDbConnection(dbCommand);
 
                     if(result == true)

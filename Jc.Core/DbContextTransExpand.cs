@@ -24,6 +24,8 @@ namespace Jc.Core
         /// <summary>
         /// 获取事务DbContext
         /// 已自动开启事务
+        /// 注意:在MySql,Oracle中,DDL没有事务性，DDL自动提交,不能回滚.
+        /// 执行自动建表时,需要注意事务使用方式
         /// </summary>
         /// <returns></returns>
         public TransactionDbContext GetTransactionDbContext(IsolationLevel? level = null)

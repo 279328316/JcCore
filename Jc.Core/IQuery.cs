@@ -174,12 +174,14 @@ namespace Jc.Core
             {
                 try
                 {
-                    dbCommand.Connection = dbContext.GetDbConnection();
-                    DbDataReader dr = dbCommand.ExecuteReader();
-                    DataTable dt = dbContext.ConvertDataReaderToDataTable(dr,1);
-                    if (dt != null && dt.Rows.Count > 0)
+                    dbContext.SetDbConnection(dbCommand);
+                    using (DbDataReader dr = dbCommand.ExecuteReader())
                     {
-                        dto = dt.Rows[0].ToEntity<T>();
+                        DataTable dt = dbContext.ConvertDataReaderToDataTable(dr, 1);
+                        if (dt != null && dt.Rows.Count > 0)
+                        {
+                            dto = dt.Rows[0].ToEntity<T>();
+                        }
                     }
                     dbContext.CloseDbConnection(dbCommand);
                 }
@@ -206,7 +208,7 @@ namespace Jc.Core
             {
                 try
                 {
-                    dbCommand.Connection = dbContext.GetDbConnection();
+                    dbContext.SetDbConnection(dbCommand);
                     object objVal = dbCommand.ExecuteScalar();
                     if (objVal != DBNull.Value)
                     {   //使用属性字典
@@ -240,7 +242,7 @@ namespace Jc.Core
             {
                 try
                 {
-                    dbCommand.Connection = dbContext.GetDbConnection();
+                    dbContext.SetDbConnection(dbCommand);
                     object objVal = dbCommand.ExecuteScalar();
                     if (objVal != DBNull.Value)
                     {   //使用属性字典
@@ -272,7 +274,7 @@ namespace Jc.Core
             {
                 try
                 {
-                    dbCommand.Connection = dbContext.GetDbConnection();
+                    dbContext.SetDbConnection(dbCommand);
                     object objVal = dbCommand.ExecuteScalar();
                     if (objVal != DBNull.Value)
                     {   //使用属性字典
@@ -305,7 +307,7 @@ namespace Jc.Core
             {
                 try
                 {
-                    dbCommand.Connection = dbContext.GetDbConnection();
+                    dbContext.SetDbConnection(dbCommand);
                     object objVal = dbCommand.ExecuteScalar();
                     if (objVal != DBNull.Value)
                     {   //使用属性字典
@@ -338,11 +340,13 @@ namespace Jc.Core
             {
                 try
                 {
-                    dbCommand.Connection = this.dbContext.GetDbConnection();
-                    DbDataReader dr = dbCommand.ExecuteReader();
-                    DataTable dt = this.dbContext.ConvertDataReaderToDataTable(dr);
-                    list = dt.ToList<T>();
-                    this.dbContext.CloseDbConnection(dbCommand);
+                    this.dbContext.SetDbConnection(dbCommand);
+                    using (DbDataReader dr = dbCommand.ExecuteReader())
+                    {
+                        DataTable dt = this.dbContext.ConvertDataReaderToDataTable(dr);
+                        list = dt.ToList<T>();
+                    }
+                    dbContext.CloseDbConnection(dbCommand);
                 }
                 catch (Exception ex)
                 {
@@ -374,12 +378,12 @@ namespace Jc.Core
                 {
                     dbCommand = dbContext.DbProvider.GetQueryRecordsPageDbCommand<T>(filter, subTableArg);
                 }
-                dbCommand.Connection = dbContext.GetDbConnection();
-                DbDataReader dr = dbCommand.ExecuteReader();
-                DataTable dt = dbContext.ConvertDataReaderToDataTable(dr);
-
-                list = dt.ToList<T>();
-
+                dbContext.SetDbConnection(dbCommand);
+                using (DbDataReader dr = dbCommand.ExecuteReader())
+                {
+                    DataTable dt = dbContext.ConvertDataReaderToDataTable(dr);
+                    list = dt.ToList<T>();
+                }
                 int totalCount = 0;
                 DbCommand getRecCountDbCommand = dbContext.DbProvider.GetCountDbCommand<T>(filter, subTableArg);
                 getRecCountDbCommand.Connection = dbCommand.Connection;

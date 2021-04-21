@@ -215,7 +215,7 @@ namespace Jc.Core
                 {
                     try
                     {
-                        dbCommand.Connection = GetDbConnection();
+                        SetDbConnection(dbCommand);
                         result = dbCommand.ExecuteScalar();
                         CloseDbConnection(dbCommand);
                     }
@@ -263,7 +263,7 @@ namespace Jc.Core
                     dr.GetValues(objValues);
                     dt.LoadDataRow(objValues, true);
 
-                    if (rowsCount >= loadAmount)
+                    if (loadAmount.HasValue && rowsCount >= loadAmount)
                     {
                         break;
                     }
@@ -319,12 +319,14 @@ namespace Jc.Core
             {
                 try
                 {
-                    dbCommand.Connection = GetDbConnection();
-                    DbDataReader dr = dbCommand.ExecuteReader();
-                    DataTable dt = ConvertDataReaderToDataTable(dr,1);
-                    if (dt != null && dt.Rows.Count > 0)
+                    SetDbConnection(dbCommand);
+                    using (DbDataReader dr = dbCommand.ExecuteReader())
                     {
-                        dto = dt.Rows[0].ToEntity<T>();
+                        DataTable dt = ConvertDataReaderToDataTable(dr, 1);
+                        if (dt != null && dt.Rows.Count > 0)
+                        {
+                            dto = dt.Rows[0].ToEntity<T>();
+                        }
                     }
                     CloseDbConnection(dbCommand);
                 }
@@ -361,13 +363,14 @@ namespace Jc.Core
             {
                 try
                 {
-                    dbCommand.Connection = GetDbConnection();
-
-                    DbDataReader dr = dbCommand.ExecuteReader();
-                    DataTable dt = ConvertDataReaderToDataTable(dr,1);
-                    if (dt != null && dt.Rows.Count > 0)
+                    SetDbConnection(dbCommand);
+                    using (DbDataReader dr = dbCommand.ExecuteReader())
                     {
-                        dto = dt.Rows[0].ToEntity<T>();
+                        DataTable dt = ConvertDataReaderToDataTable(dr, 1);
+                        if (dt != null && dt.Rows.Count > 0)
+                        {
+                            dto = dt.Rows[0].ToEntity<T>();
+                        }
                     }
                     CloseDbConnection(dbCommand);
                 }
@@ -463,10 +466,12 @@ namespace Jc.Core
             {
                 try
                 {
-                    dbCommand.Connection = GetDbConnection();
-                    DbDataReader dr = dbCommand.ExecuteReader();
-                    DataTable dt = ConvertDataReaderToDataTable(dr);
-                    list = dt.ToList<T>();
+                    SetDbConnection(dbCommand);
+                    using (DbDataReader dr = dbCommand.ExecuteReader())
+                    {
+                        DataTable dt = ConvertDataReaderToDataTable(dr);
+                        list = dt.ToList<T>();
+                    }
                     CloseDbConnection(dbCommand);
                 }
                 catch (Exception ex)
@@ -560,9 +565,11 @@ namespace Jc.Core
             {
                 try
                 {
-                    dbCommand.Connection = GetDbConnection();
-                    DbDataReader dr = dbCommand.ExecuteReader();
-                    dt = ConvertDataReaderToDataTable(dr);
+                    SetDbConnection(dbCommand);
+                    using (DbDataReader dr = dbCommand.ExecuteReader())
+                    {
+                        dt = ConvertDataReaderToDataTable(dr);
+                    }
                     CloseDbConnection(dbCommand);
                 }
                 catch (Exception ex)
