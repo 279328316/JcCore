@@ -116,7 +116,7 @@ namespace Jc.Core
         /// <returns></returns>
         internal virtual void SetDbConnection(DbCommand dbCommand)
         {
-            DbConnection dbConnection = dbProvider.CreateDbConnection();
+            DbConnection dbConnection = GetDbConnection();
             dbCommand.Connection = dbConnection;
         }
 
@@ -130,7 +130,7 @@ namespace Jc.Core
             {
                 try
                 {
-                    dbCommand.Connection = GetDbConnection();
+                    SetDbConnection(dbCommand);
                     dbCommand.ExecuteNonQuery();
                     CloseDbConnection(dbCommand);
                 }
