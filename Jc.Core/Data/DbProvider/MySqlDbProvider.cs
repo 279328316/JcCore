@@ -272,7 +272,7 @@ namespace Jc.Core.Data
                 strBuilder.Append($"{piMap.FieldName} ");
 
                 string fieldType = attr.FieldType.ToLower();
-                string[] charFieldTypeList = "char,nchar,varchar,nvarchar".Split(',');
+                string[] charFieldTypeList = "char,nchar,varchar,nvarchar,tinyint".Split(',');
 
                 strBuilder.Append($" {attr.FieldType} ");
                 if (charFieldTypeList.Contains(fieldType))
