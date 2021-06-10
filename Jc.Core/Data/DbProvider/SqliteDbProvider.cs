@@ -22,25 +22,8 @@ namespace Jc.Core.Data
         public SqliteDbProvider(string connectString) : base(connectString)
         {
             if (sqliteCreator == null)
-            {   //使用静态变量缓存MySqlDbCreator
-                Assembly assembly;
-                string assemblyName = "Jc.Core.Sqlite";
-                string className = "SqliteDbCreator";
-                try
-                {
-                    //assembly = Assembly.LoadFrom($"{assemblyName}.dll");
-                    assembly = Assembly.Load($"{assemblyName}");
-                }
-                catch
-                {
-                    throw new Exception($"加载{className}访问模块失败.请检查是否已添加{assemblyName}引用.");
-                }
-                IDbCreator dbCreator = assembly.CreateInstance($"{assemblyName}.{className}") as IDbCreator;
-                if (dbCreator == null)
-                {
-                    throw new Exception($"加载{className}失败.");
-                }
-                sqliteCreator = dbCreator;
+            {
+                sqliteCreator = new SqliteDbCreator();
             }
             this.dbCreator = sqliteCreator;
         }

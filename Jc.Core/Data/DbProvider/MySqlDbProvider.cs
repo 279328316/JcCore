@@ -25,25 +25,8 @@ namespace Jc.Core.Data
         public MySqlDbProvider(string connectString) : base(connectString)
         {
             if (mySqlCreator == null)
-            {   //使用静态变量缓存MySqlDbCreator
-                Assembly assembly;
-                string assemblyName = "Jc.Core.MySql";
-                string className = "MySqlDbCreator";
-                try
-                {
-                    //assembly = Assembly.LoadFrom($"{assemblyName}.dll");
-                    assembly = Assembly.Load($"{assemblyName}");
-                }
-                catch
-                {
-                    throw new Exception($"加载{className}访问模块失败.请检查是否已添加{assemblyName}引用.");
-                }
-                IDbCreator dbCreator = assembly.CreateInstance($"{assemblyName}.{className}") as IDbCreator;
-                if (dbCreator == null)
-                {
-                    throw new Exception($"加载{className}失败.");
-                }
-                mySqlCreator = dbCreator;
+            {                
+                mySqlCreator = new MySqlDbCreator();
             }
             this.dbCreator = mySqlCreator;
         }

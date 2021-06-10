@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Data;
 using System.Text;
@@ -11,7 +12,7 @@ namespace Jc.Core.Data.Query
     public static class DbTypeConvertor
     {
         //缓存类型与DbType对应关系
-        private static Dictionary<Type, DbType> typeDic = new Dictionary<Type, DbType>();
+        private static ConcurrentDictionary<Type, DbType> typeDic = new ConcurrentDictionary<Type, DbType>();
 
         // C#数据类型转换为DbType
         /// <summary>
@@ -43,14 +44,7 @@ namespace Jc.Core.Data.Query
                         typeName = realType.Name;
                     }
                     dbType = (DbType)Enum.Parse(typeof(DbType), typeName);
-
-                    try
-                    {
-                        typeDic.Add(type, dbType);
-                    }
-                    catch
-                    {
-                    }
+                    typeDic.TryAdd(type, dbType);
                     #endregion
                 }
             }

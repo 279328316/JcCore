@@ -8,10 +8,6 @@
   <ItemGroup>
     <ProjectReference Include="..\Jc.Base\Jc.Base.csproj" />
     <ProjectReference Include="..\Jc.Cache\Jc.Cache.csproj" />
-    <ProjectReference Include="..\Jc.Core.MsSql\Jc.Core.MsSql.csproj" />
-    <ProjectReference Include="..\Jc.Core.MySql\Jc.Core.MySql.csproj" />
-    <ProjectReference Include="..\Jc.Core.PostgreSql\Jc.Core.PostgreSql.csproj" />
-    <ProjectReference Include="..\Jc.Core.Sqlite\Jc.Core.Sqlite.csproj" />
     <ProjectReference Include="..\Jc.Core\Jc.Core.csproj" />
     <ProjectReference Include="..\Jc.Util\Jc.Util.csproj" />
   </ItemGroup>

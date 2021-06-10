@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Linq.Expressions;
 using System.Configuration;
+using System.Collections.Concurrent;
 
 namespace Jc.Core.Data.Query
 {
@@ -19,7 +20,7 @@ namespace Jc.Core.Data.Query
         /// 实体类缓存,静态变量是保存为了减少反射次数
         /// object 为DtoMapping
         /// </summary>
-        private static Dictionary<Type, object> dtoMappingCache = new Dictionary<Type, object>();
+        private static ConcurrentDictionary<Type, object> dtoMappingCache = new ConcurrentDictionary<Type, object>();
 
         private static object lockForPiMappingCacheObj = new object();  //字典缓存写入锁
 
@@ -43,7 +44,7 @@ namespace Jc.Core.Data.Query
                         SetDtoMappingDic<T>(mapping);
                         mapping.EntityType = t;
                         mapping.TableAttr = GetDtoTableAttr<T>();
-                        dtoMappingCache.Add(t, mapping);
+                        dtoMappingCache.TryAdd(t, mapping);
                     }
                 }
             }
@@ -239,7 +240,7 @@ namespace Jc.Core.Data.Query
         /// 为查询时,获取PiMapList缓存
         /// Key {typeof(T).FullName}-S{select}-Un{unSelect}
         /// </summary>
-        private static Dictionary<string, List<PiMap>> piMappingCache = new Dictionary<string, List<PiMap>>();
+        private static ConcurrentDictionary<string, List<PiMap>> piMappingCache = new ConcurrentDictionary<string, List<PiMap>>();
 
         /// <summary>
         /// 根据查询表达式获取查询属性,转换为表字段
@@ -302,13 +303,7 @@ namespace Jc.Core.Data.Query
             {
                 if (!piMappingCache.Keys.Contains(cacheKey))
                 {
-                    lock (lockForPiMappingCacheObj)
-                    {
-                        if (!piMappingCache.Keys.Contains(cacheKey))
-                        {
-                            piMappingCache.Add(cacheKey, result);
-                        }
-                    }
+                    piMappingCache.TryAdd(cacheKey, result);
                 }
             }
             catch (Exception ex)

@@ -12,6 +12,7 @@ using System.Collections.Specialized;
 using Jc.Core.Data.Model;
 using Jc.Core.Data.Query;
 using System.Threading.Tasks;
+using System.Collections.Concurrent;
 
 namespace Jc.Core
 {
@@ -21,12 +22,6 @@ namespace Jc.Core
     /// </summary>
     public partial class DbContext
     {
-        #region Static Cache
-        // 表是否已存在,缓存
-        private static Dictionary<string, bool> tableExistsDic = new Dictionary<string, bool>();
-
-        #endregion
-
         #region SetMethods
 
         /// <summary>
@@ -642,11 +637,7 @@ namespace Jc.Core
             string subTableArg = this.GetSubTableArg<T>();
             DtoMapping dtoDbMapping = DtoMappingHelper.GetDtoMapping<T>();
             string tableName = dtoDbMapping.GetTableName(subTableArg);
-            if (tableExistsDic.ContainsKey(tableName))
-            {
-                result = true;
-                return result;
-            }
+
             using (DbCommand dbCommand = dbProvider.GetCheckTableExistsDbCommand(tableName))
             {
                 try
@@ -658,17 +649,6 @@ namespace Jc.Core
                         dr.Close();
                     }
                     CloseDbConnection(dbCommand);
-
-                    if(result == true)
-                    {
-                        lock (tableExistsDic)
-                        {
-                            if (!tableExistsDic.ContainsKey(tableName))
-                            {
-                                tableExistsDic.Add(tableName, true);
-                            }
-                        }
-                    }
                 }
                 catch (Exception ex)
                 {

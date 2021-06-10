@@ -1,6 +1,7 @@
 ﻿using Jc.Core.Data.Query;
 using Microsoft.Extensions.Configuration;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Configuration;
 using System.Data;
@@ -19,8 +20,8 @@ namespace Jc.Core.Data
     /// </summary>
     public class DbProviderHelper
     {
-        private static Dictionary<string, DbProvider> dbConDic =
-            new Dictionary<string, DbProvider>();    //缓存DbCommandProvider
+        private static ConcurrentDictionary<string, DbProvider> dbConDic =
+            new ConcurrentDictionary<string, DbProvider>();    //缓存DbCommandProvider
 
         /// <summary>
         /// 创建DbProvider
@@ -124,7 +125,7 @@ namespace Jc.Core.Data
                 dbProvider = CreateDbProvider(connectString, dbType);
                 try
                 {
-                    dbConDic.Add(connectString, dbProvider);
+                    dbConDic.TryAdd(connectString, dbProvider);
                 }
                 catch
                 {   //如果添加失败,异常不做处理
