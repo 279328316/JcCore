@@ -80,7 +80,7 @@ namespace Jc.Util
                     Directory.CreateDirectory(targetDir);
                 }
                 DirectoryInfo dir = new DirectoryInfo(sourceDir);
-                FileInfo[] files = dir.GetFiles(sourceDir);
+                FileInfo[] files = dir.GetFiles();
                 foreach (FileInfo file in files)
                 {
                     string targetFilePath = Path.Combine(targetDir, file.Name);
@@ -89,7 +89,7 @@ namespace Jc.Util
                     file.CopyTo(targetFilePath, true);
                 }
 
-                DirectoryInfo[] childDirs = dir.GetDirectories(sourceDir);
+                DirectoryInfo[] childDirs = dir.GetDirectories();
                 foreach (DirectoryInfo childDir in childDirs)
                 {
                     CopyDirectory(childDir.FullName, Path.Combine(targetDir, childDir.Name));
