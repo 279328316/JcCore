@@ -11,7 +11,7 @@ using System.Runtime.Serialization;
 
 using System.Linq.Expressions;
 
-namespace Jc.Core
+namespace Jc
 {
     /// <summary>
     /// DtoBase INotifyPropertyChanged

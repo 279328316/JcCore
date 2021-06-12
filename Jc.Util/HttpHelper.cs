@@ -13,7 +13,7 @@ using System.Reflection;
 using System.Threading;
 using System.ComponentModel;
 
-namespace Jc.Util
+namespace Jc
 {
     /// <summary>
     /// 类型ContentType

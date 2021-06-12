@@ -8,7 +8,7 @@ using System.Net.Mail;
 using System.Net.Mime;  
 using System.IO;  
 
-namespace Jc.Util
+namespace Jc
 {
     public class MailHelper
     {

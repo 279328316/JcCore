@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Linq.Expressions;
 
-namespace Jc.Util.Excel
+namespace Jc.Excel
 {
     /// <summary>
     /// Field Map

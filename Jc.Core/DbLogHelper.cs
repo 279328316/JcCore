@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace Jc.Core
+namespace Jc
 {
     /// <summary>
     /// Db Log Helper

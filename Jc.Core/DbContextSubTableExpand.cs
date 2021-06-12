@@ -11,8 +11,8 @@ using System.Runtime.Serialization;
 
 using System.Linq.Expressions;
 using System.Data.Common;
-using Jc.Core.Data.Query;
-namespace Jc.Core
+using Jc.Data.Query;
+namespace Jc
 {
     /// <summary>
     /// DbContext

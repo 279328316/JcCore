@@ -5,7 +5,7 @@ using System.Text;
 using System.Security.Cryptography;
 using System.IO;
 
-namespace Jc.Util.Security
+namespace Jc.Security
 {
     /// <summary>
     /// 获取Sha1 Helper

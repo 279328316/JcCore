@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 
-namespace Jc.Util
+namespace Jc
 {
     /// <summary>
     /// 简单日志Helper

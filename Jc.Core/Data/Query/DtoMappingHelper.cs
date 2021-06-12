@@ -7,7 +7,7 @@ using System.Linq.Expressions;
 using System.Configuration;
 using System.Collections.Concurrent;
 
-namespace Jc.Core.Data.Query
+namespace Jc.Data.Query
 {
     /// <summary>
     /// Dto实体的解析接口

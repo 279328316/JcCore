@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Text;
 
-namespace Jc.Util
+namespace Jc
 {
     /// <summary>
     /// MIME类型 Helper

@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Jc.Core.AntChain
+namespace Jc.AntChain
 {
     class Program
     {

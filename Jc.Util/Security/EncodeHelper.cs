@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace Jc.Util.Security
+namespace Jc.Security
 {
     /// <summary>
     /// Encode 辅助类

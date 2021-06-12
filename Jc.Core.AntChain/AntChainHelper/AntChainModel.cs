@@ -2,7 +2,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace Jc.Core.AntChain
+namespace Jc.AntChain
 {
     public enum Method
     {

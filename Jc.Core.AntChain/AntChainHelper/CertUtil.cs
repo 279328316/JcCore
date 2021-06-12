@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using System.Security.Cryptography;
 using System.Text;
 
-namespace Jc.Core.AntChain
+namespace Jc.AntChain
 {
     public class CertUtil
     {

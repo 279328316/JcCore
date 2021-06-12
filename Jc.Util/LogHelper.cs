@@ -7,7 +7,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 
-namespace Jc.Util
+namespace Jc
 {
     /// <summary>
     /// Log Helper

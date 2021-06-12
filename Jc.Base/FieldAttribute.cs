@@ -7,7 +7,7 @@ using System.Reflection;
 using System.Data;
 using System.Linq.Expressions;
 
-namespace Jc.Core
+namespace Jc
 {
     /// <summary>
     /// FieldAttribute

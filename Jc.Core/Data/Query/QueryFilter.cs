@@ -6,7 +6,7 @@ using System.Data;
 using System.Linq.Expressions;
 using System.Collections;
 
-namespace Jc.Core.Data.Query
+namespace Jc.Data.Query
 {
     ///  <summary>
     /// ¹ıÂËÃüÁî

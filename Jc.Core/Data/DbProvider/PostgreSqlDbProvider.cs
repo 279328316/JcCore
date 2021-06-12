@@ -6,9 +6,9 @@ using System.Configuration;
 using System.Reflection;
 using System.Data;
 using System.Linq;
-using Jc.Core.Data.Query;
+using Jc.Data.Query;
 
-namespace Jc.Core.Data
+namespace Jc.Data
 {
     /// <summary>
     /// PostgreSql Provider

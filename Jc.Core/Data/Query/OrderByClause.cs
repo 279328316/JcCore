@@ -4,7 +4,7 @@ using System.Text;
 using System.Runtime.Serialization;
 
 
-namespace Jc.Core.Data.Query
+namespace Jc.Data.Query
 {
     /// <summary>
     /// Represents a ORDER BY clause to be used with SELECT statements

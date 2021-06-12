@@ -6,7 +6,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 
-namespace Jc.Core
+namespace Jc
 {
     /// <summary>
     /// New Object Expression

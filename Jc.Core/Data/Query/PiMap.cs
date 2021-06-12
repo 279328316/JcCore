@@ -7,7 +7,7 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Jc.Core.Data.Query
+namespace Jc.Data.Query
 {
     /// <summary>
     /// 属性映射对象

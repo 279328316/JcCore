@@ -1,4 +1,4 @@
-﻿using Jc.Core.Data.Query;
+﻿using Jc.Data.Query;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -9,7 +9,7 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Jc.Core.Data
+namespace Jc.Data
 {
     /// <summary>
     /// Db Provider

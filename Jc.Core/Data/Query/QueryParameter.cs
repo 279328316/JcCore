@@ -7,7 +7,7 @@ using System.Data;
 using System.Runtime.Serialization;
 
 
-namespace Jc.Core.Data.Query
+namespace Jc.Data.Query
 {
     public class QueryParameter
     {

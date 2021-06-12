@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace Jc.Util
+namespace Jc
 {
     /// <summary>
     /// 结果返回后委托

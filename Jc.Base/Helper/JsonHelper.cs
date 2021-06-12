@@ -10,7 +10,7 @@ using System.Collections.Generic;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 
-namespace Jc.Core.Helper
+namespace Jc.Helper
 {
     /// <summary>
     /// Json操作类

@@ -10,7 +10,7 @@ using System.IO;
 using System.Linq.Expressions;
 using System.Collections;
 
-namespace Jc.Util
+namespace Jc
 {
     /// <summary>
     /// 异常处理Helper

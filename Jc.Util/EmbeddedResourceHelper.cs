@@ -4,7 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 
-namespace Jc.Util
+namespace Jc
 {
     /// <summary>
     /// 内嵌资源使用Helper

@@ -3,7 +3,7 @@ using System.Text;
 using System.Security.Cryptography;
 using System.IO;
 
-namespace Jc.Util.Security
+namespace Jc.Security
 {
     /// <summary>
     /// DesHelper

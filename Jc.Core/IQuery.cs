@@ -1,6 +1,6 @@
 ﻿
-using Jc.Core.Data;
-using Jc.Core.Data.Query;
+using Jc.Data;
+using Jc.Data.Query;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -12,7 +12,7 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Jc.Core
+namespace Jc
 {
     /// <summary>
     /// 查询

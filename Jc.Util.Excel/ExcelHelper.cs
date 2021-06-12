@@ -8,7 +8,7 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 
-namespace Jc.Util.Excel
+namespace Jc.Excel
 {
     /// <summary>
     /// Excel Import/Export Helper

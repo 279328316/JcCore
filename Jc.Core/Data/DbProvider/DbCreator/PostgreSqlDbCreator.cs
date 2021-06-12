@@ -1,9 +1,9 @@
-﻿using Jc.Core.Data;
+﻿using Jc.Data;
 using Npgsql;
 using System;
 using System.Data.Common;
 
-namespace Jc.Core.Data
+namespace Jc.Data
 {
     public class PostgreSqlDbCreator : IDbCreator
     {

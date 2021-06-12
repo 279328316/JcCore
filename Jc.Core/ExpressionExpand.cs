@@ -5,7 +5,7 @@ using System.Linq.Expressions;
 using System.Text;
 using System.Reflection;
 
-namespace Jc.Core
+namespace Jc
 {
     /// <summary>
     /// Expression 扩展

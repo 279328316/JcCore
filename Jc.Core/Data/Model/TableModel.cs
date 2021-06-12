@@ -4,7 +4,7 @@ using System.Text;
 using System.ComponentModel;
 using System.Data;
 
-namespace Jc.Core.Data.Model
+namespace Jc.Data.Model
 {
     /// <summary>
     /// 数据表Model

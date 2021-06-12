@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Runtime.Serialization;
 
-namespace Jc.Core
+namespace Jc
 {
     /// <summary>
     /// 数据库类型

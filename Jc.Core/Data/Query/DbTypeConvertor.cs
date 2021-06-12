@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Text;
 
-namespace Jc.Core.Data.Query
+namespace Jc.Data.Query
 {
     /// <summary>
     /// DbTypeConvertor

@@ -4,10 +4,10 @@ using System.Text;
 using System.Data.Common;
 using System.Linq;
 using System.IO;
-using Jc.Core.Data.Query;
+using Jc.Data.Query;
 using System.Reflection;
 
-namespace Jc.Core.Data
+namespace Jc.Data
 {
     /// <summary>
     /// sqlite数据库

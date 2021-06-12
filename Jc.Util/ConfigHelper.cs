@@ -5,7 +5,7 @@ using System.Configuration;
 using System.IO;
 using System.Text;
 
-namespace Jc.Util
+namespace Jc
 {
     /// <summary>
     /// 配置Helper

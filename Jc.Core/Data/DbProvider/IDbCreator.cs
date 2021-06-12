@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Data.Common;
 using System.Text;
 
-namespace Jc.Core.Data
+namespace Jc.Data
 {
     /// <summary>
     /// IDb Interface

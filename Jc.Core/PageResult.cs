@@ -6,7 +6,7 @@ using System.Linq;
 using System.Runtime.Serialization;
 using System.Text;
 
-namespace Jc.Core
+namespace Jc
 {
     /// <summary>
     /// 分页结果对象

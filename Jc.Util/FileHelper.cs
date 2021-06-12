@@ -6,7 +6,7 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading;
 
-namespace Jc.Util
+namespace Jc
 {
     /// <summary>
     /// File操作Helper

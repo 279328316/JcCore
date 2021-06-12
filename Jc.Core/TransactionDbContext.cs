@@ -11,9 +11,9 @@ using System.Runtime.Serialization;
 
 using System.Linq.Expressions;
 using System.Data.Common;
-using Jc.Core.Data;
+using Jc.Data;
 
-namespace Jc.Core
+namespace Jc
 {
     /// <summary>
     /// 事务DbContext

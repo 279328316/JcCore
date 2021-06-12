@@ -4,7 +4,7 @@ using System.Data.SQLite;
 using System.IO;
 using System.Text;
 
-namespace Jc.Core.Data
+namespace Jc.Data
 {
 
     /// <summary>

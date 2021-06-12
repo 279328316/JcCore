@@ -1,4 +1,4 @@
-﻿using Jc.Core.Data.Query;
+﻿using Jc.Data.Query;
 using System;
 using System.Collections.Generic;
 using System.Data;

@@ -9,9 +9,9 @@ using Microsoft.CSharp;
 using System.IO;
 using System.Linq.Expressions;
 using System.Collections;
-using Jc.Core.Data;
+using Jc.Data;
 
-namespace Jc.Core
+namespace Jc
 {
     /// <summary>
     /// 表达式处理Helper

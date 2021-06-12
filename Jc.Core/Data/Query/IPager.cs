@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Jc.Core.Data.Query
+namespace Jc.Data.Query
 {
     /// <summary>
     /// 分页

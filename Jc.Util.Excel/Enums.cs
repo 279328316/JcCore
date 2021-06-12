@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace Jc.Util.Excel
+namespace Jc.Excel
 {
     /// <summary>
     /// 字段类型

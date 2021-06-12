@@ -1,9 +1,9 @@
-﻿using Jc.Core.Data;
+﻿using Jc.Data;
 using System;
 using System.Data.Common;
 using System.Data.SQLite;
 
-namespace Jc.Core.Data
+namespace Jc.Data
 {
     public class SqliteDbCreator:IDbCreator
     {

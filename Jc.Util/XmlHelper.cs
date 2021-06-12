@@ -7,7 +7,7 @@ using System.Reflection;
 using System.Text;
 using System.Xml;
 
-namespace Jc.Util
+namespace Jc
 {
     /// <summary>
     /// Xml文件操作Helper

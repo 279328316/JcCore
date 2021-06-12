@@ -5,7 +5,7 @@ using System.Text;
 using System.Runtime.Serialization;
 using System.Reflection;
 
-namespace Jc.Core
+namespace Jc
 {
     /// <summary>
     /// Enum 扩展

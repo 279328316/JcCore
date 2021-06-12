@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.IO;
 
-namespace Jc.Util
+namespace Jc
 {
     /// <summary>
     /// Date Helper

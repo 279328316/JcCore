@@ -5,7 +5,7 @@ using System.Text;
 using System.Runtime.Serialization;
 using System.Collections;
 
-namespace Jc.Core
+namespace Jc
 {
     /// <summary>
     /// Collection 扩展

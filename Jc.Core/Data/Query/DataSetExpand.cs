@@ -1,4 +1,4 @@
-﻿using Jc.Core.Data.Query;
+﻿using Jc.Data.Query;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -6,7 +6,7 @@ using System.Reflection;
 using System.Reflection.Emit;
 using System.Text;
 
-namespace Jc.Core.Data
+namespace Jc.Data
 {
     public static class DataSetExpand
     {

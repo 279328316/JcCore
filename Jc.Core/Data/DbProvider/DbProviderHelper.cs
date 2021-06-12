@@ -1,4 +1,4 @@
-﻿using Jc.Core.Data.Query;
+﻿using Jc.Data.Query;
 using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Concurrent;
@@ -13,7 +13,7 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Jc.Core.Data
+namespace Jc.Data
 {
     /// <summary>
     /// Db Provider

@@ -7,7 +7,7 @@ using System.Reflection.Emit;
 using System.Linq.Expressions;
 using System.ComponentModel;
 
-namespace Jc.Core.Data.Query
+namespace Jc.Data.Query
 {
     /// <summary>
     /// EntityConvertor delegate

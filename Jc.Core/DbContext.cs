@@ -3,16 +3,16 @@ using System.Collections.Generic;
 using System.Text;
 using System.Data;
 using System.Data.Common;
-using Jc.Core.Data;
+using Jc.Data;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Collections;
 using System.Reflection;
 using System.Collections.Specialized;
-using Jc.Core.Data.Model;
-using Jc.Core.Data.Query;
+using Jc.Data.Model;
+using Jc.Data.Query;
 
-namespace Jc.Core
+namespace Jc
 {
     /// <summary>
     /// DbContext

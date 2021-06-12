@@ -5,7 +5,7 @@ using System.Text;
 using System.Configuration;
 using System.Security.Cryptography;
 
-namespace Jc.Util.Security
+namespace Jc.Security
 {
     public class RSACrypHelper
     {

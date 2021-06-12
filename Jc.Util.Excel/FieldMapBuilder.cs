@@ -8,7 +8,7 @@ using System.Linq.Expressions;
 using System.Reflection;
 using System.Text;
 
-namespace Jc.Util.Excel
+namespace Jc.Excel
 {
     /// <summary>
     /// FieldMap Builder
