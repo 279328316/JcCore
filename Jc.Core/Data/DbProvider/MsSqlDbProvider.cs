@@ -315,6 +315,7 @@ namespace Jc.Data
                         progress?.Report(p);
                     });
                     bulkCopy.BatchSize = batchSize;
+                    bulkCopy.NotifyAfter = batchSize;
                     bulkCopy.DestinationTableName = tableName;
                     bulkCopy.BulkCopyTimeout = timeout;
                     bulkCopy.WriteToServer(dt);
