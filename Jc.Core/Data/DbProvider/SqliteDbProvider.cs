@@ -6,6 +6,7 @@ using System.Linq;
 using System.IO;
 using Jc.Data.Query;
 using System.Reflection;
+using System.Data;
 
 namespace Jc.Data
 {
@@ -496,6 +497,11 @@ namespace Jc.Data
                 }
             }
             return sysFieldType;
+        }
+
+        public override void BulkCopy(string tableName, DataTable dt, int batchSize, int timeout = 0, IProgress<float> progress = null)
+        {
+            throw new NotImplementedException();
         }
     }    
 }

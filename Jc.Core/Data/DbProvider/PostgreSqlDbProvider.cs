@@ -306,5 +306,10 @@ namespace Jc.Data
             }
             return fieldStr;
         }
+
+        public override void BulkCopy(string tableName, DataTable dt, int batchSize, int timeout = 0, IProgress<float> progress = null)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

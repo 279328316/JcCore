@@ -163,10 +163,21 @@ namespace Jc.Data
         /// <param name="tableName">新建表名称,如果为空,则使用T对应表名称</param>
         /// <returns></returns>
         public abstract string GetCreateTableSql<T>(string tableName = null);
+
+        /// <summary>
+        /// 使用BulkCopy插入数据
+        /// </summary>
+        /// <param name="tableName"></param>
+        /// <param name="dt"></param>
+        /// <param name="batchSize"></param>
+        /// <param name="timeout"></param>
+        /// <param name="progress">0,1 进度</param>
+        /// <returns></returns>
+        public abstract void BulkCopy(string tableName, DataTable dt, int batchSize, int timeout = 0, IProgress<float> progress = null);
         #endregion
 
         #region Methods
-        
+
         /// <summary>
         /// 获取插入DbCmd
         /// </summary>

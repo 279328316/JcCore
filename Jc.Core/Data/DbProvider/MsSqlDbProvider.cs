@@ -7,7 +7,7 @@ using System.Reflection;
 using System.Data;
 using System.Linq;
 using Jc.Data.Query;
-
+using System.Data.SqlClient;
 
 namespace Jc.Data
 {
@@ -293,6 +293,35 @@ namespace Jc.Data
                 fieldStr = strBuilder.ToString();
             }
             return fieldStr;
-        }        
+        }
+
+        /// <summary>
+        /// 使用BulkCopy插入数据
+        /// </summary>
+        /// <param name="tableName"></param>
+        /// <param name="dt"></param>
+        /// <param name="batchSize"></param>
+        /// <param name="timeout"></param>
+        /// <param name="progress">0,1 进度</param>
+        /// <returns></returns>
+        public override void BulkCopy(string tableName, DataTable dt,int batchSize, int timeout = 0,IProgress<float> progress = null)
+        {
+            using (SqlConnection con = (SqlConnection)this.CreateDbConnection())
+            {
+                using (SqlBulkCopy bulkCopy = new SqlBulkCopy((SqlConnection)con))
+                {
+                    bulkCopy.SqlRowsCopied += new SqlRowsCopiedEventHandler((sender,e)=> {
+                        float p = e.RowsCopied * 1.0f/ dt.Rows.Count;
+                        progress?.Report(p);
+                    });
+                    bulkCopy.BatchSize = batchSize;
+                    bulkCopy.DestinationTableName = tableName;
+                    bulkCopy.BulkCopyTimeout = timeout;
+                    bulkCopy.WriteToServer(dt);
+                    bulkCopy.Close();
+                    con.Close();
+                }
+            }
+        }
     }
 }

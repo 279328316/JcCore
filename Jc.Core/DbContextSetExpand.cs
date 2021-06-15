@@ -739,6 +739,94 @@ namespace Jc
             }
             return result;
         }
+
+
+        /// <summary>
+        /// 使用BulkCopy插入数据
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="list">数据List</param>
+        /// <param name="batchSize">BatchSize</param>
+        /// <param name="timeout">BulkCopyTimeout</param>
+        /// <param name="progress">0,1 进度</param>
+        public void BulkCopy<T>(List<T> list, int batchSize, int timeout = 0,IProgress<float> progress = null)
+        {
+            if (list == null || list.Count <= 0)
+            {
+                return;
+            }
+            DtoMapping dtoDbMapping = DtoMappingHelper.GetDtoMapping<T>();
+            string tableName = dtoDbMapping.GetTableName();
+            DataTable dt = EntityToDataTable(list);
+            dbProvider.BulkCopy(tableName, dt, batchSize, timeout, progress);
+        }
+
+        /// <summary>
+        /// Convert List To DataTable
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="list"></param>
+        /// <returns></returns>
+        private DataTable EntityToDataTable<T>(List<T> list)
+        {
+            DataTable dt = new DataTable();
+
+            List<FieldModel> fields = GetTableFieldList<T>();
+            DtoMapping dtoDbMapping = DtoMappingHelper.GetDtoMapping<T>();
+            string tableName = dtoDbMapping.GetTableName();
+            List<PiMap> piMaps = DtoMappingHelper.GetPiMapList<T>();
+
+            List<PiMap> mappingPis = new List<PiMap>();
+
+            for (int i = 0; i < fields.Count; i++)
+            {
+                FieldModel field = fields[i];
+                PiMap piMap = piMaps.FirstOrDefault(a => a.FieldName.ToLower() == field.FieldName.ToLower());
+                if (piMap == null)
+                {
+                    throw new Exception($"{dtoDbMapping.EntityType.FullName} 未定义与表 '{tableName}' 列名为 '{field.FieldName}' 映射的属性");
+                }
+                mappingPis.Add(piMap);
+
+                Type realType = piMap.PropertyType.GenericTypeArguments.Length > 0 ?
+                                        piMap.PropertyType.GenericTypeArguments[0] : piMap.PropertyType;
+                if (realType.IsEnum)
+                {
+                    realType = typeof(int);
+                }
+                dt.Columns.Add(new DataColumn(field.FieldName, realType));
+            }
+
+            foreach (T dto in list)
+            {
+                DataRow dr = dt.NewRow();
+                for (int i = 0; i < mappingPis.Count; i++)
+                {
+                    PiMap piMap = mappingPis[i];
+
+                    object value = piMap.Pi.GetValue(dto);
+
+                    if (piMap == dtoDbMapping.PkMap && !dtoDbMapping.IsAutoIncrementPk)
+                    {   //是否需要生成Guid
+                        if (value == null || (Guid)value == Guid.Empty)
+                        {
+                            value = Guid.NewGuid();
+                            piMap.Pi.SetValue(dto, value);
+                        }
+                    }
+
+                    if (piMap.IsEnum)
+                    {
+                        if (value != null)
+                            value = (int)value;
+                    }
+                    dr[i] = value ?? DBNull.Value;
+                }
+                dt.Rows.Add(dr);
+            }
+            return dt;
+        }
+
         #endregion
     }
 }

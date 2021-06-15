@@ -592,16 +592,32 @@ namespace Jc
         }
 
         /// <summary>
+        /// 查询对象表字段信息
+        /// </summary>
+        /// <returns>受影响记录数</returns>
+        public List<FieldModel> GetTableFieldList<T>()
+        {
+            string subTableArg = this.GetSubTableArg<T>();
+            DtoMapping dtoDbMapping = DtoMappingHelper.GetDtoMapping<T>();
+            string tableName = dtoDbMapping.GetTableName(subTableArg);
+            return GetTableFieldList(tableName);
+        }
+
+        /// <summary>
         /// 查询数据库表字段信息
         /// </summary>
         /// <param name="tableName">表名称</param>
         /// <returns>受影响记录数</returns>
-        public List<FieldModel> GetTableFieldList(string tableName = null)
+        public List<FieldModel> GetTableFieldList(string tableName)
         {
+            if (tableName.Contains("'"))
+            {
+                throw new Exception($"Table Name Error:{tableName} is unavaliable");
+            }
             DbCommand dbCommand = dbProvider.GetFieldListDbCommand(tableName);
             return GetList<FieldModel>(dbCommand);
         }
-        
+
         #endregion
     }
 }

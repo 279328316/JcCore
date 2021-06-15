@@ -11,7 +11,7 @@ namespace Jc.Core.TestApp
         /// <summary>
         /// Db
         /// </summary>
-        public static DbContext Db = DbContext.CreateDbContext("Stock", DatabaseType.MsSql);
+        public static DbContext Db = DbContext.CreateDbContext("Test", DatabaseType.MsSql);
 
         /// <summary>
         /// Db
