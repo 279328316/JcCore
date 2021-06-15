@@ -144,7 +144,7 @@ namespace Jc.Core.TestApp.Test
             sw.Reset();
             Console.WriteLine("执行数据插入...");
             sw.Start();
-            Dbc.Db.BulkCopy(users, 1000, 0, new Progress<float>((p)=> {
+            Dbc.Db.BulkCopy(users, 1000, 0, true, new Progress<float>((p)=> {
                 Console.WriteLine($"进度:{Math.Round(p * 100.0, 2)}%");
             }));
             sw.Stop();
@@ -275,12 +275,16 @@ namespace Jc.Core.TestApp.Test
                     LastUpdateDate = DateTime.Now
                 });
             }
+            {   //Add 事务 异常抛出 Test
+                users[users.Count - 1].Id = Guid.NewGuid();
+                users[users.Count - 2].Id = users[users.Count - 1].Id;
+            }
             sw.Stop();
             Console.WriteLine($"构造{users.Count}条记录，共耗时{sw.ElapsedMilliseconds}Ms");
             sw.Reset();
             Console.WriteLine("执行数据插入...");
             sw.Start();
-            Dbc.Db.BulkCopy(users, 1000, 0, new Progress<float>((p) => {
+            Dbc.Db.BulkCopy(users, 1000, 0, true, new Progress<float>((p) => {
                 Console.WriteLine($"进度:{Math.Round(p * 100.0, 2)}%");
             }));
             sw.Stop();

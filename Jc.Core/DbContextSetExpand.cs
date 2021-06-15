@@ -743,13 +743,15 @@ namespace Jc
 
         /// <summary>
         /// 使用BulkCopy插入数据
+        /// 目前仅支持MsSql(Sql Server)
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="list">数据List</param>
         /// <param name="batchSize">BatchSize</param>
         /// <param name="timeout">BulkCopyTimeout</param>
+        /// <param name="useTransaction">使用事务</param>
         /// <param name="progress">0,1 进度</param>
-        public void BulkCopy<T>(List<T> list, int batchSize, int timeout = 0,IProgress<float> progress = null)
+        public void BulkCopy<T>(List<T> list, int batchSize, int timeout = 0, bool useTransaction = true, IProgress<float> progress = null)
         {
             if (list == null || list.Count <= 0)
             {
@@ -758,7 +760,7 @@ namespace Jc
             DtoMapping dtoDbMapping = DtoMappingHelper.GetDtoMapping<T>();
             string tableName = dtoDbMapping.GetTableName();
             DataTable dt = EntityToDataTable(list);
-            dbProvider.BulkCopy(tableName, dt, batchSize, timeout, progress);
+            dbProvider.BulkCopy(tableName, dt, batchSize, timeout, useTransaction, progress);
         }
 
         /// <summary>

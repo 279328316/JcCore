@@ -302,23 +302,36 @@ namespace Jc.Data
         /// <param name="dt"></param>
         /// <param name="batchSize"></param>
         /// <param name="timeout"></param>
+        /// <param name="useTransaction"></param>
         /// <param name="progress">0,1 进度</param>
         /// <returns></returns>
-        public override void BulkCopy(string tableName, DataTable dt,int batchSize, int timeout = 0,IProgress<float> progress = null)
+        public override void BulkCopy(string tableName, DataTable dt,int batchSize, int timeout = 0, bool useTransaction = true, IProgress<float> progress = null)
         {
             using (SqlConnection con = (SqlConnection)this.CreateDbConnection())
             {
-                using (SqlBulkCopy bulkCopy = new SqlBulkCopy((SqlConnection)con))
+                SqlTransaction transaction = con.BeginTransaction();                
+                using (SqlBulkCopy bulkCopy = new SqlBulkCopy(con,new SqlBulkCopyOptions(),transaction))
                 {
-                    bulkCopy.SqlRowsCopied += new SqlRowsCopiedEventHandler((sender,e)=> {
-                        float p = e.RowsCopied * 1.0f/ dt.Rows.Count;
+                    bulkCopy.SqlRowsCopied += new SqlRowsCopiedEventHandler((sender, e) =>
+                    {
+                        float p = e.RowsCopied * 1.0f / dt.Rows.Count;
                         progress?.Report(p);
                     });
-                    bulkCopy.BatchSize = batchSize;
-                    bulkCopy.NotifyAfter = batchSize;
-                    bulkCopy.DestinationTableName = tableName;
-                    bulkCopy.BulkCopyTimeout = timeout;
-                    bulkCopy.WriteToServer(dt);
+
+                    try
+                    {
+                        bulkCopy.BatchSize = batchSize;
+                        bulkCopy.NotifyAfter = batchSize;
+                        bulkCopy.DestinationTableName = tableName;
+                        bulkCopy.BulkCopyTimeout = timeout;
+                        bulkCopy.WriteToServer(dt);
+                        transaction.Commit();
+                    }
+                    catch (Exception ex)
+                    {
+                        transaction.Rollback();
+                        throw;
+                    }
                     bulkCopy.Close();
                     con.Close();
                 }

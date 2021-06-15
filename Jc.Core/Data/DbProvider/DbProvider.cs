@@ -171,9 +171,10 @@ namespace Jc.Data
         /// <param name="dt"></param>
         /// <param name="batchSize"></param>
         /// <param name="timeout"></param>
+        /// <param name="useTransaction">使用事务</param>
         /// <param name="progress">0,1 进度</param>
         /// <returns></returns>
-        public abstract void BulkCopy(string tableName, DataTable dt, int batchSize, int timeout = 0, IProgress<float> progress = null);
+        public abstract void BulkCopy(string tableName, DataTable dt, int batchSize, int timeout = 0, bool useTransaction = true, IProgress<float> progress = null);
         #endregion
 
         #region Methods
