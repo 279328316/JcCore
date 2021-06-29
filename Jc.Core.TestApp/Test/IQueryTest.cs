@@ -24,6 +24,18 @@ namespace Jc.Core.TestApp.Test
 
             try
             {
+                DateTime? dateTime = null;
+                List<UserDto> users = Dbc.Db.GetList<UserDto>(a => !a.IsDelete && a.Birthday >= dateTime);
+
+                Console.WriteLine($"Null Date Compare Test:{users.Count}");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Null Date Compare Test,Error:{ex.Message}");
+            }
+
+            try
+            {
                 DateTime? dateTime = DateTime.Parse("2020-06-14");
                 List<UserDto> users = Dbc.Db.GetList<UserDto>(a => !a.IsDelete && a.Birthday >= dateTime.Value.AddDays(1));
 
