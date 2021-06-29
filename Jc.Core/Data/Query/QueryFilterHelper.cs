@@ -527,6 +527,11 @@ namespace Jc.Data.Query
                 }
                 catch (Exception ex)
                 {
+                    if(ex.InnerException != null)
+                    {
+                        throw ex.InnerException;
+                    }
+                    throw;
                 }
             }
             else

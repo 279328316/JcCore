@@ -74,7 +74,7 @@ namespace Jc.Core.TestApp
         /// 是否删除
         /// </summary>
         [Field(DisplayText = "是否删除", FieldType = "bit")]
-        public bool? IsDelete { get; set; }
+        public bool IsDelete { get; set; }
 
         /// <summary>
         /// 状态 0停用 1启用
