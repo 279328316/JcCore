@@ -9,7 +9,47 @@ namespace Jc.Core.TestApp.Test
     {
         public void Test()
         {
-            UserDto user = new UserDto() { IsDelete = false,Birthday = DateTime.Parse("2020-06-15")};
+            TaskDto task1 = new TaskDto() { RunCount = 1, MaxRunCount = 10 };
+            TaskDto task2 = new TaskDto() { RunCount = 12, MaxRunCount = 10 };
+            TaskDto task3 = new TaskDto() { RunCount = 13, MaxRunCount = 10 };
+            TaskDto task4 = new TaskDto() { RunCount = 1, MaxRunCount = 10 };
+            TaskDto task5 = new TaskDto() { RunCount = 1, MaxRunCount = 10 };
+            List<TaskDto> tasks = new List<TaskDto>() { task1, task2, task3, task4, task5 };
+            Dbc.Db.SetList(tasks);
+
+            try
+            {
+                List<TaskDto> taskList = Dbc.Db.GetList<TaskDto>(a => a.RunCount > a.MaxRunCount);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Field Compare Test,Error:{ex.Message}");
+            }
+        }
+
+        public void FieldCompareTest()
+        {
+            TaskDto task1 = new TaskDto() { RunCount = 1, MaxRunCount = 10 };
+            TaskDto task2 = new TaskDto() { RunCount = 12, MaxRunCount = 10 };
+            TaskDto task3 = new TaskDto() { RunCount = 13, MaxRunCount = 10 };
+            TaskDto task4 = new TaskDto() { RunCount = 1, MaxRunCount = 10 };
+            TaskDto task5 = new TaskDto() { RunCount = 1, MaxRunCount = 10 };
+            List<TaskDto> tasks = new List<TaskDto>() { task1, task2, task3, task4, task5 };
+            Dbc.Db.SetList(tasks);
+
+            try
+            {
+                List<TaskDto> taskList = Dbc.Db.GetList<TaskDto>(a => a.RunCount > a.MaxRunCount);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Field Compare Test,Error:{ex.Message}");
+            }
+        }
+
+        public void NullValueQueryTest()
+        {
+            UserDto user = new UserDto() { IsDelete = false, Birthday = DateTime.Parse("2020-06-15") };
             Dbc.Db.Set(user);
 
             try
@@ -46,7 +86,6 @@ namespace Jc.Core.TestApp.Test
                 Console.WriteLine($"Error:{ex.Message}");
             }
         }
-
 
         public void BoolQueryTest()
         {
