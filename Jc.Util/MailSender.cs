@@ -12,7 +12,7 @@ namespace Jc
 {
     public class MailHelper
     {
-        public static void SendMial(string serverAddress, string msgBody, string msgSubject, string msgFromAddress, string msgFromName, List<string> msgToAddress)
+        public static void SendMail(string serverAddress, string msgBody, string msgSubject, string msgFromAddress, string msgFromName, List<string> msgToAddress)
         {
             try
             {
