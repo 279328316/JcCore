@@ -53,7 +53,9 @@ namespace Jc
                 {
                     string queryItemVal = collection[queryItemKey];
                     Object itemValue = null;
-                    if (!string.IsNullOrEmpty(queryItemVal))
+                    if (!string.IsNullOrEmpty(queryItemVal)
+                        && queryItemVal.ToLower() != "null"
+                        && queryItemVal.ToLower() != "undefined")
                     {
                         PiMap piMap = piMapList.Where(p => queryItemKey.ToLower() == p.PiName.ToLower()
                                 || queryItemKey.ToLower() == ($"min{p.PiName}").ToLower()
