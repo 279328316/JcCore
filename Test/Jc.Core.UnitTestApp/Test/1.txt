@@ -1,6 +1,0 @@
-
-
-xcopy /E/I/Y "netstandard2.0" "C:\Users\jiahua.zhang\.nuget\packages\jc.core\1.0.43\lib\netstandard2.0"
-pause
-
-
