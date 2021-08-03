@@ -1,4 +1,5 @@
-﻿using Jc.Data.Query;
+﻿
+using Jc.Data.Query;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -6,25 +7,10 @@ using System.Reflection;
 using System.Reflection.Emit;
 using System.Text;
 
-namespace Jc.Core.LocalTests
+namespace Jc.Core.FrameworkTest
 {
-    /// <summary>
-    /// IEntityConvertor
-    /// </summary>
-    /// <typeparam name="T">Dto</typeparam>
-    public interface IEntityConvertor<T>
+    public partial class EmitTest
     {
-        /// <summary>
-        /// 转换DataRow为Dto
-        /// </summary>
-        /// <param name="dr"></param>
-        /// <returns></returns>
-        T ConvertDto(DataRow dr);
-    }
-
-    public class EmitTest
-    {
-
         /// <summary>
         /// IL生成SetValueMethod内容
         /// 独立出来为共用代码
@@ -141,6 +127,7 @@ namespace Jc.Core.LocalTests
 
             return obj as IEntityConvertor<T>;
         }
+
         /// <summary>
         /// IL生成SetValueMethod内容
         /// 独立出来为共用代码
@@ -157,19 +144,32 @@ namespace Jc.Core.LocalTests
                               "Convert" + typeof(T).Name,
                               MethodAttributes.Public | MethodAttributes.Static,
                               typeof(T),
-                              new Type[] { typeof(DataRow) });
+                              new Type[] { typeof(DataRow), typeof(Robj<object>) });
             ILGenerator il = method.GetILGenerator();
             LocalBuilder result = il.DeclareLocal(typeof(T));
             il.Emit(OpCodes.Newobj, typeof(T).GetConstructor(Type.EmptyTypes));
             il.Emit(OpCodes.Stloc, result);
 
             //取出dr中所有的列名集合
-            il.DeclareLocal(typeof(DataColumnCollection));
+            LocalBuilder columns = il.DeclareLocal(typeof(DataColumnCollection));
             il.Emit(OpCodes.Ldarg_0);
             il.Emit(OpCodes.Callvirt, typeof(DataRow).GetMethod("get_Table"));
             il.Emit(OpCodes.Callvirt, typeof(DataTable).GetMethod("get_Columns"));
-            il.Emit(OpCodes.Stloc_1); //var columns = dr.Table.Columns
+            il.Emit(OpCodes.Stloc, columns); //var columns = dr.Table.Columns
 
+            //定义局部变量
+            LocalBuilder curColumn = il.DeclareLocal(typeof(DataColumn));
+            il.Emit(OpCodes.Ldnull);
+            il.Emit(OpCodes.Box, typeof(DataColumn)); // boxing the value type to object
+            il.Emit(OpCodes.Stloc, curColumn); //curColumn = null;
+            
+            //定义局部变量
+            LocalBuilder errorRobj = il.DeclareLocal(typeof(Robj<object>));
+            il.Emit(OpCodes.Ldarg_1);
+            il.Emit(OpCodes.Box, typeof(Robj<object>)); // boxing the value type to object
+            il.Emit(OpCodes.Stloc, errorRobj); //errorRobj = errorRobj;
+
+            il.BeginExceptionBlock();
             List<PiMap> piMapList = DtoMappingHelper.GetPiMapList<T>();
             foreach (PiMap piMap in piMapList)
             {
@@ -181,7 +181,7 @@ namespace Jc.Core.LocalTests
                 string fieldName = piMap.FieldName.Replace("\"", "").Replace("'", "").Replace("[", "").Replace("]", "");
                 //加入判断条件 if (columns.Contains("Id") && !dataRow.IsNull("Id"))
                 var endIfLabel = il.DefineLabel();
-                il.Emit(OpCodes.Ldloc_1);    //columns
+                il.Emit(OpCodes.Ldloc, columns);    //columns
                 il.Emit(OpCodes.Ldstr, fieldName); //Id
                 il.Emit(OpCodes.Callvirt, typeof(DataColumnCollection).GetMethod("Contains", new Type[] { typeof(string) }));
                 il.Emit(OpCodes.Brfalse, endIfLabel); //判断columns.Contains("Id")
@@ -191,11 +191,16 @@ namespace Jc.Core.LocalTests
                 il.Emit(OpCodes.Callvirt, typeof(DataRow).GetMethod("IsNull", new Type[] { typeof(string) }));
                 il.Emit(OpCodes.Brtrue, endIfLabel); //判断dr.IsNull("Id")
 
-                //自DataReader中读取值 调用get_Item方法 dataRow["Id"]
+                il.Emit(OpCodes.Ldloc, columns);
+                il.Emit(OpCodes.Ldstr, fieldName);
+                il.Emit(OpCodes.Callvirt, typeof(DataRow).GetMethod("get_Item", new Type[] { typeof(string) }));
+                il.Emit(OpCodes.Stloc, curColumn); //curColumn = columns["Id"];
+
+                //自DataReader中读取值 调用get_Item方法 dataRow[curColumn]
                 il.Emit(OpCodes.Ldloc, result);  //result
                 il.Emit(OpCodes.Ldarg_0);    //dataRow
-                il.Emit(OpCodes.Ldstr, fieldName);   //Id
-                il.Emit(OpCodes.Callvirt, typeof(DataRow).GetMethod("get_Item", new Type[] { typeof(string) }));
+                il.Emit(OpCodes.Ldloc, curColumn);   //curColumn
+                il.Emit(OpCodes.Callvirt, typeof(DataRow).GetMethod("get_Item", new Type[] { typeof(DataColumn) }));
 
                 Type type = piMap.PropertyType;  //拆箱                
                 if (type.IsValueType)
@@ -205,10 +210,6 @@ namespace Jc.Core.LocalTests
                         il.Emit(OpCodes.Unbox_Any, typeof(int));
                         Type realType = type.GenericTypeArguments.Length > 0 ?
                                         type.GenericTypeArguments[0] : type;
-                        //Type helperType = typeof(TEnumHelper<>);
-                        //Type thealperType = helperType.MakeGenericType(realType);
-                        //MethodInfo convertMethod = thealperType.GetMethod("ToEnum");
-                        //il.Emit(OpCodes.Callvirt, convertMethod);
                         il.Emit(OpCodes.Unbox_Any, realType);
                     }
                     else
@@ -225,9 +226,38 @@ namespace Jc.Core.LocalTests
                 il.MarkLabel(endIfLabel);
             }
             /*给本地变量（result）返回值*/
+            il.BeginCatchBlock(typeof(Exception));
+            LocalBuilder exception = il.DeclareLocal(typeof(Exception));
+            il.Emit(OpCodes.Stloc, exception);
+
+            il.Emit(OpCodes.Ldstr, "Column {0} Load Error:{1}");
+            il.Emit(OpCodes.Ldloc, curColumn);
+            il.Emit(OpCodes.Callvirt, typeof(DataColumn).GetMethod("get_ColumnName"));
+
+            il.Emit(OpCodes.Ldloc, exception);
+            il.Emit(OpCodes.Callvirt, typeof(Exception).GetMethod("get_Message"));
+
+            il.Emit(OpCodes.Callvirt, typeof(string).GetMethod("Format", new Type[] { typeof(string), typeof(object), typeof(object) }));
+
+            LocalBuilder errorMsg = il.DeclareLocal(typeof(string));
+            il.Emit(OpCodes.Stloc, errorMsg);
+
+            LocalBuilder ex = il.DeclareLocal(typeof(Exception));
+            il.Emit(OpCodes.Ldloc, errorMsg);
+            il.Emit(OpCodes.Newobj, typeof(Exception).GetConstructor(new Type[] { typeof(string) }));
+            il.Emit(OpCodes.Stloc, ex);
+
+            il.Emit(OpCodes.Ldloc, errorRobj);
+            il.Emit(OpCodes.Ldloc, errorMsg);
+            //il.Emit(OpCodes.Ldfld, 4000);
+            //给该属性设置对应值
+            PropertyInfo resultPi = typeof(Robj<object>).GetProperty("Result");
+            il.Emit(OpCodes.Callvirt, resultPi.GetSetMethod());
+
+            il.EndExceptionBlock();
             il.Emit(OpCodes.Ldloc, result);
             il.Emit(OpCodes.Ret);
-            var helloKittyClassType = typeBuilder.CreateType();
+            Type helloKittyClassType = typeBuilder.CreateType();
             assemblyBuilder.SetEntryPoint(helloKittyClassType.GetMethod("Convert" + typeof(T).Name));
             assemblyBuilder.Save("Kitty.exe");
         }

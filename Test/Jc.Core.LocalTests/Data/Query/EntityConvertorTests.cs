@@ -2,7 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
-using Jc.Core.LocalTests;
+using Jc.Tests;
 using System.Data;
 using Jc.Data.Query;
 

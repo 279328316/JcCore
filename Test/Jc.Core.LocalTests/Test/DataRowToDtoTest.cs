@@ -1,5 +1,6 @@
 ﻿
 using Jc.Helper;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -7,11 +8,13 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Jc.Core.LocalTests.Test
+namespace Jc.Tests.Test
 {
+    [TestClass]
     public class DataRowToDtoTest
     {
-        public static void Test()
+        [TestMethod]
+        public void Test()
 		{
 			List<UserDto> users = new List<UserDto>();
 			DataTable dt = Dbc.Db.GetDataTable("Select * from t_User");
@@ -19,7 +22,7 @@ namespace Jc.Core.LocalTests.Test
 			{
 				for (int i = 0; i < dt.Rows.Count; i++)
 				{
-					UserDto user = ConvertUserDto(dt.Rows[i]);
+					UserDto user = ConvertUserDto2(dt.Rows[i]);
 					users.Add(user);
 				}
 			}
@@ -100,10 +103,111 @@ namespace Jc.Core.LocalTests.Test
                     userDto.LastUpdateDate = (DateTime?)dataRow["LastUpdateDate"];
                 }
             }
-            catch(Exception ex)
+            catch (NotSupportedException ex)
+            {
+                throw new Exception($"NotSupportedException:{ex.Message}\r\n{ex.StackTrace}");
+            }
+            catch (Exception ex)
             {
                 throw new Exception($"异常:{ex.Message}\r\n{ex.StackTrace}");
             }
+			return userDto;
+		}
+
+        public static UserDto ConvertUserDto2(DataRow dataRow)
+        {
+			UserDto userDto = new UserDto();
+			DataColumnCollection columns = dataRow.Table.Columns;
+			DataColumn dataColumn = null;
+			try
+			{
+				if (columns.Contains("Id") && !dataRow.IsNull("Id"))
+				{
+					dataColumn = columns["Id"];
+					userDto.Id = (int?)dataRow[dataColumn];
+				}
+				if (columns.Contains("UserName") && !dataRow.IsNull("UserName"))
+				{
+					dataColumn = columns["UserName"];
+					userDto.UserName = (string)dataRow[dataColumn];
+				}
+				if (columns.Contains("UserPwd") && !dataRow.IsNull("UserPwd"))
+				{
+					dataColumn = columns["UserPwd"];
+					userDto.UserPwd = (string)dataRow[dataColumn];
+				}
+				if (columns.Contains("NickName") && !dataRow.IsNull("NickName"))
+				{
+					dataColumn = columns["NickName"];
+					userDto.NickName = (string)dataRow[dataColumn];
+				}
+				if (columns.Contains("RealName") && !dataRow.IsNull("RealName"))
+				{
+					dataColumn = columns["RealName"];
+					userDto.RealName = (string)dataRow[dataColumn];
+				}
+				if (columns.Contains("Email") && !dataRow.IsNull("Email"))
+				{
+					dataColumn = columns["Email"];
+					userDto.Email = (string)dataRow[dataColumn];
+				}
+				if (columns.Contains("Avatar") && !dataRow.IsNull("Avatar"))
+				{
+					dataColumn = columns["Avatar"];
+					userDto.Avatar = (string)dataRow[dataColumn];
+				}
+				if (columns.Contains("PhoneNo") && !dataRow.IsNull("PhoneNo"))
+				{
+					dataColumn = columns["PhoneNo"];
+					userDto.PhoneNo = (string)dataRow[dataColumn];
+				}
+				if (columns.Contains("Sex") && !dataRow.IsNull("Sex"))
+				{
+					dataColumn = columns["Sex"];
+					userDto.Sex = (Sex)((int)dataRow[dataColumn]);
+				}
+				if (columns.Contains("Birthday") && !dataRow.IsNull("Birthday"))
+				{
+					dataColumn = columns["Birthday"];
+					userDto.Birthday = (DateTime?)dataRow[dataColumn];
+				}
+				if (columns.Contains("IsDelete") && !dataRow.IsNull("IsDelete"))
+				{
+					dataColumn = columns["IsDelete"];
+					userDto.IsDelete = (bool)dataRow[dataColumn];
+				}
+				if (columns.Contains("UserStatus") && !dataRow.IsNull("UserStatus"))
+				{
+					dataColumn = columns["UserStatus"];
+					userDto.UserStatus = (int?)dataRow[dataColumn];
+				}
+				if (columns.Contains("AddUser") && !dataRow.IsNull("AddUser"))
+				{
+					dataColumn = columns["AddUser"];
+					userDto.AddUser = (Guid?)dataRow[dataColumn];
+				}
+				if (columns.Contains("AddDate") && !dataRow.IsNull("AddDate"))
+				{
+					dataColumn = columns["AddDate"];
+					userDto.AddDate = (DateTime?)dataRow[dataColumn];
+				}
+				if (columns.Contains("LastUpdateUser") && !dataRow.IsNull("LastUpdateUser"))
+				{
+					dataColumn = columns["LastUpdateUser"];
+					userDto.LastUpdateUser = (Guid?)dataRow[dataColumn];
+				}
+				if (columns.Contains("LastUpdateDate") && !dataRow.IsNull("LastUpdateDate"))
+				{
+					dataColumn = columns["LastUpdateDate"];
+					userDto.LastUpdateDate = (DateTime?)dataRow[dataColumn];
+				}
+			}
+			catch (Exception ex)
+			{
+				string message = string.Format("Column {0} Load Error:{1}", dataColumn.ColumnName, ex.Message);
+				Exception ex2 = new Exception(message);
+				throw ex2;
+			}
 			return userDto;
 		}
 	}

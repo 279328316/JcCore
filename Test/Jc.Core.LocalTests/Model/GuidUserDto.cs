@@ -1,12 +1,12 @@
 ﻿using Jc.Core;
 using System;
 
-namespace Jc.Core.LocalTests
+namespace Jc.Tests
 {
     /// <summary>
     /// User Dto
     /// </summary>
-    [Table(Name = "t_GUser{0}", DisplayText = "",AutoCreate = true)]
+    [Table(Name = "t_GUser", DisplayText = "",AutoCreate = true)]
     public class GUserDto
     {
         #region Properties

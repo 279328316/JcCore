@@ -1,71 +1,46 @@
-﻿using System;
+﻿using Jc.Data.Query;
+using System;
 using System.Collections.Generic;
-using System.Text;
 using System.Data;
+using System.Linq;
 using System.Reflection;
 using System.Reflection.Emit;
-using System.Linq.Expressions;
-using System.ComponentModel;
+using System.Text;
+using System.Threading.Tasks;
 
-namespace Jc.Data.Query
+namespace Jc.Core.FrameworkTest.Emit
 {
-    /// <summary>
-    /// EntityConvertor delegate
-    /// </summary>
-    /// <typeparam name="T"></typeparam>
-    /// <param name="dr">DataRow</param>
-    /// <param name="convertResult">转换结果对象 
-    /// 因Emit中使用String.Format Concat方法异常,无法组合异常消息
-    /// 故引入对象接收异常结果
-    /// 暂未发现其它更好方法</param>
-    /// <returns></returns>
-    public delegate object EntityConvertorDelegate(DataRow dr, EntityConvertResult convertResult);
-
-    public class EntityConvertor
+    public class JcDtoEmitTest
     {
-        /// <summary>
-        /// 构造EntityConvertor Handler
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <returns></returns>
-        public static EntityConvertorDelegate CreateEntityConvertor<T>()
-        {
-            DynamicMethod dynamicMethod = BuildSetValueMethod<T>();
-            EntityConvertorDelegate handler = (EntityConvertorDelegate)dynamicMethod.CreateDelegate(typeof(EntityConvertorDelegate));
-            return handler;
-        }
-
-        /// <summary>
-        /// 构造转换动态方法(核心代码)
-        /// </summary>
-        /// <typeparam name="T">返回的实体类型</typeparam>
-        /// <returns>实体对象</returns>
-        public static DynamicMethod BuildSetValueMethod<T>()
-        {
-            DynamicMethod method = new DynamicMethod("Convert" + typeof(T).Name,
-                    MethodAttributes.Public | MethodAttributes.Static,
-                    CallingConventions.Standard, typeof(T),
-                    new Type[] { typeof(DataRow),typeof(EntityConvertResult) }, typeof(T).Module, true);
-            ILGenerator generator = method.GetILGenerator();
-            ILGenerateSetValueMethodContent<T>(generator);
-            return method;
-        }
-                
         /// <summary>
         /// IL生成SetValueMethod内容
         /// 独立出来为共用代码
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="il"></param>
-        public static void ILGenerateSetValueMethodContent<T>(ILGenerator il)
+        public static IEntityConvertor<T> JcDtoConvertorTest<T>()
         {
+            var asmName = new AssemblyName("Test");
+            //var assemblyBuilder = AssemblyBuilder.DefineDynamicAssembly(asmName, AssemblyBuilderAccess.RunAndSave);
+            var assemblyBuilder = AppDomain.CurrentDomain.DefineDynamicAssembly(asmName, AssemblyBuilderAccess.RunAndSave);
+            var moduleBuilder = assemblyBuilder.DefineDynamicModule("KittyModule", "Kitty.exe");
+            var typeBuilder = moduleBuilder.DefineType("HelloKittyClass", TypeAttributes.Class | TypeAttributes.Public);
+            typeBuilder.AddInterfaceImplementation(typeof(IEntityConvertor<T>));
+            MethodBuilder method = typeBuilder.DefineMethod("ConvertDto",
+                               MethodAttributes.Public | MethodAttributes.HideBySig |
+                               MethodAttributes.NewSlot | MethodAttributes.Virtual |
+                               MethodAttributes.Final, typeof(T),
+                              new Type[] { typeof(DataRow), typeof(EntityConvertResult) });
+
+            ILGenerator il = method.GetILGenerator();
+
             LocalBuilder result = il.DeclareLocal(typeof(T));
             il.Emit(OpCodes.Newobj, typeof(T).GetConstructor(Type.EmptyTypes));
             il.Emit(OpCodes.Stloc, result);
 
             //取出dr中所有的列名集合
             il.DeclareLocal(typeof(DataColumnCollection));
-            il.Emit(OpCodes.Ldarg_0);
+            il.Emit(OpCodes.Ldarg_1);
             il.Emit(OpCodes.Callvirt, typeof(DataRow).GetMethod("get_Table"));
             il.Emit(OpCodes.Callvirt, typeof(DataTable).GetMethod("get_Columns"));
             il.Emit(OpCodes.Stloc_1); //var columns = dr.Table.Columns
@@ -95,7 +70,7 @@ namespace Jc.Data.Query
                 il.Emit(OpCodes.Callvirt, typeof(DataColumnCollection).GetMethod("Contains", new Type[] { typeof(string) }));
                 il.Emit(OpCodes.Brfalse, endIfLabel); //判断columns.Contains("Id")
 
-                il.Emit(OpCodes.Ldarg_0);    //dr
+                il.Emit(OpCodes.Ldarg_1);    //dr
                 il.Emit(OpCodes.Ldstr, fieldName);     //Id
                 il.Emit(OpCodes.Callvirt, typeof(DataRow).GetMethod("IsNull", new Type[] { typeof(string) }));
                 il.Emit(OpCodes.Brtrue, endIfLabel); //判断dr.IsNull("Id")
@@ -107,7 +82,7 @@ namespace Jc.Data.Query
 
                 //自DataReader中读取值 调用get_Item方法 dataRow["Id"]
                 il.Emit(OpCodes.Ldloc, result);  //result
-                il.Emit(OpCodes.Ldarg_0);    //dataRow
+                il.Emit(OpCodes.Ldarg_1);    //dataRow
                 il.Emit(OpCodes.Ldstr, fieldName);   //Id
                 il.Emit(OpCodes.Callvirt, typeof(DataRow).GetMethod("get_Item", new Type[] { typeof(string) }));
 
@@ -141,30 +116,38 @@ namespace Jc.Data.Query
             LocalBuilder exception = il.DeclareLocal(typeof(Exception));
             il.Emit(OpCodes.Stloc, exception);
 
-            il.Emit(OpCodes.Ldarg_1);
+            il.Emit(OpCodes.Ldarg_2);
             il.Emit(OpCodes.Ldc_I4_1);
             il.Emit(OpCodes.Call, typeof(EntityConvertResult).GetMethod("set_IsException", new Type[] { typeof(bool) }));
 
-            il.Emit(OpCodes.Ldarg_1);
+            il.Emit(OpCodes.Ldarg_2);
             il.Emit(OpCodes.Ldloc, curColumn);
             il.Emit(OpCodes.Call, typeof(DataColumn).GetMethod("get_ColumnName"));
             il.Emit(OpCodes.Call, typeof(EntityConvertResult).GetMethod("set_ColumnName", new Type[] { typeof(string) }));
 
-            il.Emit(OpCodes.Ldarg_1);
+            il.Emit(OpCodes.Ldarg_2);
             il.Emit(OpCodes.Ldloc, exception);
             il.Emit(OpCodes.Call, typeof(Exception).GetMethod("get_Message"));
             il.Emit(OpCodes.Call, typeof(EntityConvertResult).GetMethod("set_Message", new Type[] { typeof(string) }));
 
-            //il.Emit(OpCodes.Ldarg_1);     //不对外输出Exception
-            //il.Emit(OpCodes.Ldloc, exception);
-            //il.Emit(OpCodes.Call, typeof(EntityConvertResult).GetMethod("set_Exception", new Type[] { typeof(Exception) }));
+            il.Emit(OpCodes.Ldarg_2);
+            il.Emit(OpCodes.Ldloc, exception);
+            il.Emit(OpCodes.Call, typeof(EntityConvertResult).GetMethod("set_Exception", new Type[] { typeof(Exception) }));
 
             //end catch
             il.EndExceptionBlock();
 
             /*给本地变量（result）返回值*/
             il.Emit(OpCodes.Ldloc, result);
-            il.Emit(OpCodes.Ret);            
+            il.Emit(OpCodes.Ret);
+
+            TypeInfo typeInfo = typeBuilder.CreateTypeInfo();
+            assemblyBuilder.Save("Kitty.exe");
+
+            object obj = assemblyBuilder.CreateInstance(typeInfo.Name);
+
+            return obj as IEntityConvertor<T>;
         }
+
     }
 }

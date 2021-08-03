@@ -1,7 +1,7 @@
 ﻿using System;
 using Jc.Core;
 
-namespace Jc.Core.LocalTests
+namespace Jc.Tests
 {
     /// <summary>
     /// User Dto

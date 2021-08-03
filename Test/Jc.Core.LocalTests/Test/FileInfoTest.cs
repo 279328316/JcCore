@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 
-namespace Jc.Core.LocalTests
+namespace Jc.Tests
 {
     public class FileInfoTest
     {

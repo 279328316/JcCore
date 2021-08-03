@@ -39,7 +39,13 @@ namespace Jc.Data
             {
                 dtoMapping.EntityConvertor = EntityConvertor.CreateEntityConvertor<T>();   //存入dtoMapping中,缓存起来
             }
-            return (T)((EntityConvertorDelegate)dtoMapping.EntityConvertor)(dr);
+            EntityConvertResult convertResult = new EntityConvertResult();
+            T dto = (T)((EntityConvertorDelegate)dtoMapping.EntityConvertor)(dr, convertResult);
+            if (convertResult.IsException)
+            {
+                throw new Exception($"load column '{convertResult.ColumnName}' error :{convertResult.Message}");
+            }
+            return dto;
         }
     }
 }
