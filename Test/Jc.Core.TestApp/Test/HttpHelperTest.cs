@@ -19,7 +19,7 @@ namespace Jc.Core.TestApp.Test
             string filePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory,@"Test\1.exe");
             List<string> fileList = new List<string>() { filePath };
             string paramStr = "groupName=groupName&groupCode=groupCode&ConfigCode=ConfigCode";
-            string result = httpHelper.UploadFile(url, paramStr, fileList);
+            string result = httpHelper.UploadFileList(url, paramStr, fileList);
         }
 
         public void PostTest()

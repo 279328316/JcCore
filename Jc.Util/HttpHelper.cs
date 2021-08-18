@@ -440,39 +440,10 @@ namespace Jc
         /// <param name="requestParams">请求参数</param>
         /// <param name="fileList">文件路径列表</param>
         /// <returns></returns>
-        public T UploadFile<T>(string url, object requestParams = null,List<string> fileList = null)
+        public T UploadFileList<T>(string url, object requestParams = null,List<string> fileList = null)
         {
-            string resultString = UploadFile(url, requestParams, fileList);
+            string resultString = UploadFileList(url, requestParams, fileList);
             return JsonHelper.DeserializeObject<T>(resultString);
-        }
-        /// <summary>
-        /// 执行UploadFile请求
-        /// 可接受IDictionary&lt;string,object&gt;,IEnumerable&lt;keyvaluePair&lt;string,object&gt;&gt;,
-        /// IEnumerable&lt;object&gt;,string(a=a1&amp;b=b1),object等类型参数
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="url">请求url</param>
-        /// <param name="requestParams">请求参数</param>
-        /// <param name="fileList">文件路径列表</param>
-        /// <returns></returns>
-        public AfterEvent<T> UploadFileAsync<T>(string url, object requestParams = null, List<string> fileList = null)
-        {
-            AfterEvent<T> after = null;
-            Task t = new Task(() =>
-            {
-                string resultString = UploadFile(url, requestParams, fileList);
-                if (typeof(T) == typeof(string))
-                {
-                    T result = (T)Convert.ChangeType(resultString, typeof(T));
-                    after.DoAfter(result);
-                }
-                else
-                {
-                    after.DoAfter(JsonHelper.DeserializeObject<T>(resultString));
-                }
-            });
-            t.Start();
-            return after;
         }
 
         /// <summary>
@@ -485,7 +456,7 @@ namespace Jc
         /// <param name="requestParams">请求参数</param>
         /// <param name="fileList">文件路径列表</param>
         /// <returns></returns>
-        public string UploadFile(string url, object requestParams = null, List<string> fileList = null)
+        public string UploadFileList(string url, object requestParams = null, List<string> fileList = null)
         {
             string result = "";
             try
@@ -501,6 +472,142 @@ namespace Jc
                 throw new System.Exception(ex.Message);
             }
             return result;
+        }
+
+        /// <summary>
+        /// 执行UploadFile请求
+        /// 可接受IDictionary&lt;string,object&gt;,IEnumerable&lt;keyvaluePair&lt;string,object&gt;&gt;,
+        /// IEnumerable&lt;object&gt;,string(a=a1&amp;b=b1),object等类型参数
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="url">请求url</param>
+        /// <param name="requestParams">请求参数</param>
+        /// <param name="filePath">文件路径</param>
+        /// <returns></returns>
+        public T UploadFile<T>(string url, object requestParams = null, string filePath = "")
+        {
+            FileInfo file = new FileInfo(filePath);
+            using (FileStream fileStream = File.OpenRead(filePath))
+            {
+                string resultString = UploadFile(url, requestParams, file.Name, fileStream);
+                return JsonHelper.DeserializeObject<T>(resultString);
+            }
+        }
+
+        /// <summary>
+        /// 执行UploadFile请求
+        /// 可接受IDictionary&lt;string,object&gt;,IEnumerable&lt;keyvaluePair&lt;string,object&gt;&gt;,
+        /// IEnumerable&lt;object&gt;,string(a=a1&amp;b=b1),object等类型参数
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="url">请求url</param>
+        /// <param name="requestParams">请求参数</param>
+        /// <param name="filePath">文件路径</param>
+        /// <returns></returns>
+        public string UploadFile(string url, object requestParams = null, string filePath = "")
+        {
+            FileInfo file = new FileInfo(filePath);
+            using (FileStream fileStream = File.OpenRead(filePath))
+            {
+                string resultString = UploadFile(url, requestParams, file.Name, fileStream);
+                return resultString;
+            }
+        }
+
+        /// <summary>
+        /// 执行UploadFile请求 以stream方式上传单个文件
+        /// 可接受IDictionary&lt;string,object&gt;,IEnumerable&lt;keyvaluePair&lt;string,object&gt;&gt;,
+        /// IEnumerable&lt;object&gt;,string(a=a1&amp;b=b1),object等类型参数
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="url">请求url</param>
+        /// <param name="requestParams">请求参数</param>
+        /// <param name="fileName">文件名</param>
+        /// <param name="stream">数据流</param>
+        /// <returns></returns>
+        public string UploadFile(string url, object requestParams = null,string fileName = "", Stream fileStream = null)
+        {
+            string result = "";
+            try
+            {
+                byte[] buffur = new byte[fileStream.Length];
+                fileStream.Read(buffur, 0, (int)fileStream.Length);
+                using (HttpWebResponse response = CreateUploadFileHttpResponse(url, requestParams, fileName, buffur))
+                {
+                    result = ReadResponse(response);
+                    response.Close();
+                }
+            }
+            catch (System.Exception ex)
+            {
+                throw new System.Exception(ex.Message);
+            }
+            return result;
+        }
+
+
+        /// <summary>
+        /// 执行UploadFile请求 以stream方式上传单个文件
+        /// 可接受IDictionary&lt;string,object&gt;,IEnumerable&lt;keyvaluePair&lt;string,object&gt;&gt;,
+        /// IEnumerable&lt;object&gt;,string(a=a1&amp;b=b1),object等类型参数
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="url">请求url</param>
+        /// <param name="requestParams">请求参数</param>
+        /// <param name="fileName">文件名</param>
+        /// <param name="stream">数据流</param>
+        /// <returns></returns>
+        public T UploadFile<T>(string url, object requestParams = null, string fileName = "", Stream fileStream = null)
+        {
+            string resultString = UploadFile(url, requestParams, fileName, fileStream);
+            return JsonHelper.DeserializeObject<T>(resultString);            
+        }
+
+        /// <summary>
+        /// 执行UploadFile请求 以Byte[]上传单个文件
+        /// 可接受IDictionary&lt;string,object&gt;,IEnumerable&lt;keyvaluePair&lt;string,object&gt;&gt;,
+        /// IEnumerable&lt;object&gt;,string(a=a1&amp;b=b1),object等类型参数
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="url">请求url</param>
+        /// <param name="requestParams">请求参数</param>
+        /// <param name="fileName">文件名</param>
+        /// <param name="stream">数据流</param>
+        /// <returns></returns>
+        public string UploadFile(string url, object requestParams = null, string fileName = "", byte[] fileData = null)
+        {
+            string result = "";
+            try
+            {
+                using (HttpWebResponse response = CreateUploadFileHttpResponse(url, requestParams, fileName, fileData))
+                {
+                    result = ReadResponse(response);
+                    response.Close();
+                }
+            }
+            catch (System.Exception ex)
+            {
+                throw new System.Exception(ex.Message);
+            }
+            return result;
+        }
+
+
+        /// <summary>
+        /// 执行UploadFile请求 以Byte[]上传单个文件
+        /// 可接受IDictionary&lt;string,object&gt;,IEnumerable&lt;keyvaluePair&lt;string,object&gt;&gt;,
+        /// IEnumerable&lt;object&gt;,string(a=a1&amp;b=b1),object等类型参数
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="url">请求url</param>
+        /// <param name="requestParams">请求参数</param>
+        /// <param name="fileName">文件名</param>
+        /// <param name="stream">数据流</param>
+        /// <returns></returns>
+        public T UploadFile<T>(string url, object requestParams = null, string fileName = "", byte[] fileData = null)
+        {
+            string resultString = UploadFile(url, requestParams, fileName, fileData);
+            return JsonHelper.DeserializeObject<T>(resultString);
         }
 
         /// <summary>
@@ -792,6 +899,107 @@ namespace Jc
                                 stream.Write(buffur, 0, buffur.Length);
                             }
                         }
+                    }
+                    //结尾加上结束分隔符
+                    byte[] endBoundaryBytes = Encoding.UTF8.GetBytes("\r\n--" + boundary + "--\r\n");
+                    stream.Write(endBoundaryBytes, 0, endBoundaryBytes.Length);
+                }
+            }
+            #endregion
+            return request.GetResponse() as HttpWebResponse;
+        }
+
+
+        /// <summary>
+        /// 创建UploadFile请求 以stream方式上传单个文件
+        /// 可接受IDictionary&lt;string,object&gt;,IEnumerable&lt;keyvaluePair&lt;string,object&gt;&gt;,
+        /// IEnumerable&lt;object&gt;,string(a=a1&amp;b=b1),object等类型参数
+        /// </summary>
+        /// <param name="url">请求url</param>
+        /// <param name="requestParams">请求参数</param>
+        /// <param name="fileName">文件名</param>
+        /// <param name="stream">文件数据流</param>
+        /// <returns></returns>
+        public HttpWebResponse CreateUploadFileHttpResponse(string url, object requestParams = null,string fileName = "",byte[] fileData = null)
+        {
+            if (!url.ToLower().StartsWith("http") && !string.IsNullOrEmpty(BaseUrl))
+            {
+                url = BaseUrl + url;
+            }
+            if (string.IsNullOrEmpty(url))
+            {
+                throw new ArgumentNullException("url");
+            }
+            HttpWebRequest request = WebRequest.Create(url) as HttpWebRequest;
+            if (url.StartsWith("https", StringComparison.OrdinalIgnoreCase))
+            {   //如果是发送HTTPS请求
+                request.ProtocolVersion = HttpVersion.Version10;
+                request.ServerCertificateValidationCallback = new RemoteCertificateValidationCallback(CheckValidationResult);
+            }
+
+            request.UserAgent = UserAgent;
+            request.AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate;
+
+            if (Headers != null && Headers.Count > 0)
+            {
+                foreach (string key in Headers.AllKeys)
+                {
+                    request.Headers.Add(key, Headers[key]);
+                }
+            }
+            request.Timeout = Timeout;
+            request.ReadWriteTimeout = Timeout;
+            request.CookieContainer = new CookieContainer();
+            request.CookieContainer.Add(Cookies);
+
+            request.Method = "POST";
+
+            string boundary = DateTime.Now.Ticks.ToString("X"); // 随机分隔线
+            request.ContentType = "multipart/form-data;boundary=" + boundary;   //请求类型
+            request.AllowWriteStreamBuffering = false;  //对发送的数据不使用缓存
+
+            // 最后的结束符  
+            byte[] endBoundary = Encoding.UTF8.GetBytes("\r\n--" + boundary + "--\r\n");
+
+            //文件数据
+            string fileFormdataTemplate =
+                "\r\n--" + boundary +
+                "\r\nContent-Disposition: form-data; name=\"file\"; filename=\"{0}\"" +
+                "\r\nContent-Type: application/octet-stream\r\n\r\n";
+
+            //文本数据 
+            string dataFormdataTemplate =
+                "\r\n--" + boundary +
+                "\r\nContent-Disposition: form-data; name=\"{0}\"" +
+                "\r\n\r\n{1}";
+
+            #region 上传数据 文件
+
+            if (requestParams != null || (fileData != null && fileData.Length > 0))
+            {
+                using (Stream stream = request.GetRequestStream())
+                {
+                    //如果需要Post数据
+                    if (requestParams != null)
+                    {
+                        #region 写入其他表单参数
+                        IDictionary<string, object> items = GetParameterDictionary(requestParams);
+                        foreach (KeyValuePair<string, object> key in items)
+                        {
+                            var p = string.Format(dataFormdataTemplate, key.Key, key.Value);
+                            var bp = Encoding.UTF8.GetBytes(p);
+                            stream.Write(bp, 0, bp.Length);
+                        }
+                        #endregion
+                    }
+                    if (fileData != null && fileData.Length > 0)
+                    {
+                        string strPostHeader = string.Format(fileFormdataTemplate, fileName);
+                        byte[] postHeaderBytes = Encoding.UTF8.GetBytes(strPostHeader);
+                        stream.Write(postHeaderBytes, 0, postHeaderBytes.Length);  //把头部转为数据流放入到请求流中去
+
+                        // 将文件数据写入到请求流中去
+                        stream.Write(fileData, 0, fileData.Length);                        
                     }
                     //结尾加上结束分隔符
                     byte[] endBoundaryBytes = Encoding.UTF8.GetBytes("\r\n--" + boundary + "--\r\n");
