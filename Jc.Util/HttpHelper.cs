@@ -440,7 +440,7 @@ namespace Jc
         /// <param name="requestParams">请求参数</param>
         /// <param name="fileList">文件路径列表</param>
         /// <returns></returns>
-        public T UploadFileList<T>(string url, object requestParams = null,List<string> fileList = null)
+        public T UploadFileList<T>(string url, object requestParams,List<string> fileList)
         {
             string resultString = UploadFileList(url, requestParams, fileList);
             return JsonHelper.DeserializeObject<T>(resultString);
@@ -456,7 +456,7 @@ namespace Jc
         /// <param name="requestParams">请求参数</param>
         /// <param name="fileList">文件路径列表</param>
         /// <returns></returns>
-        public string UploadFileList(string url, object requestParams = null, List<string> fileList = null)
+        public string UploadFileList(string url, object requestParams, List<string> fileList)
         {
             string result = "";
             try
@@ -484,7 +484,7 @@ namespace Jc
         /// <param name="requestParams">请求参数</param>
         /// <param name="filePath">文件路径</param>
         /// <returns></returns>
-        public T UploadFile<T>(string url, object requestParams = null, string filePath = "")
+        public T UploadFile<T>(string url, object requestParams, string filePath)
         {
             FileInfo file = new FileInfo(filePath);
             using (FileStream fileStream = File.OpenRead(filePath))
@@ -504,7 +504,7 @@ namespace Jc
         /// <param name="requestParams">请求参数</param>
         /// <param name="filePath">文件路径</param>
         /// <returns></returns>
-        public string UploadFile(string url, object requestParams = null, string filePath = "")
+        public string UploadFile(string url, object requestParams, string filePath)
         {
             FileInfo file = new FileInfo(filePath);
             using (FileStream fileStream = File.OpenRead(filePath))
@@ -525,7 +525,7 @@ namespace Jc
         /// <param name="fileName">文件名</param>
         /// <param name="stream">数据流</param>
         /// <returns></returns>
-        public string UploadFile(string url, object requestParams = null,string fileName = "", Stream fileStream = null)
+        public string UploadFile(string url, object requestParams,string fileName, Stream fileStream)
         {
             string result = "";
             try
@@ -557,7 +557,7 @@ namespace Jc
         /// <param name="fileName">文件名</param>
         /// <param name="stream">数据流</param>
         /// <returns></returns>
-        public T UploadFile<T>(string url, object requestParams = null, string fileName = "", Stream fileStream = null)
+        public T UploadFile<T>(string url, object requestParams, string fileName, Stream fileStream)
         {
             string resultString = UploadFile(url, requestParams, fileName, fileStream);
             return JsonHelper.DeserializeObject<T>(resultString);            
@@ -574,7 +574,7 @@ namespace Jc
         /// <param name="fileName">文件名</param>
         /// <param name="stream">数据流</param>
         /// <returns></returns>
-        public string UploadFile(string url, object requestParams = null, string fileName = "", byte[] fileData = null)
+        public string UploadFile(string url, object requestParams, string fileName, byte[] fileData)
         {
             string result = "";
             try
@@ -604,7 +604,7 @@ namespace Jc
         /// <param name="fileName">文件名</param>
         /// <param name="stream">数据流</param>
         /// <returns></returns>
-        public T UploadFile<T>(string url, object requestParams = null, string fileName = "", byte[] fileData = null)
+        public T UploadFile<T>(string url, object requestParams, string fileName, byte[] fileData)
         {
             string resultString = UploadFile(url, requestParams, fileName, fileData);
             return JsonHelper.DeserializeObject<T>(resultString);
@@ -803,7 +803,7 @@ namespace Jc
         /// <param name="requestParams">请求参数</param>
         /// <param name="fileList">文件路径列表</param>
         /// <returns></returns>
-        public HttpWebResponse CreateUploadFileHttpResponse(string url, object requestParams = null,List<string> fileList = null)
+        public HttpWebResponse CreateUploadFileHttpResponse(string url,object requestParams,List<string> fileList)
         {
             if (!url.ToLower().StartsWith("http") && !string.IsNullOrEmpty(BaseUrl))
             {
