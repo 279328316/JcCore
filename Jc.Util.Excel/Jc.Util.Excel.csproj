@@ -5,7 +5,8 @@
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <Description>Excel操作Helper
 简单Excel导入导出操作</Description>
-    <Version>1.1.3.3</Version>
+    <Version>1.1.3.4</Version>
+    <GenerateDocumentationFile>True</GenerateDocumentationFile>
   </PropertyGroup>
 
   <ItemGroup>

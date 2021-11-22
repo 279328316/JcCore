@@ -17,7 +17,7 @@ namespace Jc.Tests
         {
             try
             {
-                List<UserDto> users = Dbc.Db.GetList<UserDto>();
+                List<UserDto> users = Dbc.Db.GetList<UserDto>(a=>a.Email.Contains("@") && a.IsDelete == false);
             }
             catch (Exception ex)
             { 
