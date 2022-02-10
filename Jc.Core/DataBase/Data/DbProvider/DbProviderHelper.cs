@@ -35,7 +35,7 @@ namespace Jc.Data
             #region Set ConnectString
             if (!connectString.Contains(";"))
             {   //使用;判断是否为数据库名称or连接串
-                string dbConnectString = GetConnectString(connectString);
+                string dbConnectString = ConfigHelper.GetConnectString(connectString);
                 if (string.IsNullOrEmpty(dbConnectString))
                 {
                     throw new Exception($"DbServer[{connectString}]配置无效.请检查.");
@@ -64,48 +64,6 @@ namespace Jc.Data
             }
             dbProvider.dbType = dbType;
             return dbProvider;
-        }
-
-        /// <summary>
-        /// 获取配置
-        /// </summary>
-        /// <param name="key">key</param>
-        /// <param name="configFileName">配置文件名称</param>
-        /// <returns></returns>
-        public static string GetConnectString(string key, string configFileName = null)
-        {
-            string value = null;
-            string filePath;
-            if (string.IsNullOrEmpty(configFileName))
-            {
-                configFileName = "appsettings.json";
-                filePath = Path.Combine(AppContext.BaseDirectory, configFileName);
-            }
-            else
-            {
-                if (File.Exists(configFileName))
-                {
-                    filePath = configFileName;
-                }
-                else
-                {
-                    filePath = Path.Combine(AppContext.BaseDirectory, configFileName);
-                }
-            }
-            if (File.Exists(filePath))
-            {
-                IConfigurationBuilder builder = new ConfigurationBuilder().AddJsonFile(filePath);
-                IConfiguration configuration = builder.Build();
-                value = configuration.GetConnectionString(key);
-            }
-            else
-            {   //兼容 .netFramework应用程序
-                if (ConfigurationManager.ConnectionStrings[key] != null)
-                {
-                    value = ConfigurationManager.ConnectionStrings[key].ConnectionString;
-                }
-            }
-            return value;
         }
 
         /// <summary>

@@ -15,7 +15,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\Jc.Base\Jc.Base.csproj" />
-    <ProjectReference Include="..\..\Jc.Util\Jc.Util.csproj" />
+    <ProjectReference Include="..\..\Jc.Core\Jc.Core.csproj" />
   </ItemGroup>
 
 </Project>

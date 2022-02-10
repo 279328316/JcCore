@@ -5,17 +5,19 @@ using System.Runtime.Serialization;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Xml.Serialization;
 using System.Xml;
+using System.Text;
 using System.Text.RegularExpressions;
 using System.Collections.Generic;
+using Newtonsoft.Json.Linq;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 
-namespace Jc.Helper
+namespace Jc
 {
     /// <summary>
     /// Json操作类
     /// </summary>
-    public class Json
+    public class JsonHelper
     {
         /// <summary>
         /// 序列化方法 同SerializeObject
@@ -45,7 +47,7 @@ namespace Jc.Helper
                     setting = new JsonSerializerSettings();
                     setting.DateFormatString = "yyyy-MM-dd HH:mm:ss";//日期字符串格式化
                     setting.NullValueHandling = NullValueHandling.Ignore;//忽略空值
-                    setting.ReferenceLoopHandling = ReferenceLoopHandling.Ignore;//忽略空值
+                    setting.ReferenceLoopHandling = ReferenceLoopHandling.Ignore;//忽略循环
                     setting.ContractResolver = new CamelCasePropertyNamesContractResolver();
                 }
                 result = JsonConvert.SerializeObject(obj, setting);

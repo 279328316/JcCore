@@ -222,10 +222,6 @@
       <Project>{5a37603f-40ac-4bed-b27c-6d4e5e2b0475}</Project>
       <Name>Jc.Core</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\Jc.Util\Jc.Util.csproj">
-      <Project>{08230dba-f550-4314-b31c-a098121f0092}</Project>
-      <Name>Jc.Util</Name>
-    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="..\..\packages\Stub.System.Data.SQLite.Core.NetFramework.1.0.113.3\build\net46\Stub.System.Data.SQLite.Core.NetFramework.targets" Condition="Exists('..\..\packages\Stub.System.Data.SQLite.Core.NetFramework.1.0.113.3\build\net46\Stub.System.Data.SQLite.Core.NetFramework.targets')" />

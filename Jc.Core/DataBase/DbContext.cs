@@ -157,7 +157,7 @@ namespace Jc
                 } 
                 catch(Exception ex)
                 {
-                    DbLogHelper.Error($"CloseDbConnection Error:{DbExHelper.GetExceptionMsg(ex)}");
+                    DbLogHelper.Error($"CloseDbConnection Error:{ExHelper.GetExceptionMsg(ex)}");
                 }
             }
         }
