@@ -48,9 +48,9 @@ namespace Jc
         public string BaseUrl { get; set; }
 
         /// <summary>
-        /// 超时时间 默认60S
+        /// 超时时间单位ms 默认600s 10 * 60 * 1000
         /// </summary>
-        public int Timeout { get; set; } = 60000;
+        public int Timeout { get; set; } = 10 * 60 * 1000;
 
         /// <summary>
         /// 用户代理
@@ -523,7 +523,7 @@ namespace Jc
         /// <param name="url">请求url</param>
         /// <param name="requestParams">请求参数</param>
         /// <param name="fileName">文件名</param>
-        /// <param name="stream">数据流</param>
+        /// <param name="fileStream">数据流</param>
         /// <returns></returns>
         public string UploadFile(string url, object requestParams,string fileName, Stream fileStream)
         {
@@ -555,7 +555,7 @@ namespace Jc
         /// <param name="url">请求url</param>
         /// <param name="requestParams">请求参数</param>
         /// <param name="fileName">文件名</param>
-        /// <param name="stream">数据流</param>
+        /// <param name="fileStream">数据流</param>
         /// <returns></returns>
         public T UploadFile<T>(string url, object requestParams, string fileName, Stream fileStream)
         {
@@ -568,11 +568,10 @@ namespace Jc
         /// 可接受IDictionary&lt;string,object&gt;,IEnumerable&lt;keyvaluePair&lt;string,object&gt;&gt;,
         /// IEnumerable&lt;object&gt;,string(a=a1&amp;b=b1),object等类型参数
         /// </summary>
-        /// <typeparam name="T"></typeparam>
         /// <param name="url">请求url</param>
         /// <param name="requestParams">请求参数</param>
         /// <param name="fileName">文件名</param>
-        /// <param name="stream">数据流</param>
+        /// <param name="fileData">数据</param>
         /// <returns></returns>
         public string UploadFile(string url, object requestParams, string fileName, byte[] fileData)
         {
@@ -602,7 +601,7 @@ namespace Jc
         /// <param name="url">请求url</param>
         /// <param name="requestParams">请求参数</param>
         /// <param name="fileName">文件名</param>
-        /// <param name="stream">数据流</param>
+        /// <param name="fileData">数据</param>
         /// <returns></returns>
         public T UploadFile<T>(string url, object requestParams, string fileName, byte[] fileData)
         {
@@ -918,7 +917,7 @@ namespace Jc
         /// <param name="url">请求url</param>
         /// <param name="requestParams">请求参数</param>
         /// <param name="fileName">文件名</param>
-        /// <param name="stream">文件数据流</param>
+        /// <param name="fileData">文件数据</param>
         /// <returns></returns>
         public HttpWebResponse CreateUploadFileHttpResponse(string url, object requestParams = null,string fileName = "",byte[] fileData = null)
         {
