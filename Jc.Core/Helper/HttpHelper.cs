@@ -1116,6 +1116,10 @@ namespace Jc
                         {
                             string valueStr;
                             object value = piList[i].GetValue(requestParams);
+                            if(value == null)
+                            {
+                                continue;
+                            }
                             if (value is ValueType || value is string)
                             {
                                 valueStr = value?.ToString();
