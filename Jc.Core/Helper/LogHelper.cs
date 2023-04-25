@@ -164,16 +164,35 @@ namespace Jc
         /// <param name="msg"></param>
         public static void Error(string msg)
         {
-            if (ErrorLogger != null)
+            try
             {
-                try
+                if (ErrorLogger != null)
                 {
                     ErrorLogger.Error(msg);
                 }
-                catch(Exception ex)
+                else
                 {
-
+                    Info(msg);
                 }
+            }
+            catch
+            {
+            }
+        }
+
+        /// <summary>
+        /// 记录日志
+        /// </summary>
+        /// <param name="msg"></param>
+        public static void Error(Exception ex)
+        {
+            try
+            {
+                string msg = GetExceptionInfo(ex);
+                Error(msg);
+            }
+            catch
+            {
             }
         }
 
@@ -184,41 +203,35 @@ namespace Jc
         /// <param name="ex">异常信息</param>
         public static void Error(string msg,Exception ex)
         {
-            if (ErrorLogger != null)
+            try
             {
-                try
+                if (string.IsNullOrEmpty(msg))
                 {
-                    if (string.IsNullOrEmpty(msg))
-                    {
-                        msg = "";
-                    }
-                    msg += $"{ex.Message}\r\n{ex.StackTrace}";
-                    if (ex.InnerException != null)
-                    {
-                        ex = GetOriginalException(ex.InnerException);
-                        msg += $"{ex.Message}\r\n{ex.StackTrace}";
-                    }
-                    ErrorLogger.Error(msg);
+                    msg = "";
                 }
-                catch (Exception ex1)
-                {
-
-                }
+                msg = msg + GetExceptionInfo(ex);
+                Error(msg);
+            }
+            catch
+            {
             }
         }
 
         /// <summary>
-        /// 获取Original Exception
+        /// 获取Exception Info
         /// </summary>
         /// <param name="ex"></param>
         /// <returns></returns>
-        private static Exception GetOriginalException(Exception ex)
+        private static string GetExceptionInfo(Exception ex)
         {
-            while (ex.InnerException != null)
+            string msg = $"{ex.Message}\r\n{ex.StackTrace}";
+            Exception innerEx = ex.InnerException;
+            while (innerEx != null)
             {
-                return GetOriginalException(ex.InnerException);
+                msg += $"{innerEx.Message}\r\n{innerEx.StackTrace}";
+                innerEx = innerEx.InnerException;
             }
-            return ex;
+            return msg;
         }
     }
 }
