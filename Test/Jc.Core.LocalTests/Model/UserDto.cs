@@ -63,7 +63,7 @@ namespace Jc.Tests
         /// 性别 0女 1男
         /// </summary>
         [Field(DisplayText = "性别 0女 1男", FieldType = "int")]
-        public Sex Sex { get; set; }
+        public Sex? Sex { get; set; }
 
         /// <summary>
         /// 出生日期

@@ -251,7 +251,7 @@ namespace Jc.Data
                 {
                     strBuilder.Append(" primary key ");
 
-                    if (fieldType == "integer" || fieldType== "long")
+                    if (fieldType == "int" || fieldType == "integer" || fieldType== "long" || fieldType == "bigint")
                     {
                         strBuilder.Append(" autoincrement ");
                     }

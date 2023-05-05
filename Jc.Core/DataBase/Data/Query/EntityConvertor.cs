@@ -114,15 +114,16 @@ namespace Jc.Data.Query
                 Type type = piMap.PropertyType;  //拆箱
                 if (type.IsValueType)
                 {   //直接拆箱 可空类型,也可以直接拆箱
+                    Type realType = type;
                     if (piMap.IsEnum)
                     {
                         if (type.GenericTypeArguments.Length > 0)
                         {   //如果为可空枚举类型,抛出异常
-                            Type realType = type.GenericTypeArguments[0];
+                            realType = type.GenericTypeArguments[0];
                             throw new Exception($"对象{typeof(T).Name}属性{piMap.Pi.Name}[{realType.Name}]转换异常.不支持可空枚举类型.");
                         }
                     }
-                    il.Emit(OpCodes.Unbox_Any, type);
+                    il.Emit(OpCodes.Unbox_Any, realType);
                 }
                 else
                 {   //引用类型

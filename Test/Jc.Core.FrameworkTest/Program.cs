@@ -14,10 +14,10 @@ namespace Jc.Core.FrameworkTest
             Console.WriteLine("测试即将开始,请按任意键继续.");
             //Console.ReadKey();           
             //EmitTest.ILGenerateSetValueMethodContent<UserDto>();
-            JcDtoEmitTest.JcDtoConvertorTest<UserDto>();
+            //JcDtoEmitTest.JcDtoConvertorTest<UserDto>();
 
-            //EntityConvertorTest test = new EntityConvertorTest();
-            //test.GetListTest();
+            EntityConvertorTest test = new EntityConvertorTest();
+            test.GetListTest();
             Console.WriteLine("测试完成,请按任意键继续.");
             //Console.ReadKey();
         }

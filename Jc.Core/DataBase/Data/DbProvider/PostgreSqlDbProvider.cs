@@ -291,7 +291,8 @@ namespace Jc.Data
                 }
                 if (attr.IsPk == true)
                 {
-                    if (attr.FieldType.ToLower() == "int" || attr.FieldType.ToLower() == "integer")
+                    if (attr.FieldType.ToLower() == "int" || attr.FieldType.ToLower() == "integer"
+                        || attr.FieldType.ToLower() == "bigint")
                     {
                         strBuilder.Append(" serial ");
                     }

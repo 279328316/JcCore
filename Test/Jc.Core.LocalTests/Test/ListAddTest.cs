@@ -37,7 +37,7 @@ namespace Jc.Tests
                     Email = $"Email{i}@qq.com",
                     Avatar = $"Avatar{i}",
                     PhoneNo = $"133810{i}".PadRight(11,'0'),
-                    //Sex = (Sex)Enum.Parse(typeof(Sex),(i%2).ToString()),
+                    Sex = (Sex)Enum.Parse(typeof(Sex),(i%2).ToString()),
                     Birthday = DateTime.Now.AddYears(-1).AddHours(-1*i),
                     WeChatOpenId = $"WeChatOpenId{i}",
                     IsDelete = i % 2 == 0 ? true : false,
@@ -77,8 +77,11 @@ namespace Jc.Tests
                 users[i].RealName = $"UpRealName{i}";
                 users[i].Email = $"UpEmail{i}@qq.com";
                 users[i].Avatar = $"Avatar{i}";
-                users[i].PhoneNo = $"133810{i}".PadRight(11, '0');                
-                //users[i].Sex = (Sex)Enum.Parse(typeof(Sex), (i % 2).ToString());
+                users[i].PhoneNo = $"133810{i}".PadRight(11, '0');
+                if (i % 3 == 0 || i % 5 == 0)
+                {
+                    users[i].Sex = (Sex)Enum.Parse(typeof(Sex), (i % 2).ToString());
+                }
                 users[i].Birthday = DateTime.Now.AddYears(-1).AddHours(-1 * i);
                 users[i].WeChatOpenId = $"WeChatOpenId{i}";
                 users[i].IsDelete = i % 2 == 0 ? true : false;
@@ -91,7 +94,7 @@ namespace Jc.Tests
             sw.Reset();
             Console.WriteLine("执行数据更新...");
             sw.Start();
-            Dbc.Db.UpdateList(users,a=>new {a.Id,a.UserName,a.Email,a.LastUpdateDate,a.NickName});
+            Dbc.Db.UpdateList(users);
             sw.Stop();
             Console.WriteLine($"Int更新{users.Count}条记录，共耗时{sw.ElapsedMilliseconds / 1000}S");
         }

@@ -278,7 +278,7 @@ namespace Jc.Data
                 }
                 if (attr.IsPk == true)
                 {
-                    if (attr.FieldType.ToLower() == "int")
+                    if (attr.FieldType.ToLower() == "int" || attr.FieldType.ToLower() == "bigint")
                     {
                         strBuilder.Append("  identity(1,1) ");
                     }

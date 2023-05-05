@@ -120,7 +120,7 @@ namespace Jc.Tests.Test
 			DataColumn dataColumn = null;
 			try
 			{
-				if (columns.Contains("Id") && !dataRow.IsNull("Id"))
+                if (columns.Contains("Id") && !dataRow.IsNull("Id"))
 				{
 					dataColumn = columns["Id"];
 					userDto.Id = (int?)dataRow[dataColumn];
@@ -163,7 +163,7 @@ namespace Jc.Tests.Test
 				if (columns.Contains("Sex") && !dataRow.IsNull("Sex"))
 				{
 					dataColumn = columns["Sex"];
-					userDto.Sex = (Sex)((int)dataRow[dataColumn]);
+					userDto.Sex = (Sex?)((int)dataRow[dataColumn]);
 				}
 				if (columns.Contains("Birthday") && !dataRow.IsNull("Birthday"))
 				{
