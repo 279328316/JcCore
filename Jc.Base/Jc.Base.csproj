@@ -6,8 +6,16 @@
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <Description>简单好用的.net开源Orm框架
 https://github.com/279328316/JcCore</Description>
-    <Version>1.1.5.0</Version>
+    <Version>1.1.6.0</Version>
     <RootNamespace>Jc</RootNamespace>
+    <RepositoryUrl>https://github.com/279328316/JcCore</RepositoryUrl>
+    <PackageProjectUrl>https://github.com/279328316/JcCore</PackageProjectUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageTags>jc;jccore;orm;</PackageTags>
+    <PackageOutputPath>$(OutputPath)</PackageOutputPath>
+    <Copyright>MIT</Copyright>
+    <Authors>Jc.Core</Authors>
+    <Title></Title>
   </PropertyGroup>
 
   <ItemGroup>

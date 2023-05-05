@@ -5,7 +5,13 @@
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <Description>简单好用的.net开源Orm框架
 https://github.com/279328316/JcCore</Description>
-    <Version>1.1.5.0</Version>
+    <Version>1.1.6.0</Version>
+    <Authors>Jc.Core</Authors>
+    <Copyright>MIT</Copyright>
+    <PackageProjectUrl>https://github.com/279328316/JcCore</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/279328316/JcCore</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageTags>Jc;Jc.Cache</PackageTags>
   </PropertyGroup>
 
   <ItemGroup>

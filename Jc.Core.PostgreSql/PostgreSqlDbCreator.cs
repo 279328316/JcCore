@@ -3,7 +3,7 @@ using Npgsql;
 using System;
 using System.Data.Common;
 
-namespace Jc.Data
+namespace Jc.Core.PostgreSql
 {
     public class PostgreSqlDbCreator : IDbCreator
     {

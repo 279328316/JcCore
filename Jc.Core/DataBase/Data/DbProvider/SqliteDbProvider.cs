@@ -15,18 +15,35 @@ namespace Jc.Data
     /// </summary>
     public class SqliteDbProvider : DbProvider
     {
-        private static IDbCreator sqliteCreator;//使用静态变量缓存MsSqlDbCreator
+        new readonly DatabaseType dbType = DatabaseType.Sqlite;
+
         /// <summary>
         /// Ctor
         /// </summary>
         /// <param name="connectString"></param>
         public SqliteDbProvider(string connectString) : base(connectString)
         {
-            if (sqliteCreator == null)
+            if (!DbCreators.ContainsKey(dbType))
             {
-                sqliteCreator = new SqliteDbCreator();
+                Assembly assembly;
+                string assemblyName = "Jc.Core.Sqlite";
+                string className = "SqliteDbCreator";
+                try
+                {
+                    assembly = Assembly.Load($"{assemblyName}");
+                }
+                catch
+                {
+                    throw new Exception($"加载{className}访问模块失败.请检查是否已添加{assemblyName}引用.");
+                }
+                IDbCreator msSqlCreator = assembly.CreateInstance($"{assemblyName}.{className}") as IDbCreator;
+                if (msSqlCreator == null)
+                {
+                    throw new Exception($"加载{className}失败.");
+                }
+                DbCreators.TryAdd(dbType, msSqlCreator);
             }
-            this.dbCreator = sqliteCreator;
+            this.dbCreator = DbCreators[dbType];
         }
 
         /// <summary>

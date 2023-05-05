@@ -3,7 +3,7 @@ using System;
 using System.Data.Common;
 using System.Data.SQLite;
 
-namespace Jc.Data
+namespace Jc.Core.Sqlite
 {
     public class SqliteDbCreator:IDbCreator
     {

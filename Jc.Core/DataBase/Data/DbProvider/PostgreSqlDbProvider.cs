@@ -15,7 +15,7 @@ namespace Jc.Data
     /// </summary>
     public class PostgreSqlDbProvider : DbProvider
     {
-        private static IDbCreator postgreSqlCreator;//使用静态变量缓存PostgreSqlDbCreator
+        new readonly DatabaseType dbType = DatabaseType.PostgreSql;
 
         /// <summary>
         /// Ctor
@@ -23,11 +23,27 @@ namespace Jc.Data
         /// <param name="connectString"></param>
         public PostgreSqlDbProvider(string connectString) : base(connectString)
         {
-            if (postgreSqlCreator == null)
+            if (!DbCreators.ContainsKey(dbType))
             {
-                postgreSqlCreator = new PostgreSqlDbCreator();
+                Assembly assembly;
+                string assemblyName = "Jc.Core.PostgreSql";
+                string className = "PostgreSqlDbCreator";
+                try
+                {
+                    assembly = Assembly.Load($"{assemblyName}");
+                }
+                catch
+                {
+                    throw new Exception($"加载{className}访问模块失败.请检查是否已添加{assemblyName}引用.");
+                }
+                IDbCreator msSqlCreator = assembly.CreateInstance($"{assemblyName}.{className}") as IDbCreator;
+                if (msSqlCreator == null)
+                {
+                    throw new Exception($"加载{className}失败.");
+                }
+                DbCreators.TryAdd(dbType, msSqlCreator);
             }
-            this.dbCreator = postgreSqlCreator;
+            this.dbCreator = DbCreators[dbType];
         }
 
         /// <summary>

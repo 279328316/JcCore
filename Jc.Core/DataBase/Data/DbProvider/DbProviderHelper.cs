@@ -20,8 +20,7 @@ namespace Jc.Data
     /// </summary>
     public class DbProviderHelper
     {
-        private static ConcurrentDictionary<string, DbProvider> dbConDic =
-            new ConcurrentDictionary<string, DbProvider>();    //缓存DbCommandProvider
+        private static ConcurrentDictionary<string, DbProvider> dbConDic = new ConcurrentDictionary<string, DbProvider>();    //缓存DbCommandProvider
 
         /// <summary>
         /// 创建DbProvider
@@ -62,7 +61,6 @@ namespace Jc.Data
                     dbProvider = new MsSqlDbProvider(connectString);
                     break;
             }
-            dbProvider.dbType = dbType;
             return dbProvider;
         }
 

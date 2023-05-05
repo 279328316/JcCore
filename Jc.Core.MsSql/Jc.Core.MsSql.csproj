@@ -2,20 +2,23 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
-    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <Description>Excel操作Helper
-简单Excel导入导出操作</Description>
+    <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
     <Version>1.1.6.0</Version>
-    <GenerateDocumentationFile>True</GenerateDocumentationFile>
     <Authors>Jc.Core</Authors>
     <Copyright>MIT</Copyright>
+    <Description>简单好用的.net开源Orm框架
+https://github.com/279328316/JcCore</Description>
     <PackageProjectUrl>https://github.com/279328316/JcCore</PackageProjectUrl>
     <RepositoryUrl>https://github.com/279328316/JcCore</RepositoryUrl>
-    <PackageTags>Excel;Jc</PackageTags>
+    <PackageTags>Jc;JcCore;Orm</PackageTags>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="NPOI" Version="2.5.2" />
+    <PackageReference Include="System.Data.SqlClient" Version="4.8.5" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Jc.Core\Jc.Core.csproj" />
   </ItemGroup>
 
 </Project>

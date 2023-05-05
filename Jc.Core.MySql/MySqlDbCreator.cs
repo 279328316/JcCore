@@ -3,7 +3,7 @@ using MySqlConnector;
 using System;
 using System.Data.Common;
 
-namespace Jc.Data
+namespace Jc.Core.MySql
 {
     public class MySqlDbCreator: IDbCreator
     {

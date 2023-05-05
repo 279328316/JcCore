@@ -14,9 +14,9 @@ namespace Jc.Data
     /// <summary>
     /// MsSql Provider
     /// </summary>
-    public class MsSqlDbProvider : DbProvider
+    public partial class MsSqlDbProvider : DbProvider
     {
-        private static IDbCreator msSqlCreator;//使用静态变量缓存MsSqlDbCreator
+        new readonly DatabaseType dbType = DatabaseType.MsSql;
 
         /// <summary>
         /// Ctor
@@ -24,11 +24,27 @@ namespace Jc.Data
         /// <param name="connectString"></param>
         public MsSqlDbProvider(string connectString) : base(connectString)
         {
-            if (msSqlCreator == null)
+            if (!DbCreators.ContainsKey(dbType))
             {
-                msSqlCreator = new MsSqlDbCreator();
+                Assembly assembly;
+                string assemblyName = "Jc.Core.MsSql";
+                string className = "MsSqlDbCreator";
+                try
+                {
+                    assembly = Assembly.Load($"{assemblyName}");
+                }
+                catch
+                {
+                    throw new Exception($"加载{className}访问模块失败.请检查是否已添加{assemblyName}引用.");
+                }
+                IDbCreator msSqlCreator = assembly.CreateInstance($"{assemblyName}.{className}") as IDbCreator;
+                if (msSqlCreator == null)
+                {
+                    throw new Exception($"加载{className}失败.");
+                }
+                DbCreators.TryAdd(dbType, msSqlCreator);
             }
-            this.dbCreator = msSqlCreator;
+            this.dbCreator = DbCreators[dbType];
         }
 
         /// <summary>
@@ -307,35 +323,7 @@ namespace Jc.Data
         /// <returns></returns>
         public override void BulkCopy(string tableName, DataTable dt,int batchSize, int timeout = 0, bool useTransaction = true, IProgress<float> progress = null)
         {
-            using (SqlConnection con = (SqlConnection)this.CreateDbConnection())
-            {
-                SqlTransaction transaction = con.BeginTransaction();                
-                using (SqlBulkCopy bulkCopy = new SqlBulkCopy(con,new SqlBulkCopyOptions(),transaction))
-                {
-                    bulkCopy.SqlRowsCopied += new SqlRowsCopiedEventHandler((sender, e) =>
-                    {
-                        float p = e.RowsCopied * 1.0f / dt.Rows.Count;
-                        progress?.Report(p);
-                    });
-
-                    try
-                    {
-                        bulkCopy.BatchSize = batchSize;
-                        bulkCopy.NotifyAfter = batchSize;
-                        bulkCopy.DestinationTableName = tableName;
-                        bulkCopy.BulkCopyTimeout = timeout;
-                        bulkCopy.WriteToServer(dt);
-                        transaction.Commit();
-                    }
-                    catch (Exception ex)
-                    {
-                        transaction.Rollback();
-                        throw;
-                    }
-                    bulkCopy.Close();
-                    con.Close();
-                }
-            }
+            throw new NotImplementedException();
         }
     }
 }

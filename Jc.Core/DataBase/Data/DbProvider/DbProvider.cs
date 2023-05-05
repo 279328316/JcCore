@@ -1,5 +1,6 @@
 ﻿using Jc.Data.Query;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.Common;
@@ -16,12 +17,14 @@ namespace Jc.Data
     /// </summary>
     public abstract class DbProvider
     {
+        internal static ConcurrentDictionary<DatabaseType, IDbCreator> DbCreators = new ConcurrentDictionary<DatabaseType, IDbCreator>();
+
         #region Fields & Properties
 
         private string dbName;
         private string connectString;
 
-        internal DatabaseType dbType;
+        internal readonly DatabaseType dbType;
 
         internal IDbCreator dbCreator;  //DbCreator
 
