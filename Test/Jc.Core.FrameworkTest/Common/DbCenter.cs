@@ -1,4 +1,5 @@
-﻿using Jc.Core;
+﻿using Jc;
+using Jc.Database;
 using System.Collections.Generic;
 
 namespace Jc.Core.FrameworkTest

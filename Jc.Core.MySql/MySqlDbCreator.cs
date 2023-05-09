@@ -1,6 +1,7 @@
-﻿using Jc.Data;
+﻿using Jc.Database.Provider;
 using MySqlConnector;
 using System;
+using System.Data;
 using System.Data.Common;
 
 namespace Jc.Core.MySql
@@ -32,6 +33,11 @@ namespace Jc.Core.MySql
             }
             dbCommand.CommandTimeout = 60;
             return dbCommand;
+        }
+
+        public void BulkCopy(string connectionString, string tableName, DataTable dt, int batchSize, int timeout = 0, bool useTransaction = true, IProgress<float> progress = null)
+        {
+            throw new Exception("BulkCopy暂不支持");
         }
     }
 }

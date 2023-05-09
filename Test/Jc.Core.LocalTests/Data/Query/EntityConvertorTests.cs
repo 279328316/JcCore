@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Text;
 using Jc.Tests;
 using System.Data;
-using Jc.Data.Query;
+using Jc.Database.Query;
 
 namespace Jc.Core.Data.Query.Tests
 {

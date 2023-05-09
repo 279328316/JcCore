@@ -1,5 +1,5 @@
 ﻿using Jc;
-using System.Collections.Generic;
+using Jc.Database;
 
 namespace Jc.Core.TestApp
 {

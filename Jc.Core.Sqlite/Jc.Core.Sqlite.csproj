@@ -18,7 +18,7 @@ https://github.com/279328316/JcCore</Description>
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Jc.Core\Jc.Core.csproj" />
+    <ProjectReference Include="..\Jc.Core.Database\Jc.Core.Database.csproj" />
   </ItemGroup>
 
 </Project>

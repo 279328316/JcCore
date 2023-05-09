@@ -8,6 +8,8 @@
   <ItemGroup>
     <ProjectReference Include="..\..\Jc.Base\Jc.Base.csproj" />
     <ProjectReference Include="..\..\Jc.Cache\Jc.Cache.csproj" />
+    <ProjectReference Include="..\..\Jc.Core.Database\Jc.Core.Database.csproj" />
+    <ProjectReference Include="..\..\Jc.Core.MsSql\Jc.Core.MsSql.csproj" />
     <ProjectReference Include="..\..\Jc.Core\Jc.Core.csproj" />
   </ItemGroup>
 

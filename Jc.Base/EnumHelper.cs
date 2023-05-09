@@ -1,6 +1,9 @@
-﻿using System;
+﻿
+using Newtonsoft.Json.Linq;
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
@@ -13,47 +16,56 @@ namespace Jc
     public class EnumHelper
     {
         /// <summary>
-        /// 将Enum类型转换为 EnumModel
+        /// 获取EnumModel对象,包含Enumitems
+        /// </summary>
+        /// <param name="enumType">枚举类型</param>
+        /// <param name="sortExpr">排序字段</param>
+        /// <param name="order">排序方向</param>
+        /// <returns></returns>
+        public static EnumModel GetEnumModel<T>(Expression<Func<EnumItem, object>> sortExpr = null, Sorting order = Sorting.Asc)
+        {
+            return GetEnumModel(typeof(T), null, sortExpr, order);
+        }
+
+        /// <summary>
+        /// 获取EnumModel对象,包含Enumitems
+        /// </summary>
+        /// <param name="defaultItemName">添加默认ItemName 设置为null时,不添加默认项</param>
+        /// <param name="sortExpr">排序字段</param>
+        /// <param name="order">排序方向</param>
+        /// <returns></returns>
+        public static EnumModel GetEnumModel<T>(string defaultItemName, Expression<Func<EnumItem, object>> sortExpr = null, Sorting order = Sorting.Asc)
+        {
+            return GetEnumModel(typeof(T), defaultItemName, sortExpr, order);
+        }
+
+        /// <summary>
+        /// 获取EnumModel对象,包含Enumitems
         /// </summary>
         /// <param name="enumType">枚举类型 typeof(enum)</param>
         /// <param name="addNullItem">添加NullItem</param>
         /// <returns>EnumModel</returns>
-        public static EnumModel GetEnumModel(Type enumType,bool addNullItem = false)
+        public static EnumModel GetEnumModel(Type enumType,Expression<Func<EnumItem, object>> sortExpr = null, Sorting order = Sorting.Asc)
+        {
+            return GetEnumModel(enumType, null, sortExpr, order);
+        }
+
+        /// <summary>
+        /// 获取EnumModel对象,包含Enumitems
+        /// </summary>
+        /// <param name="enumType">枚举类型 typeof(enum)</param>
+        /// <param name="addNullItem">添加NullItem</param>
+        /// <returns>EnumModel</returns>
+        public static EnumModel GetEnumModel(Type enumType, string defaultItemName, Expression<Func<EnumItem, object>> sortExpr = null, Sorting order = Sorting.Asc)
         {
             string enumTypeName = enumType.Name;
             string enumName = enumTypeName.Substring(enumTypeName.LastIndexOf(".") + 1);
             EnumModel enumModel = new EnumModel()
             {
                 Name = enumName,
-                DisplayName = GetDisplayName(enumType)
+                DisplayName = GetDisplayName(enumType),
+                EnumItems = GetEnumItems(enumType, defaultItemName, sortExpr, order)
             };
-
-            #region 获取值
-            FieldInfo[] fields = enumType.GetFields();
-            if(addNullItem)
-            {
-                enumModel.EnumItems.Add(new EnumItemModel()
-                {
-                    DisplayName = ""
-                });
-            }
-            foreach (FieldInfo field in fields)
-            {
-                if (field.FieldType.IsEnum)
-                {
-                    int value = (int)enumType.InvokeMember(field.Name, BindingFlags.GetField, null, null, null);
-                    string key = GetDisplayName(field);
-                    EnumItemModel enumItem = new EnumItemModel()
-                    {
-                        Name = field.Name,
-                        DisplayName = GetDisplayName(field),
-                        Value = value
-                    };
-                    enumModel.EnumItems.Add(enumItem);
-                }
-            }
-            enumModel.EnumItems.Sort((a,b)=> { return a.Value - b.Value; });
-            #endregion
             return enumModel;
         }
 
@@ -80,6 +92,128 @@ namespace Jc
             {
                 return null;
             }
+        }
+
+        /// <summary>
+        /// 获取EnumItems
+        /// 默认排序字段为DisplayName,排序方向为升序
+        /// </summary>
+        /// <param name="enumType">枚举类型</param>
+        /// <param name="sortExpr">排序字段</param>
+        /// <param name="order">排序方向</param>
+        /// <returns></returns>
+        public static List<EnumItem> GetEnumItems<T>(Expression<Func<EnumItem, object>> sortExpr = null, Sorting order = Sorting.Asc)
+        {
+            return GetEnumItems(typeof(T), null, sortExpr, order);
+        }
+
+        /// <summary>
+        /// 获取EnumItems
+        /// 默认项默认不添加 默认项 Value为null,为列表第0项,不参与排序
+        /// 默认排序字段为DisplayName,排序方向为升序
+        /// </summary>
+        /// <param name="defaultItemName">添加默认ItemName 设置为null时,不添加默认项</param>
+        /// <param name="sortExpr">排序字段</param>
+        /// <param name="order">排序方向</param>
+        /// <returns></returns>
+        public static List<EnumItem> GetEnumItems<T>(string defaultItemName, Expression<Func<EnumItem, object>> sortExpr = null, Sorting order = Sorting.Asc)
+        {
+            return GetEnumItems(typeof(T), defaultItemName, sortExpr, order);
+        }
+
+        /// <summary>
+        /// 获取EnumItems
+        /// 默认排序字段为DisplayName,排序方向为升序
+        /// </summary>
+        /// <param name="enumType">枚举类型</param>
+        /// <param name="sortExpr">排序字段</param>
+        /// <param name="order">排序方向</param>
+        /// <returns></returns>
+        public static List<EnumItem> GetEnumItems(Type enumType, Expression<Func<EnumItem, object>> sortExpr = null, Sorting order = Sorting.Asc)
+        {
+            return GetEnumItems(enumType, null, sortExpr, order);
+        }
+
+        /// <summary>
+        /// 获取EnumItems
+        /// 默认项默认不添加 默认项 Value为null,为列表第0项,不参与排序
+        /// 默认排序字段为DisplayName,排序方向为升序
+        /// </summary>
+        /// <param name="enumType">枚举类型</param>
+        /// <param name="defaultItemName">添加默认ItemName 设置为null时,不添加默认项</param>
+        /// <param name="sortExpr">排序字段</param>
+        /// <param name="order">排序方向</param>
+        /// <returns></returns>
+        public static List<EnumItem> GetEnumItems(Type enumType,string defaultItemName, Expression<Func<EnumItem, object>> sortExpr = null, Sorting order = Sorting.Asc)
+        {
+            List<EnumItem> enumItems = new List<EnumItem>();
+            FieldInfo[] fields = enumType.GetFields();
+            foreach (FieldInfo field in fields)
+            {
+                if (field.FieldType.IsEnum)
+                {
+                    int value = (int)enumType.InvokeMember(field.Name, BindingFlags.GetField, null, null, null);
+                    string key = GetDisplayName(field);
+                    EnumItem enumItem = new EnumItem()
+                    {
+                        Name = field.Name,
+                        DisplayName = GetDisplayName(field),
+                        Value = value
+                    };
+                    enumItems.Add(enumItem);
+                }
+            }
+            enumItems = enumItems.OrderBy(a=>a.DisplayName).ToList();
+            if(sortExpr != null)
+            {
+                string sortField = null;
+                if (sortExpr.Body is UnaryExpression)
+                {   //t=>t.Id
+                    UnaryExpression uexp = sortExpr.Body as UnaryExpression;
+                    MemberExpression mexp = uexp.Operand as MemberExpression;
+                    sortField = mexp.Member.Name;
+                }
+                if (order == Sorting.Asc)
+                {
+                    if (sortField == "Name")
+                    {
+                        enumItems = enumItems.OrderBy(a => a.Name).ToList();
+                    }
+                    else if (sortField == "DisplayName")
+                    {
+                        enumItems = enumItems.OrderBy(a => a.DisplayName).ToList();
+                    }
+                    else if (sortField == "Value")
+                    {
+                        enumItems = enumItems.OrderBy(a => a.Value).ToList();
+                    }
+                }
+                else
+                {
+                    if (sortField == "Name")
+                    {
+                        enumItems = enumItems.OrderByDescending(a => a.Name).ToList();
+                    }
+                    else if (sortField == "DisplayName")
+                    {
+                        enumItems = enumItems.OrderByDescending(a => a.DisplayName).ToList();
+                    }
+                    else if (sortField == "Value")
+                    {
+                        enumItems = enumItems.OrderByDescending(a => a.Value).ToList();
+                    }
+                }
+            }
+            if (defaultItemName != null)
+            {   //在0位置添加默认Item "--请选择--"
+                enumItems.Insert(0, new EnumItem()
+                {
+                    Name = defaultItemName,
+                    DisplayName = defaultItemName,
+                    Value = null
+                });
+            }
+            return enumItems;
         }
 
         /// <summary>

@@ -16,6 +16,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\Jc.Core.Database\Jc.Core.Database.csproj" />
     <ProjectReference Include="..\..\Jc.Core\Jc.Core.csproj" />
   </ItemGroup>
 

@@ -1,5 +1,6 @@
-﻿using Jc.Data;
+﻿using Jc.Database.Provider;
 using System;
+using System.Data;
 using System.Data.Common;
 using System.Data.SQLite;
 
@@ -33,6 +34,11 @@ namespace Jc.Core.Sqlite
             }
             dbCommand.CommandTimeout = 60;
             return dbCommand;
+        }
+
+        public void BulkCopy(string connectionString, string tableName, DataTable dt, int batchSize, int timeout = 0, bool useTransaction = true, IProgress<float> progress = null)
+        {
+            throw new Exception("BulkCopy暂不支持");
         }
     }
 }

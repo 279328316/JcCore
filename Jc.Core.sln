@@ -23,13 +23,15 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Jc.Util.LocalTests", "Test\
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Jc.Core.FrameworkTest", "Test\Jc.Core.FrameworkTest\Jc.Core.FrameworkTest.csproj", "{178D763C-C43B-4BD6-8625-920A1CA54074}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Jc.Core.MsSql", "Jc.Core.MsSql\Jc.Core.MsSql.csproj", "{7A324E71-67C6-466B-BA14-9922D6C87E16}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Jc.Core.MsSql", "Jc.Core.MsSql\Jc.Core.MsSql.csproj", "{7A324E71-67C6-466B-BA14-9922D6C87E16}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Jc.Core.MySql", "Jc.Core.MySql\Jc.Core.MySql.csproj", "{58D22618-8E29-41A0-801A-1536BDCBD224}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Jc.Core.MySql", "Jc.Core.MySql\Jc.Core.MySql.csproj", "{58D22618-8E29-41A0-801A-1536BDCBD224}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Jc.Core.PostgreSql", "Jc.Core.PostgreSql\Jc.Core.PostgreSql.csproj", "{80C2FFB4-1015-49DF-8687-F96201796301}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Jc.Core.PostgreSql", "Jc.Core.PostgreSql\Jc.Core.PostgreSql.csproj", "{80C2FFB4-1015-49DF-8687-F96201796301}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Jc.Core.Sqlite", "Jc.Core.Sqlite\Jc.Core.Sqlite.csproj", "{A537D339-F67B-4B72-A6B6-E0BDC0695FF0}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Jc.Core.Sqlite", "Jc.Core.Sqlite\Jc.Core.Sqlite.csproj", "{A537D339-F67B-4B72-A6B6-E0BDC0695FF0}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Jc.Core.Database", "Jc.Core.Database\Jc.Core.Database.csproj", "{2652ADF3-A997-4E86-8311-48C6FE0CA36C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -89,6 +91,10 @@ Global
 		{A537D339-F67B-4B72-A6B6-E0BDC0695FF0}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A537D339-F67B-4B72-A6B6-E0BDC0695FF0}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A537D339-F67B-4B72-A6B6-E0BDC0695FF0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2652ADF3-A997-4E86-8311-48C6FE0CA36C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2652ADF3-A997-4E86-8311-48C6FE0CA36C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2652ADF3-A997-4E86-8311-48C6FE0CA36C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2652ADF3-A997-4E86-8311-48C6FE0CA36C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

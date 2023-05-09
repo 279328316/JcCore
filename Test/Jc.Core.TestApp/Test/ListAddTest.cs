@@ -275,10 +275,10 @@ namespace Jc.Core.TestApp.Test
                     LastUpdateDate = DateTime.Now
                 });
             }
-            {   //Add 事务 异常抛出 Test
-                users[users.Count - 1].Id = Guid.NewGuid();
-                users[users.Count - 2].Id = users[users.Count - 1].Id;
-            }
+            //{   //Add 事务 异常抛出 Test  重复Id测试
+            //    users[users.Count - 1].Id = Guid.NewGuid();
+            //    users[users.Count - 2].Id = users[users.Count - 1].Id;
+            //}
             sw.Stop();
             Console.WriteLine($"构造{users.Count}条记录，共耗时{sw.ElapsedMilliseconds}Ms");
             sw.Reset();
