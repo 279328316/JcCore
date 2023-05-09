@@ -10,7 +10,7 @@ namespace Jc
     /// <summary>
     /// Object 扩展
     /// </summary>
-    public static class ObjectHelper
+    public static class ObjectExpand
     {
 
         #region ICloneable 成员
@@ -85,24 +85,13 @@ namespace Jc
         /// <param name="source">来源</param>
         /// <param name="includeExpr">包含属性列表</param>
         /// <param name="excludeExpr">排除属性列表</param>
-        public static T MapTo<T>(this object source,Expression<Func<T, object>> includeExpr, Expression<Func<T, object>> excludeExpr = null) where T : class, new()
+        public static T MapTo<T>(this object source, T dest, Expression<Func<T, object>> includeExpr = null, Expression<Func<T, object>> excludeExpr = null) where T : class, new()
         {
-            T dest = new T();
-
-            if (source.GetType().IsValueType == false)
+            if(dest == null)
             {
-                if (source is IEnumerable)
-                {
-                    foreach(var item in source as IEnumerable)
-                    {
-                        item.CopyTo(dest, includeExpr, excludeExpr);
-                    }
-                }
-                else
-                {
-                    source.CopyTo(dest, includeExpr, excludeExpr);
-                }
+                dest = new T();
             }
+            source.CopyTo(dest, includeExpr, excludeExpr);
             return dest;
         }
 
@@ -112,7 +101,20 @@ namespace Jc
         /// <param name="source">来源</param>
         /// <param name="includeExpr">包含属性列表</param>
         /// <param name="excludeExpr">排除属性列表</param>
-        public static List<T> MapToList<T>(this object source, Expression<Func<T, object>> includeExpr, Expression<Func<T, object>> excludeExpr = null) where T : class, new()
+        public static T MapTo<T>(this object source,Expression<Func<T, object>> includeExpr = null, Expression<Func<T, object>> excludeExpr = null) where T : class, new()
+        {
+            T dest = new T();
+            source.CopyTo(dest, includeExpr, excludeExpr);
+            return dest;
+        }
+
+        /// <summary>
+        /// Map创建新对象(浅复制)
+        /// </summary>
+        /// <param name="source">来源</param>
+        /// <param name="includeExpr">包含属性列表</param>
+        /// <param name="excludeExpr">排除属性列表</param>
+        public static List<T> MapToList<T>(this object source, Expression<Func<T, object>> includeExpr = null, Expression<Func<T, object>> excludeExpr = null) where T : class, new()
         {
             List<T> destList = new List<T>();
             if (source.GetType().IsValueType == false)
