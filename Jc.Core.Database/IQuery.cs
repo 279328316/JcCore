@@ -170,6 +170,14 @@ namespace Jc.Database
         public T FirstOrDefault()
         {
             Pager pager = new Pager(1,1);
+            if (orderByClauseList == null || orderByClauseList.Count <= 0)
+            {
+                DtoMapping dtoDbMapping = DtoMappingHelper.GetDtoMapping<T>();
+                if (dtoDbMapping != null && dtoDbMapping.PkMap != null)
+                {
+                    orderByClauseList.Add(new OrderByClause(dtoDbMapping.PkMap.FieldName));
+                }
+            }
             QueryFilter filter = QueryFilterHelper.GetPageFilter(query, select, orderByClauseList,pager, unSelect);
             
             T dto = null;

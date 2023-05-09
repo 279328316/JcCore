@@ -621,11 +621,21 @@ namespace Jc.Database.Query
         {
             if (pager == null)
             {
+                //pager = new Pager(1, 30);
                 throw new Exception("分页查询未指定分页信息");
             }
             if (orderByClauseList == null || orderByClauseList.Count <= 0)
             {
-                throw new Exception("分页查询未指定排序信息");
+                DtoMapping dtoDbMapping = DtoMappingHelper.GetDtoMapping<T>();
+                if (dtoDbMapping != null && dtoDbMapping.PkMap != null)
+                {
+                    orderByClauseList.Add(new OrderByClause(dtoDbMapping.PkMap.FieldName));
+                }
+                else
+                {
+                    throw new Exception("分页查询未指定排序信息");
+                }
+                //throw new Exception("分页查询未指定排序信息");
             }
             QueryFilterHelper filterHelper = new QueryFilterHelper();
             filterHelper.FillFilter(query, select,  orderByClauseList, pager, unSelect);

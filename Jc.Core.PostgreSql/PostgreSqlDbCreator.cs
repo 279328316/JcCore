@@ -37,7 +37,6 @@ namespace Jc.Core.PostgreSql
 
         public void BulkCopy(string connectionString, string tableName, DataTable dt, int batchSize, int timeout = 0, bool useTransaction = true, IProgress<float> progress = null)
         {
-            throw new Exception("BulkCopy暂不支持");
         }
     }
 }
