@@ -178,7 +178,7 @@ namespace Jc.Database
                     orderByClauseList.Add(new OrderByClause(dtoDbMapping.PkMap.FieldName));
                 }
             }
-            QueryFilter filter = QueryFilterHelper.GetPageFilter(query, select, orderByClauseList,pager, unSelect);
+            QueryFilter filter = QueryFilterBuilder.GetPageFilter(query, select, orderByClauseList,pager, unSelect);
             
             T dto = null;
             using (DbCommand dbCommand = dbContext.DbProvider.GetQueryRecordsPageDbCommand<T>(filter, subTableArg))
@@ -212,7 +212,7 @@ namespace Jc.Database
         public decimal Sum(Expression<Func<T, object>> select = null)
         {
             this.select = select;
-            QueryFilter filter = QueryFilterHelper.GetFilter(query, select);
+            QueryFilter filter = QueryFilterBuilder.GetFilter(query, select);
 
             decimal result = 0;
             using (DbCommand dbCommand = dbContext.DbProvider.GetSumDbCommand<T>(filter, subTableArg))
@@ -246,7 +246,7 @@ namespace Jc.Database
             {
                 this.query = query;
             }
-            QueryFilter filter = QueryFilterHelper.GetFilter(this.query);
+            QueryFilter filter = QueryFilterBuilder.GetFilter(this.query);
 
             int result = 0;
             using (DbCommand dbCommand = dbContext.DbProvider.GetCountDbCommand<T>(filter, subTableArg))
@@ -278,7 +278,7 @@ namespace Jc.Database
         public string Min(Expression<Func<T, object>> select)
         {
             this.select = select;
-            QueryFilter filter = QueryFilterHelper.GetFilter(query, select);
+            QueryFilter filter = QueryFilterBuilder.GetFilter(query, select);
 
             string result = null;
             using (DbCommand dbCommand = dbContext.DbProvider.GetMinDbCommand<T>(filter, subTableArg))
@@ -311,7 +311,7 @@ namespace Jc.Database
         public string Max(Expression<Func<T, object>> select)
         {
             this.select = select;
-            QueryFilter filter = QueryFilterHelper.GetFilter(query, select);
+            QueryFilter filter = QueryFilterBuilder.GetFilter(query, select);
 
             string result = null;
             using (DbCommand dbCommand = dbContext.DbProvider.GetMaxDbCommand<T>(filter, subTableArg))
@@ -341,7 +341,7 @@ namespace Jc.Database
         /// <returns></returns>
         public List<T> ToList()
         {
-            QueryFilter filter = QueryFilterHelper.GetFilter(query, select, orderByClauseList, unSelect);
+            QueryFilter filter = QueryFilterBuilder.GetFilter(query, select, orderByClauseList, unSelect);
             if (pager != null)
             {
                 filter.InitPage(pager.PageIndex, pager.PageSize);
@@ -375,7 +375,7 @@ namespace Jc.Database
         public DataTable ToDataTable()
         {
             DataTable dt = null;
-            QueryFilter filter = QueryFilterHelper.GetFilter(query, select, orderByClauseList, unSelect);
+            QueryFilter filter = QueryFilterBuilder.GetFilter(query, select, orderByClauseList, unSelect);
             if (pager != null)
             {
                 filter.InitPage(pager.PageIndex, pager.PageSize);
@@ -417,7 +417,7 @@ namespace Jc.Database
         public PageResult<T> ToPageList()
         {
             PageResult<T> result = new PageResult<T>();
-            QueryFilter filter = QueryFilterHelper.GetPageFilter(query, select, orderByClauseList, pager,unSelect);
+            QueryFilter filter = QueryFilterBuilder.GetPageFilter(query, select, orderByClauseList, pager,unSelect);
 
             List<T> list = new List<T>();
             DbCommand dbCommand = null;

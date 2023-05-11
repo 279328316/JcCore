@@ -17,35 +17,12 @@ namespace Jc.Database.Provider
     /// </summary>
     public partial class MsSqlDbProvider : DbProvider
     {
-        new readonly DatabaseType dbType = DatabaseType.MsSql;
-
         /// <summary>
         /// Ctor
         /// </summary>
         /// <param name="connectString"></param>
-        public MsSqlDbProvider(string connectString) : base(connectString)
+        public MsSqlDbProvider(string connectString, DatabaseType dbType = DatabaseType.MsSql) : base(connectString, dbType)
         {
-            if (!DbCreators.ContainsKey(dbType))
-            {
-                Assembly assembly;
-                string assemblyName = "Jc.Core.MsSql";
-                string className = "MsSqlDbCreator";
-                try
-                {
-                    assembly = Assembly.Load($"{assemblyName}");
-                }
-                catch
-                {
-                    throw new Exception($"加载{className}访问模块失败.请检查是否已添加{assemblyName}引用.");
-                }
-                IDbCreator msSqlCreator = assembly.CreateInstance($"{assemblyName}.{className}") as IDbCreator;
-                if (msSqlCreator == null)
-                {
-                    throw new Exception($"加载{className}失败.");
-                }
-                DbCreators.TryAdd(dbType, msSqlCreator);
-            }
-            this.dbCreator = DbCreators[dbType];
         }
 
         /// <summary>

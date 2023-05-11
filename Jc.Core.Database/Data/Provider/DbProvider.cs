@@ -18,15 +18,12 @@ namespace Jc.Database.Provider
     /// </summary>
     public abstract class DbProvider
     {
-        internal static ConcurrentDictionary<DatabaseType, IDbCreator> DbCreators = new ConcurrentDictionary<DatabaseType, IDbCreator>();
-
         #region Fields & Properties
 
         private string dbName;
         private string connectString;
 
-        internal readonly DatabaseType dbType;
-
+        private DatabaseType dbType;
         internal IDbCreator dbCreator;  //DbCreator
 
         /// <summary>
@@ -64,23 +61,26 @@ namespace Jc.Database.Provider
         /// <summary>
         /// 数据库类型
         /// </summary>
-        public DatabaseType DbType
+        public DatabaseType DbType 
         {
-            get
+            get 
             {
-                return dbType;
+                return dbType; 
             }
         }
+
         #endregion
 
         /// <summary>
         /// Ctor
         /// </summary>
         /// <param name="connectString"></param>
-        internal DbProvider(string connectString)
+        internal DbProvider(string connectString,DatabaseType databaseType)
         {
             this.ConnectString = connectString;
+            this.dbType = databaseType;
             this.DbName = GetDbNameFromConnectString(connectString);
+            this.dbCreator = DbCreatorFactory.GetDbCreator(dbType);
         }
 
         #region Abstract Methods
@@ -366,6 +366,64 @@ namespace Jc.Database.Provider
         }
 
         /// <summary>
+        /// 获取条件更新DbCmd
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="dto"></param>
+        /// <param name="piMapList">查询属性MapList</param>
+        /// <param name="subTableArg">表名称参数.如果TableAttr设置Name.则根据Name格式化</param>
+        /// <returns></returns>
+        internal DbCommand GetUpdateDbCmd<T>(T dto, QueryFilter filter, string subTableArg = null)
+        {
+            DbCommand dbCommand = CreateDbCommand();
+            DtoMapping dtoDbMapping = DtoMappingHelper.GetDtoMapping<T>();
+            #region 设置DbCommand
+            string sqlStr = "Update {0} set {1}";
+
+            string setParams = null;
+
+            if (filter != null && filter.FilterParameters.Count > 0)
+            {
+                sqlStr += filter.FilterSQLString;
+
+                for (int i = 0; i < filter.FilterParameters.Count; i++)
+                {
+                    DbParameter dbParameter = dbCommand.CreateParameter();
+                    dbParameter.Direction = ParameterDirection.Input;
+                    dbParameter.ParameterName = filter.FilterParameters[i].ParameterName;
+                    dbParameter.Value = filter.FilterParameters[i].ParameterValue;
+                    dbParameter.DbType = filter.FilterParameters[i].ParameterDbType;
+                    dbCommand.Parameters.Add(dbParameter);
+                }
+            }
+            List<PiMap> piMapList = DtoMappingHelper.GetPiMapList<T>(filter);
+            foreach (PiMap piMap in piMapList)
+            {
+                if (piMap == dtoDbMapping.PkMap && dtoDbMapping.IsAutoIncrementPk)
+                {   //如果是自增主键 跳过更新
+                    continue;
+                }
+                DbParameter dbParameter = dbCommand.CreateParameter();
+                dbParameter.Direction = ParameterDirection.Input;
+                dbParameter.ParameterName = $"@{piMap.FieldName}";
+                dbParameter.Value = GetParameterValue(piMap, dto);
+                dbParameter.DbType = piMap.DbType;
+                dbCommand.Parameters.Add(dbParameter);
+
+                if (!string.IsNullOrEmpty(setParams))
+                {
+                    setParams += ",";
+                }
+                setParams += $"{piMap.FieldName}={dbParameter.ParameterName}";
+            }
+
+            dbCommand.CommandText = string.Format(sqlStr, dtoDbMapping.GetTableName(subTableArg), setParams);
+            #endregion
+
+            return dbCommand;
+        }
+
+        /// <summary>
         /// 获取更新DbCmd
         /// </summary>
         /// <typeparam name="T"></typeparam>
@@ -454,7 +512,7 @@ namespace Jc.Database.Provider
         }
 
         /// <summary>
-        /// 获取删除DbCmd
+        /// 获取条件删除DbCmd
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="filter">过滤条件</param>
@@ -470,20 +528,19 @@ namespace Jc.Database.Provider
 
             DtoMapping dtoDbMapping = DtoMappingHelper.GetDtoMapping<T>();
 
-            if (filter == null || filter.FilterParameters.Count <= 0)
+            if (filter != null && filter.FilterParameters.Count > 0)
             {
-                throw new Exception("条件删除时,删除条件不能为空.");
-            }
-            sqlStr += filter.FilterSQLString;
+                sqlStr += filter.FilterSQLString;
 
-            for (int i = 0; i < filter.FilterParameters.Count; i++)
-            {
-                DbParameter dbParameter = dbCommand.CreateParameter();
-                dbParameter.Direction = ParameterDirection.Input;
-                dbParameter.ParameterName = filter.FilterParameters[i].ParameterName;
-                dbParameter.Value = filter.FilterParameters[i].ParameterValue;
-                dbParameter.DbType = filter.FilterParameters[i].ParameterDbType;
-                dbCommand.Parameters.Add(dbParameter);
+                for (int i = 0; i < filter.FilterParameters.Count; i++)
+                {
+                    DbParameter dbParameter = dbCommand.CreateParameter();
+                    dbParameter.Direction = ParameterDirection.Input;
+                    dbParameter.ParameterName = filter.FilterParameters[i].ParameterName;
+                    dbParameter.Value = filter.FilterParameters[i].ParameterValue;
+                    dbParameter.DbType = filter.FilterParameters[i].ParameterDbType;
+                    dbCommand.Parameters.Add(dbParameter);
+                }
             }
             dbCommand.CommandText = string.Format(sqlStr, dtoDbMapping.GetTableName(subTableArg));
             #endregion

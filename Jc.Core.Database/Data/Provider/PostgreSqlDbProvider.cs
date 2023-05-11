@@ -16,35 +16,15 @@ namespace Jc.Database.Provider
     /// </summary>
     public class PostgreSqlDbProvider : DbProvider
     {
-        new readonly DatabaseType dbType = DatabaseType.PostgreSql;
+        readonly DatabaseType dbType = DatabaseType.PostgreSql;
 
         /// <summary>
         /// Ctor
         /// </summary>
         /// <param name="connectString"></param>
-        public PostgreSqlDbProvider(string connectString) : base(connectString)
+        public PostgreSqlDbProvider(string connectString, DatabaseType dbType = DatabaseType.PostgreSql) : base(connectString, dbType)
         {
-            if (!DbCreators.ContainsKey(dbType))
-            {
-                Assembly assembly;
-                string assemblyName = "Jc.Core.PostgreSql";
-                string className = "PostgreSqlDbCreator";
-                try
-                {
-                    assembly = Assembly.Load($"{assemblyName}");
-                }
-                catch
-                {
-                    throw new Exception($"加载{className}访问模块失败.请检查是否已添加{assemblyName}引用.");
-                }
-                IDbCreator msSqlCreator = assembly.CreateInstance($"{assemblyName}.{className}") as IDbCreator;
-                if (msSqlCreator == null)
-                {
-                    throw new Exception($"加载{className}失败.");
-                }
-                DbCreators.TryAdd(dbType, msSqlCreator);
-            }
-            this.dbCreator = DbCreators[dbType];
+            this.dbCreator = DbCreatorFactory.GetDbCreator(dbType);
         }
 
         /// <summary>

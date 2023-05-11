@@ -13,12 +13,12 @@ namespace Jc.Database.Query
     /// <summary>
     /// Lambda转QueryFilter
     /// </summary>
-    public class QueryFilterHelper
+    public class QueryFilterBuilder
     {
         DtoMapping dtoDbMapping = null;
         private QueryFilter filter = new QueryFilter();
 
-        private QueryFilterHelper()
+        private QueryFilterBuilder()
         {
         }
 
@@ -594,7 +594,7 @@ namespace Jc.Database.Query
             List<OrderByClause> orderByClauseList = null,
             Expression<Func<T, object>> unSelect = null) where T : class, new()
         {
-            QueryFilterHelper filterHelper = new QueryFilterHelper();
+            QueryFilterBuilder filterHelper = new QueryFilterBuilder();
             filterHelper.FillFilter(query, select, orderByClauseList, null, unSelect);
             return filterHelper.filter;
         }
@@ -637,7 +637,7 @@ namespace Jc.Database.Query
                 }
                 //throw new Exception("分页查询未指定排序信息");
             }
-            QueryFilterHelper filterHelper = new QueryFilterHelper();
+            QueryFilterBuilder filterHelper = new QueryFilterBuilder();
             filterHelper.FillFilter(query, select,  orderByClauseList, pager, unSelect);
             return filterHelper.filter;
         }

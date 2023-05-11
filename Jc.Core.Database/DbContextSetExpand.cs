@@ -420,6 +420,46 @@ namespace Jc.Database
         }
 
         /// <summary>
+        /// 条件更新
+        /// 如未包含主键=主键值,则会更新所有符合条件的记录
+        /// 使用时,请确保条件正确,以免造成数据错误
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="dto">实体对象</param>
+        /// <param name="where">更新条件</param>
+        /// <param name="select">更新属性</param>
+        public int Update<T>(T dto, Expression<Func<T, bool>> where ,Expression<Func<T, object>> select = null) where T : class, new()
+        {
+            if (dto == null)
+            {
+                throw new Exception("待更新对象不能为空.");
+            }
+            int rowCount = 0;
+
+            QueryFilter filter = QueryFilterBuilder.GetFilter(where, select);
+
+            using (DbCommand dbCommand = dbProvider.GetUpdateDbCmd(dto, filter, this.GetSubTableArg<T>()))
+            {
+                try
+                {
+                    SetDbConnection(dbCommand); // 更新记录
+                    rowCount = dbCommand.ExecuteNonQuery();
+                    if (rowCount <= 0)
+                    {
+                        //throw new Exception("没有更新任何记录.");
+                    }
+                    CloseDbConnection(dbCommand);
+                }
+                catch (Exception ex)
+                {
+                    CloseDbConnection(dbCommand);
+                    throw ex;
+                }
+            }
+            return rowCount;
+        }
+
+        /// <summary>
         /// 更新数据对象
         /// </summary>
         /// <typeparam name="T"></typeparam>
@@ -603,7 +643,7 @@ namespace Jc.Database
                 throw new Exception("删除条件不能为空");
             }
             int rowCount = 0;
-            QueryFilter filter = QueryFilterHelper.GetFilter(where);
+            QueryFilter filter = QueryFilterBuilder.GetFilter(where);
             using (DbCommand dbCommand = dbProvider.GetDeleteDbCmd<T>(filter, this.GetSubTableArg<T>()))
             {
                 try
