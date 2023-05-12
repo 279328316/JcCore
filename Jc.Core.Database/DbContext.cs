@@ -187,7 +187,8 @@ namespace Jc.Database
             {
                 //初始化DbContextLogger
                 string logConfigPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "applog.config");
-                if (File.Exists(logConfigPath))
+                bool dbLogOpen = ConfigHelper.GetAppSetting("DbContextLog")?.ToLower() == "true";
+                if (dbLogOpen && File.Exists(logConfigPath))
                 {
                     DbLogHelper.InitLogger(logConfigPath, "DbRepository", "DbContextLogger");
                 }
