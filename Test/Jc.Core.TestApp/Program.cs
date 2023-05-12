@@ -15,7 +15,6 @@ namespace Jc.Core.TestApp
             //初始化日志Helper
             string logConfigPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "applog.config");
             LogHelper.InitLogger(logConfigPath, "AppRepository", "Logger", "ErrorLogger");
-            DbContext.InitLogger(LogHelper.Logger);
             LogHelper.Info($"Test服务启动成功.");
             Console.WriteLine("测试即将开始,请按任意键继续.");
             Console.ReadKey();

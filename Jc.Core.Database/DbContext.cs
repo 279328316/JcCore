@@ -5,6 +5,7 @@ using System.Data;
 using System.Data.Common;
 using Jc.Database.Provider;
 using log4net;
+using System.IO;
 
 namespace Jc.Database
 {
@@ -17,7 +18,17 @@ namespace Jc.Database
         internal DbProvider dbProvider;    //DbProvider
 
         internal bool isTransaction = false; //是否为事务
-        
+
+        /// <summary>
+        /// static Ctor
+        /// 读取当前目录下applog.config,DbContextLogger配置来生成日志
+        /// 也可以通过DbContext.InitLoggger来配置日志输出
+        /// </summary>
+        static DbContext()
+        {   // 通过配置文件初始化Logger
+            InitLoggger();
+        }
+
         /// <summary>
         /// Ctor
         /// <param name="connectString">数据库连接串或数据库名称</param>
@@ -158,12 +169,32 @@ namespace Jc.Database
 
         /// <summary>
         /// 初始化 DbLogger 记录日志
+        /// 也可以通过配置目录下applog.config,DbContextLogger配置设置日志输出
         /// </summary>
         /// <param name="logger">info logger</param>
         /// <param name="errorLogger"> error logger </param>
         public static void InitLogger(ILog logger, ILog errorLogger = null)
         {
             DbLogHelper.InitLogger(logger, errorLogger);
+        }
+
+        /// <summary>
+        /// 通过配置初始化Logger
+        /// </summary>
+        private static void InitLoggger()
+        {
+            try
+            {
+                //初始化DbContextLogger
+                string logConfigPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "applog.config");
+                if (File.Exists(logConfigPath))
+                {
+                    DbLogHelper.InitLogger(logConfigPath, "DbRepository", "DbContextLogger");
+                }
+            }
+            catch (Exception ex)
+            {
+            }
         }
         #endregion
     }
