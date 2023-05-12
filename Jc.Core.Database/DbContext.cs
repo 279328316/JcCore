@@ -4,7 +4,7 @@ using System.Text;
 using System.Data;
 using System.Data.Common;
 using Jc.Database.Provider;
-
+using log4net;
 
 namespace Jc.Database
 {
@@ -125,7 +125,7 @@ namespace Jc.Database
                 try
                 {
                     SetDbConnection(dbCommand);
-                    dbCommand.ExecuteNonQuery();
+                    DbCommandExecuter.ExecuteNonQuery(dbCommand);
                     CloseDbConnection(dbCommand);
                 }
                 catch (Exception ex)
@@ -156,6 +156,15 @@ namespace Jc.Database
             }
         }
 
+        /// <summary>
+        /// 初始化 DbLogger 记录日志
+        /// </summary>
+        /// <param name="logger">info logger</param>
+        /// <param name="errorLogger"> error logger </param>
+        public static void InitLogger(ILog logger, ILog errorLogger = null)
+        {
+            DbLogHelper.InitLogger(logger, errorLogger);
+        }
         #endregion
     }
 }

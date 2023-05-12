@@ -186,7 +186,7 @@ namespace Jc.Database
                 try
                 {
                     dbContext.SetDbConnection(dbCommand);
-                    using (DbDataReader dr = dbCommand.ExecuteReader())
+                    using (DbDataReader dr = DbCommandExecuter.ExecuteReader(dbCommand))
                     {
                         DataTable dt = dbContext.ConvertDataReaderToDataTable(dr, 1);
                         if (dt != null && dt.Rows.Count > 0)
@@ -220,7 +220,7 @@ namespace Jc.Database
                 try
                 {
                     dbContext.SetDbConnection(dbCommand);
-                    object objVal = dbCommand.ExecuteScalar();
+                    object objVal = DbCommandExecuter.ExecuteScalar(dbCommand);
                     if (objVal != DBNull.Value)
                     {   //使用属性字典
                         result = (decimal)objVal;
@@ -254,7 +254,7 @@ namespace Jc.Database
                 try
                 {
                     dbContext.SetDbConnection(dbCommand);
-                    object objVal = dbCommand.ExecuteScalar();
+                    object objVal = DbCommandExecuter.ExecuteScalar(dbCommand);
                     if (objVal != DBNull.Value)
                     {   //使用属性字典
                         result = Convert.ToInt32(objVal);
@@ -286,7 +286,7 @@ namespace Jc.Database
                 try
                 {
                     dbContext.SetDbConnection(dbCommand);
-                    object objVal = dbCommand.ExecuteScalar();
+                    object objVal = DbCommandExecuter.ExecuteScalar(dbCommand);
                     if (objVal != DBNull.Value)
                     {   //使用属性字典
                         result = objVal.ToString();
@@ -319,7 +319,7 @@ namespace Jc.Database
                 try
                 {
                     dbContext.SetDbConnection(dbCommand);
-                    object objVal = dbCommand.ExecuteScalar();
+                    object objVal = DbCommandExecuter.ExecuteScalar(dbCommand);
                     if (objVal != DBNull.Value)
                     {   //使用属性字典
                         result = objVal.ToString();
@@ -352,7 +352,7 @@ namespace Jc.Database
                 try
                 {
                     this.dbContext.SetDbConnection(dbCommand);
-                    using (DbDataReader dr = dbCommand.ExecuteReader())
+                    using (DbDataReader dr = DbCommandExecuter.ExecuteReader(dbCommand))
                     {
                         DataTable dt = this.dbContext.ConvertDataReaderToDataTable(dr);
                         list = dt.ToList<T>();
@@ -392,7 +392,7 @@ namespace Jc.Database
             try
             {
                 this.dbContext.SetDbConnection(dbCommand);
-                using (DbDataReader dr = dbCommand.ExecuteReader())
+                using (DbDataReader dr = DbCommandExecuter.ExecuteReader(dbCommand))
                 {
                     dt = this.dbContext.ConvertDataReaderToDataTable(dr);
                 }
@@ -432,7 +432,7 @@ namespace Jc.Database
                     dbCommand = dbContext.DbProvider.GetQueryRecordsPageDbCommand<T>(filter, subTableArg);
                 }
                 dbContext.SetDbConnection(dbCommand);
-                using (DbDataReader dr = dbCommand.ExecuteReader())
+                using (DbDataReader dr = DbCommandExecuter.ExecuteReader(dbCommand))
                 {
                     DataTable dt = dbContext.ConvertDataReaderToDataTable(dr);
                     list = dt.ToList<T>();
@@ -440,7 +440,7 @@ namespace Jc.Database
                 int totalCount = 0;
                 DbCommand getRecCountDbCommand = dbContext.DbProvider.GetCountDbCommand<T>(filter, subTableArg);
                 getRecCountDbCommand.Connection = dbCommand.Connection;
-                object valueObj = getRecCountDbCommand.ExecuteScalar();
+                object valueObj = DbCommandExecuter.ExecuteScalar(getRecCountDbCommand);
                 if (valueObj != null && valueObj != DBNull.Value)
                 {
                     totalCount = Convert.ToInt32(valueObj);

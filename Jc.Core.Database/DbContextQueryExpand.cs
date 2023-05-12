@@ -189,7 +189,7 @@ namespace Jc.Database
                 try
                 {
                     SetDbConnection(dbCommand); // 执行Sql
-                    rowCount = dbCommand.ExecuteNonQuery();
+                    rowCount = DbCommandExecuter.ExecuteNonQuery(dbCommand);
                     CloseDbConnection(dbCommand);
                 }
                 catch (Exception ex)
@@ -217,7 +217,7 @@ namespace Jc.Database
                     try
                     {
                         SetDbConnection(dbCommand);
-                        result = dbCommand.ExecuteScalar();
+                        result = DbCommandExecuter.ExecuteScalar(dbCommand);
                         CloseDbConnection(dbCommand);
                     }
                     catch (Exception ex)
@@ -321,7 +321,7 @@ namespace Jc.Database
                 try
                 {
                     SetDbConnection(dbCommand);
-                    using (DbDataReader dr = dbCommand.ExecuteReader())
+                    using (DbDataReader dr = DbCommandExecuter.ExecuteReader(dbCommand))
                     {
                         DataTable dt = ConvertDataReaderToDataTable(dr, 1);
                         if (dt != null && dt.Rows.Count > 0)
@@ -365,7 +365,7 @@ namespace Jc.Database
                 try
                 {
                     SetDbConnection(dbCommand);
-                    using (DbDataReader dr = dbCommand.ExecuteReader())
+                    using (DbDataReader dr = DbCommandExecuter.ExecuteReader(dbCommand))
                     {
                         DataTable dt = ConvertDataReaderToDataTable(dr, 1);
                         if (dt != null && dt.Rows.Count > 0)
@@ -468,7 +468,7 @@ namespace Jc.Database
                 try
                 {
                     SetDbConnection(dbCommand);
-                    using (DbDataReader dr = dbCommand.ExecuteReader())
+                    using (DbDataReader dr = DbCommandExecuter.ExecuteReader(dbCommand))
                     {
                         DataTable dt = ConvertDataReaderToDataTable(dr);
                         list = dt.ToList<T>();
@@ -567,7 +567,7 @@ namespace Jc.Database
                 try
                 {
                     SetDbConnection(dbCommand);
-                    using (DbDataReader dr = dbCommand.ExecuteReader())
+                    using (DbDataReader dr = DbCommandExecuter.ExecuteReader(dbCommand))
                     {
                         dt = ConvertDataReaderToDataTable(dr);
                     }
@@ -596,7 +596,7 @@ namespace Jc.Database
                 try
                 {
                     this.SetDbConnection(dbCommand);
-                    using (DbDataReader dr = dbCommand.ExecuteReader())
+                    using (DbDataReader dr = DbCommandExecuter.ExecuteReader(dbCommand))
                     {
                         dt = this.ConvertDataReaderToDataTable(dr);
                     }

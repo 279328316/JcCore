@@ -61,7 +61,7 @@ namespace Jc.Database
         /// <param name="progress">保存进度</param>
         public int SetList<T>(List<T> list, Expression<Func<T, object>> select = null, bool useTransaction = true, IProgress<double> progress = null) where T : class, new()
         {
-            if(list==null || list.Count<=0)
+            if (list == null || list.Count <= 0)
             {
                 return 0;
             }
@@ -192,7 +192,7 @@ namespace Jc.Database
                         && (pkValue == null || (int)pkValue == 0))
                     {
                         dbCommand.CommandText += ";" + dbProvider.GetAutoIdDbCommand().CommandText;
-                        object valueObj = dbCommand.ExecuteScalar();
+                        object valueObj = DbCommandExecuter.ExecuteScalar(dbCommand);
                         if (valueObj == null || valueObj == DBNull.Value)
                         {
                             throw new Exception("插入记录失败.");
@@ -204,7 +204,7 @@ namespace Jc.Database
                         && (pkValue == null || (long)pkValue == 0))
                     {
                         dbCommand.CommandText = $"{dbCommand.CommandText};{dbProvider.GetAutoIdDbCommand().CommandText}";
-                        object valueObj = dbCommand.ExecuteScalar();
+                        object valueObj = DbCommandExecuter.ExecuteScalar(dbCommand);
                         if (valueObj == null || valueObj == DBNull.Value)
                         {
                             throw new Exception("插入记录失败.");
@@ -213,7 +213,7 @@ namespace Jc.Database
                     }
                     else
                     {
-                        rowCount = dbCommand.ExecuteNonQuery();
+                        rowCount = DbCommandExecuter.ExecuteNonQuery(dbCommand);
                         if (rowCount <= 0)
                         {
                             throw new Exception("插入记录失败.");
@@ -299,7 +299,7 @@ namespace Jc.Database
                             {
                                 dbCommand.Connection = dbConnection;
                                 dbCommand.Transaction = transaction;
-                                rowCount += dbCommand.ExecuteNonQuery();
+                                rowCount += DbCommandExecuter.ExecuteNonQuery(dbCommand);
                             }
                             curOpList.Clear();
                             if (progress != null)
@@ -347,7 +347,7 @@ namespace Jc.Database
                             try
                             {
                                 SetDbConnection(dbCommand);
-                                rowCount += dbCommand.ExecuteNonQuery();
+                                rowCount += DbCommandExecuter.ExecuteNonQuery(dbCommand);
                                 CloseDbConnection(dbCommand);
                             }
                             catch (Exception ex)
@@ -403,7 +403,7 @@ namespace Jc.Database
                 try
                 {
                     SetDbConnection(dbCommand); // 更新记录
-                    rowCount = dbCommand.ExecuteNonQuery();
+                    rowCount = DbCommandExecuter.ExecuteNonQuery(dbCommand);
                     if (rowCount <= 0)
                     {
                         //throw new Exception("没有更新任何记录.");
@@ -443,7 +443,7 @@ namespace Jc.Database
                 try
                 {
                     SetDbConnection(dbCommand); // 更新记录
-                    rowCount = dbCommand.ExecuteNonQuery();
+                    rowCount = DbCommandExecuter.ExecuteNonQuery(dbCommand);
                     if (rowCount <= 0)
                     {
                         //throw new Exception("没有更新任何记录.");
@@ -503,7 +503,7 @@ namespace Jc.Database
                             {
                                 dbCommand.Connection = dbConnection;
                                 dbCommand.Transaction = transaction;
-                                rowCount += dbCommand.ExecuteNonQuery();
+                                rowCount += DbCommandExecuter.ExecuteNonQuery(dbCommand);
                             }
                             curOpList.Clear();
                             if (progress != null)
@@ -537,7 +537,7 @@ namespace Jc.Database
                             try
                             {
                                 SetDbConnection(dbCommand);
-                                rowCount += dbCommand.ExecuteNonQuery();
+                                rowCount += DbCommandExecuter.ExecuteNonQuery(dbCommand);
                             }
                             catch (Exception ex)
                             {
@@ -583,7 +583,7 @@ namespace Jc.Database
                 try
                 {
                     SetDbConnection(dbCommand); // 删除记录
-                    rowCount = dbCommand.ExecuteNonQuery();
+                    rowCount = DbCommandExecuter.ExecuteNonQuery(dbCommand);
                     if (rowCount <= 0)
                     {
                         //throw new Exception("没有删除任何记录.");
@@ -616,7 +616,7 @@ namespace Jc.Database
                 try
                 {
                     SetDbConnection(dbCommand); // 删除记录
-                    rowCount = dbCommand.ExecuteNonQuery();
+                    rowCount = DbCommandExecuter.ExecuteNonQuery(dbCommand);
                     if (rowCount <= 0)
                     {
                         //throw new Exception("没有删除任何记录.");
@@ -649,7 +649,7 @@ namespace Jc.Database
                 try
                 {
                     SetDbConnection(dbCommand); // 删除记录
-                    rowCount = dbCommand.ExecuteNonQuery();
+                    rowCount = DbCommandExecuter.ExecuteNonQuery(dbCommand);
                     if (rowCount <= 0)
                     {
                         //throw new Exception("没有删除任何记录.");
@@ -682,7 +682,7 @@ namespace Jc.Database
                 try
                 {
                     SetDbConnection(dbCommand);
-                    using (DbDataReader dr = dbCommand.ExecuteReader())
+                    using (DbDataReader dr = DbCommandExecuter.ExecuteReader(dbCommand))
                     {
                         result = dr.HasRows;
                         dr.Close();
@@ -710,7 +710,7 @@ namespace Jc.Database
                 try
                 {
                     SetDbConnection(dbCommand); // 创建表
-                    dbCommand.ExecuteNonQuery();
+                    DbCommandExecuter.ExecuteNonQuery(dbCommand);
                     CloseDbConnection(dbCommand);
                 }
                 catch (Exception ex)

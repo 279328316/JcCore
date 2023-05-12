@@ -1,7 +1,9 @@
 ﻿using log4net;
+using log4net.Config;
 using log4net.Repository;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 
@@ -10,16 +12,23 @@ namespace Jc.Database
     /// <summary>
     /// Db Log Helper
     /// </summary>
-    public class DbLogHelper
+    internal class DbLogHelper
     {
-        private static object loggerLock = new object();
         private static ILog logger;
         private static ILog errorLogger;
+
+        internal static bool DbLogOn
+        {
+            get
+            {
+                return logger != null;
+            }
+        }
 
         /// <summary>
         /// 日志记录
         /// </summary>
-        public static ILog Logger
+        internal static ILog Logger
         {
             get
             {
@@ -34,7 +43,7 @@ namespace Jc.Database
         /// <summary>
         /// Error日志记录
         /// </summary>
-        public static ILog ErrorLogger
+        internal static ILog ErrorLogger
         {
             get
             {
@@ -46,10 +55,26 @@ namespace Jc.Database
             }
         }
 
+        static DbLogHelper()
+        {
+            try
+            { 
+                if(ConfigHelper.GetAppSetting("DbLog") == "true")
+                {
+                    //初始化日志Helper
+                    string logConfigPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "applog.config");
+                    InitLogger(logConfigPath, "DbRepository", "DbLogger");               
+                }
+            }
+            catch (Exception ex)
+            {
+            }
+        }
+
         /// <summary>
-        /// 初始化DbLogger
+        /// 初始化Logger
         /// </summary>
-        public static void SetLogger(string repositoryName,string loggerName)
+        internal static void SetLogger(string repositoryName, string loggerName)
         {
             ILoggerRepository repository = LogManager.GetAllRepositories().FirstOrDefault(a => a.Name == repositoryName);
             if (repository != null)
@@ -59,26 +84,57 @@ namespace Jc.Database
         }
 
         /// <summary>
-        /// 初始化DbErrorLogger
+        /// 初始化ErrorLogger
         /// </summary>
-        public static void SetErrorLogger(string repositoryName, string errorLoggerName)
+        internal static void SetErrorLogger(string repositoryName, string errorLoggerName)
         {
             ILoggerRepository repository = LogManager.GetAllRepositories().FirstOrDefault(a => a.Name == repositoryName);
             if (repository != null)
             {
-                Logger = LogManager.GetLogger(repository.Name, errorLoggerName);
+                ErrorLogger = LogManager.GetLogger(repository.Name, errorLoggerName);
             }
         }
 
         /// <summary>
-        /// 初始化DbLogger
+        /// 初始化Logger
         /// </summary>
-        public static void InitDbLogger(ILog logger,ILog errorLogger = null)
+        internal static void InitLogger(ILog logger, ILog errorLogger = null)
         {
             Logger = logger;
             ErrorLogger = errorLogger;
         }
 
+        /// <summary>
+        /// 初始化Logger
+        /// </summary>
+        internal static void InitLogger(string logConfigPath, string repositoryName, string loggerName, string errorLoggerName = null)
+        {
+            if (logger == null)
+            {
+                ILoggerRepository repository = GetLogRepository(logConfigPath, repositoryName);
+                logger = LogManager.GetLogger(repository.Name, loggerName);
+            }
+            if (errorLogger == null && !string.IsNullOrEmpty(errorLoggerName))
+            {
+                ILoggerRepository repository = GetLogRepository(logConfigPath, repositoryName);
+                errorLogger = LogManager.GetLogger(repository.Name, errorLoggerName);
+            }
+        }
+
+        /// <summary>
+        /// 获取LogRepository
+        /// </summary>
+        /// <returns></returns>
+        private static ILoggerRepository GetLogRepository(string logConfigPath, string repositoryName)
+        {
+            ILoggerRepository repository = LogManager.GetAllRepositories().FirstOrDefault(a => a.Name == repositoryName);
+            if (repository == null)
+            {
+                repository = LogManager.CreateRepository(repositoryName);
+                XmlConfigurator.Configure(repository, new FileInfo(logConfigPath));
+            }
+            return repository;
+        }
         /// <summary>
         /// 记录日志
         /// </summary>
@@ -100,7 +156,7 @@ namespace Jc.Database
                 {
                     Logger.Info(msg);
                 }
-                catch(Exception ex)
+                catch (Exception ex)
                 {
 
                 }
@@ -119,7 +175,7 @@ namespace Jc.Database
                 {
                     Logger.Warn(msg);
                 }
-                catch(Exception ex)
+                catch (Exception ex)
                 {
 
                 }
@@ -132,17 +188,69 @@ namespace Jc.Database
         /// <param name="msg"></param>
         internal static void Error(string msg)
         {
-            if (ErrorLogger != null)
+            try
             {
-                try
+                if (ErrorLogger != null)
                 {
                     ErrorLogger.Error(msg);
                 }
-                catch(Exception ex)
+                else
                 {
-
+                    Info(msg);
                 }
             }
+            catch
+            {
+            }
+        }
+
+        /// <summary>
+        /// 记录日志
+        /// </summary>
+        /// <param name="msg"></param>
+        internal static void Error(string msg ,Exception ex)
+        {
+            try
+            {
+                msg = $"{msg}{GetExceptionInfo(ex)}";
+                Error(msg);
+            }
+            catch
+            {
+            }
+        }
+
+        /// <summary>
+        /// 记录日志
+        /// </summary>
+        /// <param name="msg"></param>
+        internal static void Error(Exception ex)
+        {
+            try
+            {
+                string msg = GetExceptionInfo(ex);
+                Error(msg);
+            }
+            catch
+            {
+            }
+        }
+
+        /// <summary>
+        /// 获取Exception Info
+        /// </summary>
+        /// <param name="ex"></param>
+        /// <returns></returns>
+        private static string GetExceptionInfo(Exception ex)
+        {
+            string msg = $"{ex.Message}\r\n{ex.StackTrace}";
+            Exception innerEx = ex.InnerException;
+            while (innerEx != null)
+            {
+                msg += $"{innerEx.Message}\r\n{innerEx.StackTrace}";
+                innerEx = innerEx.InnerException;
+            }
+            return msg;
         }
     }
 }

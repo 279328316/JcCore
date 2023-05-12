@@ -11,6 +11,7 @@
     <RepositoryUrl>https://github.com/279328316/JcCore</RepositoryUrl>
     <PackageReleaseNotes>简单好用的.net开源Orm框架 author:279328316@qq.com</PackageReleaseNotes>
     <PackageTags>Jc;JcCore;Orm</PackageTags>
+    <RootNamespace>Jc.Database</RootNamespace>
   </PropertyGroup>
 
   <ItemGroup>
