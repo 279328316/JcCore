@@ -55,22 +55,6 @@ namespace Jc.Database
             }
         }
 
-        static DbLogHelper()
-        {
-            try
-            { 
-                if(ConfigHelper.GetAppSetting("DbLog") == "true")
-                {
-                    //初始化日志Helper
-                    string logConfigPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "applog.config");
-                    InitLogger(logConfigPath, "DbRepository", "DbLogger");               
-                }
-            }
-            catch (Exception ex)
-            {
-            }
-        }
-
         /// <summary>
         /// 初始化Logger
         /// </summary>
