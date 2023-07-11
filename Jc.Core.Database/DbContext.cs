@@ -170,6 +170,7 @@ namespace Jc.Database
         /// <summary>
         /// 初始化 DbLogger 记录日志
         /// 也可以通过配置目录下applog.config,DbContextLogger配置设置日志输出
+        /// 配置appSettings节点下DbContextLog为true
         /// </summary>
         /// <param name="logger">info logger</param>
         /// <param name="errorLogger"> error logger </param>
