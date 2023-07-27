@@ -389,7 +389,7 @@ namespace Jc.Database.Query
                     parameterDbType = DbTypeConvertor.GetDbType(value);
                     break;
                 case "Contains":
-                    if (mce.Object != null)
+                    if (mce.Object != null && mce.Arguments?.Count == 1)
                     {
                         if (mce.Object is MemberExpression && ((MemberExpression)mce.Object).Member.MemberType == MemberTypes.Property)
                         {   // task.Name.Contains("T1"); task.Name.Contains(keywords);
@@ -398,8 +398,22 @@ namespace Jc.Database.Query
                             op = isNotOprand ? Operand.NotLike : Operand.Like;
                             parameterDbType = DbTypeConvertor.GetDbType(value);
                         }
+                        else if (mce.Arguments[0] is ConstantExpression)
+                        {   //  a.UserName.ToLower().Contains("A")
+                            name = AtomExpressionRouter(mce.Object);
+                            value = AtomExpressionRouter(mce.Arguments[0]);
+                            op = isNotOprand ? Operand.NotLike : Operand.Like;
+                            parameterDbType = DbTypeConvertor.GetDbType(value);
+                        }
+                        else if (mce.Arguments[0] is MethodCallExpression && ((MethodCallExpression)mce.Arguments[0]).Object is ConstantExpression)
+                        {   // a.UserName.ToLower().Contains("A".ToLower())
+                            name = AtomExpressionRouter(mce.Object);
+                            value = AtomExpressionRouter(mce.Arguments[0]);
+                            op = isNotOprand ? Operand.NotLike : Operand.Like;
+                            parameterDbType = DbTypeConvertor.GetDbType(value);
+                        }
                         else
-                        {   //permIds.Contains(a.Id)
+                        {   //permIds.Contains(a.Id) || 
                             name = AtomExpressionRouter(mce.Arguments[0]);
                             value = AtomExpressionRouter(mce.Object);
                             parameterDbType = DbTypeConvertor.TypeToDbType(mce.Arguments[0].Type);
@@ -520,18 +534,42 @@ namespace Jc.Database.Query
             }
             else if (exp is MethodCallExpression)   //介绍 lambda 表达式。 它捕获一个类似于 .NET 方法主体的代码块
             {
-                //throw new Exception("MethodCallExpressionStringProvider Is Called:" + exp.ToString());
-                try
-                {   //尝试直接运算Lambda表达式
+                MethodCallExpression callExpression = exp as MethodCallExpression;
+                if (callExpression.Object is MemberExpression)
+                {
+                    MemberExpression memberExpression = callExpression.Object as MemberExpression;
+                    object meResult = AtomExpressionRouter(memberExpression);
+                    switch (callExpression.Method.Name)
+                    {
+                        case "ToLower":
+                            result = $"lower({meResult})";
+                            break;
+                        case "ToUpper":
+                            result = $"upper({meResult})";
+                            break;
+                        default:
+                            throw new Exception($"Unsuport Method {callExpression.Method.Name}");
+                            break;
+                    }
+                }
+                else if (callExpression.Object is ConstantExpression)
+                {
                     result = Expression.Lambda(exp).Compile().DynamicInvoke();
                 }
-                catch (Exception ex)
+                else
                 {
-                    if(ex.InnerException != null)
-                    {
-                        throw ex.InnerException;
+                    try
+                    {   //尝试直接运算Lambda表达式
+                        result = Expression.Lambda(exp).Compile().DynamicInvoke();
                     }
-                    throw;
+                    catch (Exception ex)
+                    {
+                        if (ex.InnerException != null)
+                        {
+                            throw ex.InnerException;
+                        }
+                        throw;
+                    }
                 }
             }
             else
@@ -542,6 +580,7 @@ namespace Jc.Database.Query
                 }
                 catch (Exception ex)
                 {
+                    throw;
                 }
             }
             return result;

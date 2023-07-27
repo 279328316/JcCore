@@ -107,7 +107,7 @@ namespace Jc.Database
         /// <returns></returns>
         public IQuery<T> Where(Expression<Func<T, bool>> query = null)
         {
-            this.query = query;
+            And(query);
             return this;
         }
 

@@ -347,7 +347,7 @@ namespace Jc.Database.Query
             string parameterName = string.Format(
                                 "@p{0}_{1}",
                                 this.FilterParameters.Count +1,
-                                fieldName.Replace('.', '_')
+                                fieldName.Replace('.', '_').Replace("(", "").Replace(")", "")
                                 );
             return parameterName;
         }

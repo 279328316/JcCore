@@ -18,8 +18,8 @@ namespace Jc.Core.TestApp
             LogHelper.Info($"Test服务启动成功.");
             Console.WriteLine("测试即将开始,请按任意键继续.");
             Console.ReadKey();
-            
-            ListAddTest test = new ListAddTest();
+
+            PgSqlQueryTest test = new PgSqlQueryTest();
             test.Test();
             Console.WriteLine("测试完成,请按任意键继续.");
             Console.ReadKey();
