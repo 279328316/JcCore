@@ -166,13 +166,10 @@ namespace Jc
         {
             try
             {
+                Info(msg);
                 if (ErrorLogger != null)
                 {
                     ErrorLogger.Error(msg);
-                }
-                else
-                {
-                    Info(msg);
                 }
             }
             catch

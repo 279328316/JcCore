@@ -6,6 +6,7 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Xml;
+using System.Xml.Linq;
 
 namespace Jc
 {
@@ -314,12 +315,17 @@ namespace Jc
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="list"></param>
-        /// <param name="filePath"></param>
-        public static void SerializeCollection<T>(IEnumerable<T> list, string filePath) where T : class, new()
+        /// <param name="xmlFilePath">xml文件路径</param>
+        /// <param name="encoding">文件编码格式</param>
+        public static void SerializeCollection<T>(IEnumerable<T> list, string xmlFilePath, Encoding encoding = null) where T : class, new()
         {
             XmlDocument xmlDoc = new XmlDocument();
             Type modelType = typeof(T);
-            XmlDeclaration declaration = xmlDoc.CreateXmlDeclaration("1.0", "utf-8", "");
+            if (encoding == null)
+            {
+                encoding = Encoding.Default;
+            }
+            XmlDeclaration declaration = xmlDoc.CreateXmlDeclaration("1.0", $"{encoding.EncodingName}", "");
             xmlDoc.AppendChild(declaration);
             XmlElement root = xmlDoc.CreateElement(string.Format("{0}List", modelType.Name));
             xmlDoc.AppendChild(root);
@@ -341,7 +347,13 @@ namespace Jc
                     }
                 }
             }
-            xmlDoc.Save(filePath);
+            XmlWriter xmlWriter = new XmlTextWriter(xmlFilePath, encoding)
+            {
+                Formatting = Formatting.Indented //缩进
+            };
+            xmlDoc.Save(xmlWriter);
+            xmlWriter.Close();
+            xmlWriter.Dispose();
         }
 
         /// <summary>
@@ -349,12 +361,17 @@ namespace Jc
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="dto"></param>
-        /// <param name="xmlPathName"></param>
-        public static void Serialize<T>(T dto, string xmlPathName) where T : class, new()
+        /// <param name="xmlFilePath">xml文件路径</param>
+        /// <param name="encoding">文件编码格式</param>
+        public static void Serialize<T>(T dto, string xmlFilePath, Encoding encoding = null) where T : class, new()
         {
             XmlDocument xmlDoc = new XmlDocument();
             Type modelType = typeof(T);
-            XmlDeclaration declaration = xmlDoc.CreateXmlDeclaration("1.0", "utf-8", "");
+            if(encoding == null)
+            {
+                encoding = Encoding.Default;
+            }
+            XmlDeclaration declaration = xmlDoc.CreateXmlDeclaration("1.0", $"{encoding.EncodingName}", "");
             xmlDoc.AppendChild(declaration);
             XmlElement root = xmlDoc.CreateElement(modelType.Name);
             xmlDoc.AppendChild(root);
@@ -371,7 +388,13 @@ namespace Jc
                     root.AppendChild(propertyNode);
                 }
             }
-            xmlDoc.Save(xmlPathName);
+            XmlWriter xmlWriter = new XmlTextWriter(xmlFilePath, encoding)
+            {
+                Formatting = Formatting.Indented //缩进
+            };
+            xmlDoc.Save(xmlWriter);
+            xmlWriter.Close();
+            xmlWriter.Dispose();
         }
 
         /// <summary>

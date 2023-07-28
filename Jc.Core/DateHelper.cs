@@ -33,6 +33,18 @@ namespace Jc
             {
                 ts = dt1.Value - dt2.Value;
             }
+            string result = FormatTimeSpan(ts);
+            return result;
+        }
+
+
+        /// <summary>
+        /// 格式化TimeSpan d天 hh:mm:ss
+        /// </summary>
+        /// <param name="ts">TimeSpan</param>
+        /// <returns>d天 hh:mm:ss</returns>
+        public static string FormatTimeSpan(TimeSpan ts)
+        {
             int days = (int)ts.TotalDays;
             int hours = (int)(ts.TotalHours - days * 24);//总时间分差
             int minutes = (int)(ts.TotalMinutes - days * 24 * 60 - hours * 60);//总时间分差
