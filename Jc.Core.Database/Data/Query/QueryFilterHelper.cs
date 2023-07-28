@@ -380,11 +380,12 @@ namespace Jc.Database.Query
             DbType parameterDbType = DbType.Object;
             Operand op = Operand.Equal;
             MethodCallExpression mce = exp as MethodCallExpression;
+
             switch (mce.Method.Name)
             {
                 case "Equals":
-                    name = MemberExpressionProvider(mce.Object);
-                    value = Expression.Lambda(mce.Arguments[0]).Compile().DynamicInvoke().ToString();
+                    name = AtomExpressionRouter(mce.Object);
+                    value = AtomExpressionRouter(mce.Arguments[0]);
                     op = isNotOprand ? Operand.NotEqual : Operand.Equal;
                     parameterDbType = DbTypeConvertor.GetDbType(value);
                     break;
@@ -413,7 +414,7 @@ namespace Jc.Database.Query
                             parameterDbType = DbTypeConvertor.GetDbType(value);
                         }
                         else
-                        {   //permIds.Contains(a.Id) || 
+                        {   //permIds.Contains(a.Id) //userNames.Contains(a.UserName.Tolower())
                             name = AtomExpressionRouter(mce.Arguments[0]);
                             value = AtomExpressionRouter(mce.Object);
                             parameterDbType = DbTypeConvertor.TypeToDbType(mce.Arguments[0].Type);
@@ -433,16 +434,14 @@ namespace Jc.Database.Query
                     }
                     break;
                 case "StartsWith":
-                    name = MemberExpressionProvider(mce.Object);
-                    //value = ConstantExpressionProvider(mce.Arguments[0]);
-                    value = Expression.Lambda(mce.Arguments[0]).Compile().DynamicInvoke().ToString();
+                    name = AtomExpressionRouter(mce.Object);
+                    value = AtomExpressionRouter(mce.Arguments[0]);
                     op = Operand.LeftLike;
                     parameterDbType = DbTypeConvertor.GetDbType(value);
                     break;
                 case "EndsWith":
-                    name = MemberExpressionProvider(mce.Object);
-                    //value = ConstantExpressionProvider(mce.Arguments[0]);
-                    value = Expression.Lambda(mce.Arguments[0]).Compile().DynamicInvoke().ToString();
+                    name = AtomExpressionRouter(mce.Object);
+                    value = AtomExpressionRouter(mce.Arguments[0]);
                     op = Operand.RightLike;
                     parameterDbType = DbTypeConvertor.GetDbType(value);
                     break;
