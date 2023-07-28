@@ -137,7 +137,7 @@ namespace Jc.Database.Query
             }
             else if(string.IsNullOrEmpty(tableName))
             {   //未设置表名称.则以类名称作为表名称
-                tableName = EntityType.Name;
+                tableName = EntityType.Name.ToLower();
             }
             return tableName;
         }

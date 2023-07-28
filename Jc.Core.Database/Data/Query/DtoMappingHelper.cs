@@ -129,8 +129,12 @@ namespace Jc.Database.Query
             if (attr == null)
             {   //如果未设置,默认使用类名称
                 attr = new TableAttribute();
-                attr.Name = type.Name;
+                attr.Name = type.Name.ToLower();
                 attr.DisplayText = type.Name;
+            }
+            else if (string.IsNullOrEmpty(attr.Name))
+            {
+                attr.Name = type.Name.ToLower();
             }
             return attr;
         }
