@@ -172,10 +172,10 @@ namespace Jc.Database
             Pager pager = new Pager(1,1);
             if (orderByClauseList == null || orderByClauseList.Count <= 0)
             {
-                DtoMapping dtoDbMapping = DtoMappingHelper.GetDtoMapping<T>();
-                if (dtoDbMapping != null && dtoDbMapping.PkMap != null)
+                TableMapping dtoDbMapping = DtoMappingHelper.GetDtoMapping<T>();
+                if (dtoDbMapping != null && dtoDbMapping.PkField != null)
                 {
-                    orderByClauseList.Add(new OrderByClause(dtoDbMapping.PkMap.FieldName));
+                    orderByClauseList.Add(new OrderByClause(dtoDbMapping.PkField.FieldName));
                 }
             }
             QueryFilter filter = QueryFilterBuilder.GetPageFilter(query, select, orderByClauseList,pager, unSelect);
@@ -186,10 +186,9 @@ namespace Jc.Database
                 try
                 {
                     dbContext.SetDbConnection(dbCommand);
-                    using (DbDataReader dr = DbCommandExecuter.ExecuteReader(dbCommand))
+                    using (DataTable dt = DbCommandExecuter.ExecuteDataTable(dbCommand,1, dbContext.LogHelper))
                     {
-                        DataTable dt = dbContext.ConvertDataReaderToDataTable(dr, 1);
-                        if (dt != null && dt.Rows.Count > 0)
+                        if (dt?.Rows.Count > 0)
                         {
                             dto = dt.Rows[0].ToEntity<T>();
                         }
@@ -220,7 +219,7 @@ namespace Jc.Database
                 try
                 {
                     dbContext.SetDbConnection(dbCommand);
-                    object objVal = DbCommandExecuter.ExecuteScalar(dbCommand);
+                    object objVal = DbCommandExecuter.ExecuteScalar(dbCommand, dbContext.LogHelper);
                     if (objVal != DBNull.Value)
                     {   //使用属性字典
                         result = (decimal)objVal;
@@ -254,7 +253,7 @@ namespace Jc.Database
                 try
                 {
                     dbContext.SetDbConnection(dbCommand);
-                    object objVal = DbCommandExecuter.ExecuteScalar(dbCommand);
+                    object objVal = DbCommandExecuter.ExecuteScalar(dbCommand, dbContext.LogHelper);
                     if (objVal != DBNull.Value)
                     {   //使用属性字典
                         result = Convert.ToInt32(objVal);
@@ -286,7 +285,7 @@ namespace Jc.Database
                 try
                 {
                     dbContext.SetDbConnection(dbCommand);
-                    object objVal = DbCommandExecuter.ExecuteScalar(dbCommand);
+                    object objVal = DbCommandExecuter.ExecuteScalar(dbCommand, dbContext.LogHelper);
                     if (objVal != DBNull.Value)
                     {   //使用属性字典
                         result = objVal.ToString();
@@ -319,7 +318,7 @@ namespace Jc.Database
                 try
                 {
                     dbContext.SetDbConnection(dbCommand);
-                    object objVal = DbCommandExecuter.ExecuteScalar(dbCommand);
+                    object objVal = DbCommandExecuter.ExecuteScalar(dbCommand, dbContext.LogHelper);
                     if (objVal != DBNull.Value)
                     {   //使用属性字典
                         result = objVal.ToString();
@@ -352,10 +351,9 @@ namespace Jc.Database
                 try
                 {
                     this.dbContext.SetDbConnection(dbCommand);
-                    using (DbDataReader dr = DbCommandExecuter.ExecuteReader(dbCommand))
+                    using (DataTable dt = DbCommandExecuter.ExecuteDataTable(dbCommand, null, dbContext.LogHelper))
                     {
-                        DataTable dt = this.dbContext.ConvertDataReaderToDataTable(dr);
-                        list = dt.ToList<T>();
+                        list = dt?.ToList<T>();
                     }
                     dbContext.CloseDbConnection(dbCommand);
                 }
@@ -392,10 +390,7 @@ namespace Jc.Database
             try
             {
                 this.dbContext.SetDbConnection(dbCommand);
-                using (DbDataReader dr = DbCommandExecuter.ExecuteReader(dbCommand))
-                {
-                    dt = this.dbContext.ConvertDataReaderToDataTable(dr);
-                }
+                dt = DbCommandExecuter.ExecuteDataTable(dbCommand, null, dbContext.LogHelper);
                 dbContext.CloseDbConnection(dbCommand);
             }
             catch (Exception ex)
@@ -432,15 +427,14 @@ namespace Jc.Database
                     dbCommand = dbContext.DbProvider.GetQueryRecordsPageDbCommand<T>(filter, subTableArg);
                 }
                 dbContext.SetDbConnection(dbCommand);
-                using (DbDataReader dr = DbCommandExecuter.ExecuteReader(dbCommand))
+                using (DataTable dt = DbCommandExecuter.ExecuteDataTable(dbCommand, null, dbContext.LogHelper))
                 {
-                    DataTable dt = dbContext.ConvertDataReaderToDataTable(dr);
-                    list = dt.ToList<T>();
+                    list = dt?.ToList<T>();
                 }
                 int totalCount = 0;
                 DbCommand getRecCountDbCommand = dbContext.DbProvider.GetCountDbCommand<T>(filter, subTableArg);
                 getRecCountDbCommand.Connection = dbCommand.Connection;
-                object valueObj = DbCommandExecuter.ExecuteScalar(getRecCountDbCommand);
+                object valueObj = DbCommandExecuter.ExecuteScalar(getRecCountDbCommand, dbContext.LogHelper);
                 if (valueObj != null && valueObj != DBNull.Value)
                 {
                     totalCount = Convert.ToInt32(valueObj);
@@ -493,10 +487,10 @@ namespace Jc.Database
         {
             if (!string.IsNullOrEmpty(sort))
             {
-                List<PiMap> piMapList = DtoMappingHelper.GetPiMapList<T>();
+                List<FieldMapping> piMapList = DtoMappingHelper.GetPiMapList<T>();
                 if (piMapList != null && piMapList.Count > 0)
                 {
-                    PiMap piMap = piMapList.FirstOrDefault(a => a.PiName.ToLower() == sort.ToLower() && a.IsIgnore == false);
+                    FieldMapping piMap = piMapList.FirstOrDefault(a => a.PiName.ToLower() == sort.ToLower() && a.IsIgnore == false);
                     if (piMap != null)
                     {
                         this.orderByClauseList.Add(new OrderByClause()
@@ -531,7 +525,7 @@ namespace Jc.Database
         /// <returns></returns>
         public IQuery<T> OrderBy(Expression<Func<T, object>> expr)
         {
-            List<PiMap> piMapList = DtoMappingHelper.GetPiMapList<T>(expr);
+            List<FieldMapping> piMapList = DtoMappingHelper.GetPiMapList<T>(expr);
             if (piMapList != null && piMapList.Count > 0)
             {
                 for (int i = 0; i < piMapList.Count; i++)
@@ -554,7 +548,7 @@ namespace Jc.Database
         /// <returns></returns>
         public IQuery<T> OrderByDesc(Expression<Func<T, object>> expr)
         {
-            List<PiMap> piMapList = DtoMappingHelper.GetPiMapList<T>(expr);
+            List<FieldMapping> piMapList = DtoMappingHelper.GetPiMapList<T>(expr);
             if (piMapList != null && piMapList.Count > 0)
             {
                 for (int i = 0; i < piMapList.Count; i++)

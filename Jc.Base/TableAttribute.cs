@@ -19,6 +19,14 @@ namespace Jc
         {
         }
 
+        /// <summary>
+        /// Ctor
+        /// </summary>
+        public TableAttribute(string name)
+        {
+            this.Name = name;
+        }
+
         #region Properties
         /// <summary>
         /// 展示名称
@@ -46,6 +54,21 @@ namespace Jc
         /// 主键字段 属性名称
         /// </summary>
         public string PkField { get; set; }
+
+        /// <summary>
+        /// 表名和字段名 大写字母分割字符 默认为空
+        /// </summary>
+        public string UpperSplitChar { get; set; }
+
+        /// <summary>
+        /// 表名 大写字母分割字符 默认为空
+        /// </summary>
+        public string TableNameUpperSplitChar { get; set; }
+
+        /// <summary>
+        /// 字段名 大写字母分割字符 默认为空
+        /// </summary>
+        public string FieldNameUpperSplitChar { get; set; }
         #endregion
 
         #region Methods
@@ -73,15 +96,106 @@ namespace Jc
         /// <returns></returns>
         public static string GetTableName(object obj)
         {
-            Type type = obj.GetType();
-            object attribute = type.GetCustomAttributes(typeof(TableAttribute), false).FirstOrDefault();
-            if (attribute == null)
+            if (obj == null)
             {
                 return null;
             }
-            return ((TableAttribute)attribute).Name;
+            Type type = obj.GetType();
+            return GetTableName(type);
         }
 
+        /// <summary>
+        /// 获取表名称
+        /// </summary>
+        /// <param name="obj"></param>
+        /// <returns></returns>
+        public static string GetTableName<T>()
+        {
+            Type type = typeof(T);
+            return GetTableName(type);
+        }
+
+        /// <summary>
+        /// 获取表名称
+        /// </summary>
+        /// <param name="obj"></param>
+        /// <returns></returns>
+        public static string GetTableName(Type type)
+        {
+            TableAttribute tableAttribute = type.GetCustomAttributes(typeof(TableAttribute), false).FirstOrDefault() as TableAttribute;
+            if (tableAttribute == null)
+            {
+                return type.Name.ToLower();
+            }
+            string tempName = null;
+            if (string.IsNullOrEmpty(tableAttribute.Name))
+            {
+                tempName = type.Name;
+                if (!string.IsNullOrEmpty(tableAttribute.TableNameUpperSplitChar))
+                {
+                    tempName = ConvertToLowerString(tempName, tableAttribute.TableNameUpperSplitChar);
+                }
+                else if (!string.IsNullOrEmpty(tableAttribute.UpperSplitChar))
+                {
+                    tempName = ConvertToLowerString(tempName, tableAttribute.UpperSplitChar);
+                }
+                else
+                {
+                    tempName = tempName.ToLower();
+                }
+            }
+            else
+            {
+                tempName = tableAttribute.Name;
+            }
+            return tempName;
+        }
+
+        /// <summary>
+        /// 转换为小写字符串 遇到大写字母,转换为小写,并使用分隔符连接,
+        /// </summary>
+        /// <param name="str"></param>
+        /// <param name="upperSplitChar"></param>
+        /// <returns></returns>
+        private static string ConvertToLowerString(string str, string upperSplitChar)
+        {
+            if (string.IsNullOrEmpty(str))
+            {
+                return str;
+            }
+            string result = str;
+            if (!string.IsNullOrEmpty(upperSplitChar))
+            {
+                StringBuilder stringBuilder = new StringBuilder();
+                for (int i = 0; i < str.Length; i++)
+                {
+                    char curChar = str[i];
+                    if (i == 0)
+                    {
+                        if (char.IsUpper(curChar))
+                        {
+                            curChar = char.ToLower(curChar);
+                        }
+                        stringBuilder.Append(curChar);
+                    }
+                    else
+                    {
+                        if (char.IsUpper(curChar))
+                        {
+                            curChar = char.ToLower(curChar);
+                        }
+                        stringBuilder.Append(upperSplitChar);
+                        stringBuilder.Append(curChar);
+                    }
+                }
+                result = stringBuilder.ToString();
+            }
+            else
+            {
+                result = str.ToLower();
+            }
+            return str;
+        }
         #endregion
     }
 }

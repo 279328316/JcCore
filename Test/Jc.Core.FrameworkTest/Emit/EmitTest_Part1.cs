@@ -50,8 +50,8 @@ namespace Jc.Core.FrameworkTest
 
             //begin try
             Label tryLabel = il.BeginExceptionBlock();
-            List<PiMap> piMapList = DtoMappingHelper.GetPiMapList<T>();
-            foreach (PiMap piMap in piMapList)
+            List<FieldMapping> piMapList = DtoMappingHelper.GetPiMapList<T>();
+            foreach (FieldMapping piMap in piMapList)
             {
                 if (piMap.IsIgnore || piMap.Pi.SetMethod == null)
                 {

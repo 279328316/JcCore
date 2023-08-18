@@ -56,6 +56,7 @@ namespace Jc.Database
         {
             SubTableDbContext subTableDbContext = new SubTableDbContext(this.ConnectString, this.DbType);
             subTableDbContext.AddSubTableArg<T>(subTableArg);
+            subTableDbContext.InitLogger(this.logHelper?.Logger, this.LogHelper?.ErrorLogger);
             return subTableDbContext;
         }
 
@@ -78,6 +79,7 @@ namespace Jc.Database
             else
             {
                 subTableDbContext = new SubTableDbContext(this.ConnectString, this.DbType);
+                subTableDbContext.InitLogger(this.logHelper?.Logger, this.LogHelper?.ErrorLogger);
                 subTableDbContext.AddSubTableArg<T>(subTableArg);
             }
             return subTableDbContext;

@@ -45,9 +45,9 @@ namespace Jc.Database
             {
                 throw new Exception($"不能为类型{typeof(T).Name}重复添加分表参数");
             }
-            DtoMapping dtoDbMapping = DtoMappingHelper.GetDtoMapping<T>();
-            string tableName = dtoDbMapping.TableAttr.Name;
-            if (string.IsNullOrEmpty(tableName) || !tableName.Contains("{0}"))
+            TableMapping dtoDbMapping = DtoMappingHelper.GetDtoMapping<T>();
+            string primaryTableName = dtoDbMapping.PrimaryTableName;
+            if (string.IsNullOrEmpty(primaryTableName) || !primaryTableName.Contains("{0}"))
             {
                 throw new Exception("必须为分表对象" + typeof(T).Name + "指定包含{0}参数的TableName属性");
             }

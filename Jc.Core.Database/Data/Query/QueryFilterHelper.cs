@@ -15,7 +15,7 @@ namespace Jc.Database.Query
     /// </summary>
     public class QueryFilterBuilder
     {
-        DtoMapping dtoDbMapping = null;
+        TableMapping dtoDbMapping = null;
         private QueryFilter filter = new QueryFilter();
 
         private QueryFilterBuilder()
@@ -184,33 +184,43 @@ namespace Jc.Database.Query
         /// <summary>
         /// 具有二进制运算符的表达式
         /// </summary>
-        /// <param name="exp"></param>
+        /// <param name="expression"></param>
         /// <returns></returns>
-        private void BinarExpressionProvider(Expression exp)
+        private void BinaryExpressionProvider(Expression expression)
         {
-            BinaryExpression be = exp as BinaryExpression;
-            Expression left = be.Left;
-            Expression right = be.Right;
-            ExpressionType expType = be.NodeType;
+            BinaryExpression binaryExpression = expression as BinaryExpression;
+            Expression left = binaryExpression.Left;
+            Expression right = binaryExpression.Right;
+            ExpressionType expType = binaryExpression.NodeType;
 
             if (!(left is BinaryExpression || left is MemberExpression 
                 || left is ConstantExpression || left is MethodCallExpression
                  || left is UnaryExpression))
             {
-                throw new Exception("不支持的表达式类型:" + be.ToString());
+                throw new Exception("不支持的表达式类型:" + binaryExpression.ToString());
             }
 
             if (!IsExpressionConjectionOperand(expType))
             {   //如果为非表达式连接操作.作为单表达式处理
-                bool isFieldOp = left is MemberExpression && right is MemberExpression
-                    && ((MemberExpression)left).Expression != null
-                    && ((MemberExpression)right).Expression != null
-                    && !((MemberExpression)left).Expression.ToString().StartsWith("value")
-                    && !((MemberExpression)right).Expression.ToString().StartsWith("value");
-                object leftVal = AtomExpressionRouter(left);
+                object param = null;
+                object paramValue = null;
+
+                bool leftIsField = IsFieldExpression(left);
+                bool rightIsField = IsFieldExpression(right);
+
+                if (leftIsField)
+                {
+                    param = AtomExpressionRouter(left);
+                    paramValue = AtomExpressionRouter(right);
+                }
+                else
+                {
+                    paramValue = AtomExpressionRouter(left);
+                    param = AtomExpressionRouter(right);
+                }
+                bool isFieldOp = leftIsField && rightIsField;
                 Operand operand = GetOperand(expType, isFieldOp);
-                object rightVal = AtomExpressionRouter(right);
-                if (rightVal == null)
+                if (paramValue == null)
                 {   //只有null时使用
                     if (operand == Operand.Equal)
                     {
@@ -221,7 +231,7 @@ namespace Jc.Database.Query
                         operand = Operand.IsNotNull;
                     }
                 }
-                filter.AddQueryItem(leftVal?.ToString(), Conjuction.And, operand, rightVal);
+                filter.AddQueryItem(param?.ToString(), Conjuction.And, operand, paramValue);
             }
             else
             {   //多个表达式情况
@@ -234,6 +244,81 @@ namespace Jc.Database.Query
         }
 
         /// <summary>
+        /// 判断是否为Field Expression
+        /// </summary>
+        /// <param name="exp"></param>
+        /// <returns></returns>
+        private bool IsFieldExpression(Expression exp)
+        {
+            bool result = false;
+            string expStr = exp.ToString();
+            if (expStr.StartsWith("value"))
+            {
+                result = false;
+            }
+            else
+            {
+                if (exp is MemberExpression)   //表示访问字段或属性
+                {
+                    MemberExpression me = exp as MemberExpression;
+                    if (me.Expression != null)
+                    {   // a.Name is MemberExpression, me.Expression is a , not null
+                        result = true;
+                    }
+                    else
+                    {   // DateTime.Now is MemberExpression but me.Expression is null
+                        result = false;
+                    }
+                }
+                else if (exp is ConstantExpression) //表示具有常数值的表达式
+                {
+                    result = false;
+                }
+                else if (exp is LambdaExpression)   //介绍 lambda 表达式。 它捕获一个类似于 .NET 方法主体的代码块
+                {
+                    LambdaExpression le = exp as LambdaExpression;
+                    result = IsFieldExpression(le.Body);
+                }
+                else if (exp is NewArrayExpression) //表示创建一个新数组，并可能初始化该新数组的元素
+                {
+                    result = false;
+                }
+                else if (exp is ParameterExpression)    //表示一个命名的参数表达式。
+                {
+                    result = false;
+                }
+                else if (exp is UnaryExpression) //表示创建一个新数组，并可能初始化该新数组的元素
+                {
+                    UnaryExpression unaryExp = exp as UnaryExpression;
+                    result = IsFieldExpression(unaryExp.Operand);
+                }
+                else if (exp is MethodCallExpression)   //介绍 lambda 表达式。 它捕获一个类似于 .NET 方法主体的代码块
+                {
+                    MethodCallExpression callExpression = exp as MethodCallExpression;
+                    if (callExpression.Object is MemberExpression)
+                    {
+                        result = true;
+                    }
+                    else if (callExpression.Object is ConstantExpression)
+                    {
+                        result = false;
+                    }
+                    else
+                    {
+                        result = IsFieldExpression(callExpression.Object);
+                    }
+                }
+                else
+                {
+                    result = false;
+                }
+            }
+            return result;
+        }
+
+
+
+        /// <summary>
         /// 处理FilterExpression 添加查询条件
         /// </summary>
         /// <param name="exp"></param>
@@ -241,7 +326,7 @@ namespace Jc.Database.Query
         {
             if (exp is BinaryExpression)
             {
-                BinarExpressionProvider(exp);
+                BinaryExpressionProvider(exp);
             }
             else if (exp is UnaryExpression)
             {   //举例:!list.Contains(doctor.Name) !a.IsDeleted !a.IsDeleted.Value 等类型表达式
@@ -354,7 +439,7 @@ namespace Jc.Database.Query
                 {
                     if (me.Expression != null && !me.Expression.Type.IsValueType)
                     {
-                        result = dtoDbMapping.PiMapDic[memberName].FieldName;
+                        result = dtoDbMapping.FieldMappings[memberName].FieldName;
                     }
                     else
                     {   // me.Expression == null DateTime.Now Guid.Empty
@@ -391,30 +476,27 @@ namespace Jc.Database.Query
                     break;
                 case "Contains":
                     if (mce.Object != null && mce.Arguments?.Count == 1)
-                    {
-                        if (mce.Object is MemberExpression && ((MemberExpression)mce.Object).Member.MemberType == MemberTypes.Property)
+                    {   // 是否可以简化为 mce.Object 根据!mce.Object.ToString().StartsWith("value")判断
+                        // 来决定采用mce.Object或mce.Arguments[0]作为字段
+                        if (mce.Object is MemberExpression && ((MemberExpression)mce.Object).Member.MemberType == MemberTypes.Property
+                            && !mce.Object.ToString().StartsWith("value"))
                         {   // task.Name.Contains("T1"); task.Name.Contains(keywords);
                             name = AtomExpressionRouter(mce.Object);
                             value = AtomExpressionRouter(mce.Arguments[0]);
                             op = isNotOprand ? Operand.NotLike : Operand.Like;
                             parameterDbType = DbTypeConvertor.GetDbType(value);
                         }
-                        else if (mce.Arguments[0] is ConstantExpression)
-                        {   //  a.UserName.ToLower().Contains("A")
-                            name = AtomExpressionRouter(mce.Object);
-                            value = AtomExpressionRouter(mce.Arguments[0]);
-                            op = isNotOprand ? Operand.NotLike : Operand.Like;
-                            parameterDbType = DbTypeConvertor.GetDbType(value);
-                        }
-                        else if (mce.Arguments[0] is MethodCallExpression && ((MethodCallExpression)mce.Arguments[0]).Object is ConstantExpression)
-                        {   // a.UserName.ToLower().Contains("A".ToLower())
+                        else if (mce.Object is MethodCallExpression && 
+                            (((MethodCallExpression)mce.Object).Object as MemberExpression)?.Member.MemberType == MemberTypes.Property)
+                        {   // a.UserName.ToLower().Contains("ABC".ToLower()) or a.UserName.ToLower().Contains("ABC")
+                            // or a.UserName.ToLower().Contains(queryObj.UserName)
                             name = AtomExpressionRouter(mce.Object);
                             value = AtomExpressionRouter(mce.Arguments[0]);
                             op = isNotOprand ? Operand.NotLike : Operand.Like;
                             parameterDbType = DbTypeConvertor.GetDbType(value);
                         }
                         else
-                        {   //permIds.Contains(a.Id) //userNames.Contains(a.UserName.Tolower())
+                        {   //permIds.Contains(a.Id) or userNames.Contains(a.UserName.Tolower()) or queryObj.Ids.Contains(a.Id)
                             name = AtomExpressionRouter(mce.Arguments[0]);
                             value = AtomExpressionRouter(mce.Object);
                             parameterDbType = DbTypeConvertor.TypeToDbType(mce.Arguments[0].Type);
@@ -536,19 +618,27 @@ namespace Jc.Database.Query
                 MethodCallExpression callExpression = exp as MethodCallExpression;
                 if (callExpression.Object is MemberExpression)
                 {
-                    MemberExpression memberExpression = callExpression.Object as MemberExpression;
-                    object meResult = AtomExpressionRouter(memberExpression);
-                    switch (callExpression.Method.Name)
-                    {
-                        case "ToLower":
-                            result = $"lower({meResult})";
-                            break;
-                        case "ToUpper":
-                            result = $"upper({meResult})";
-                            break;
-                        default:
-                            throw new Exception($"Unsuport Method {callExpression.Method.Name}");
-                            break;
+                    string expStr = exp.ToString();
+                    if (expStr.StartsWith("value"))
+                    {   //引用其它对象属性类型 如 list.contais(student.Name) , a.HospitalId == hospital.Id 
+                        result = Expression.Lambda(exp).Compile().DynamicInvoke();
+                    }
+                    else
+                    {   // 字段情况处理
+                        MemberExpression memberExpression = callExpression.Object as MemberExpression;
+                        object meResult = AtomExpressionRouter(memberExpression);
+                        switch (callExpression.Method.Name)
+                        {
+                            case "ToLower":
+                                result = $"lower({meResult})";
+                                break;
+                            case "ToUpper":
+                                result = $"upper({meResult})";
+                                break;
+                            default:
+                                throw new Exception($"Unsuport Method {callExpression.Method.Name}");
+                                break;
+                        }
                     }
                 }
                 else if (callExpression.Object is ConstantExpression)
@@ -563,10 +653,6 @@ namespace Jc.Database.Query
                     }
                     catch (Exception ex)
                     {
-                        if (ex.InnerException != null)
-                        {
-                            throw ex.InnerException;
-                        }
                         throw;
                     }
                 }
@@ -664,10 +750,10 @@ namespace Jc.Database.Query
             }
             if (orderByClauseList == null || orderByClauseList.Count <= 0)
             {
-                DtoMapping dtoDbMapping = DtoMappingHelper.GetDtoMapping<T>();
-                if (dtoDbMapping != null && dtoDbMapping.PkMap != null)
+                TableMapping dtoDbMapping = DtoMappingHelper.GetDtoMapping<T>();
+                if (dtoDbMapping != null && dtoDbMapping.PkField != null)
                 {
-                    orderByClauseList.Add(new OrderByClause(dtoDbMapping.PkMap.FieldName));
+                    orderByClauseList.Add(new OrderByClause(dtoDbMapping.PkField.FieldName));
                 }
                 else
                 {

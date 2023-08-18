@@ -76,6 +76,11 @@ namespace Jc
         public bool Required { get; set; }
 
         /// <summary>
+        /// 表名和字段名 大写字母分割字符 默认为空
+        /// </summary>
+        public string UpperSplitChar { get; set; }
+
+        /// <summary>
         /// 字段类型
         /// </summary>
         public string FieldType { get; set; }
@@ -122,6 +127,11 @@ namespace Jc
     {
         public PkFieldAttribute()
         {
+            IsPk = true;
+        }
+        public PkFieldAttribute(string name)
+        {
+            this.Name = name;
             IsPk = true;
         }
     }

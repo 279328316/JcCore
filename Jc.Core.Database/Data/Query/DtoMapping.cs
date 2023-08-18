@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.NetworkInformation;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -11,108 +13,47 @@ namespace Jc.Database.Query
     /// 对象参数
     /// 解析后的 tableAttr 与 fieldMapList
     /// </summary>
-    public class DtoMapping
+    public class TableMapping
     {
-        private TableAttribute tableAttr;   //Table Attr
-        private Dictionary<string, PiMap> piMapDic = new Dictionary<string, PiMap>();    //piMapDic
-        private PiMap pkMap; //pkMap
-
         private Type entityType;  //T Type
+        private TableAttribute tableAttr;   //Table Attr
+        private string primaryTableName;
+        private readonly Dictionary<string, FieldMapping> fieldMappings = new Dictionary<string, FieldMapping>();    //piMapDic
+        private FieldMapping pkField; //pkMap
+        private bool isAutoIncrementPk = false;
         private object entityConvertor;    //实际值为 EntityConvertorDelegate<T>
 
-        /// <summary>
-        /// Ctor
-        /// </summary>
-        public DtoMapping()
-        {
-        }
-
-        /// <summary>
-        /// 表对象名称
-        /// </summary>
-        private string TableName
-        {
-            get { return TableAttr?.Name; }
-        }
-
-        /// <summary>
-        /// 类属性名与属性,字段关系映射列表
-        /// </summary>
-        public Dictionary<string, PiMap> PiMapDic
-        {
-            get { return piMapDic; }
-            set
-            {
-                piMapDic = value;
-            }
-        }
-
-        /// <summary>
-        /// 主键字段映射Map
-        /// </summary>
-        public PiMap PkMap
-        {
-            get
-            {
-                if (pkMap == null)
-                {
-                    KeyValuePair<string, PiMap> pkFieldPair = piMapDic.Where(map => map.Value.FieldAttr.IsPk == true).FirstOrDefault();
-                    if (pkFieldPair.Key != null)
-                    {
-                        pkMap = piMapDic[pkFieldPair.Key];
-                    }
-                    else
-                    {
-                        string pkFiledName = !string.IsNullOrEmpty(TableAttr.PkField) ? TableAttr.PkField : "Id";
-
-                        pkFieldPair = piMapDic.Where(map => map.Key.ToLower() == pkFiledName.ToLower()).FirstOrDefault();
-                        if (pkFieldPair.Key != null)
-                        {
-                            pkMap = piMapDic[pkFieldPair.Key];
-                            pkMap.FieldAttr.IsPk = true;
-                        }
-                        else 
-                        {
-                            throw new Exception($"请为 Class { EntityType.Name } 设置主键字段");
-                        }
-                    }
-                }
-                return pkMap;
-            }
-        }
-
-        /// <summary>
-        /// 主键字段映射Map
-        /// </summary>
-        public bool IsAutoIncrementPk
-        {
-            get
-            {
-                bool result = false;
-                if (PkMap != null)
-                {
-                    if (PkMap.PropertyType == typeof(int) || PkMap.PropertyType == typeof(int?))
-                    {   //自增Id
-                        result = true;
-                    }
-                    else if (PkMap.PropertyType == typeof(long) || PkMap.PropertyType == typeof(long?))
-                    {
-                        result = true;
-                    }
-                }
-                return result;
-            }
-        }
+        #region Properties
 
         /// <summary>
         /// 表属性
         /// </summary>
-        public TableAttribute TableAttr { get { return tableAttr; } set { tableAttr = value; } }
+        public TableAttribute TableAttr { get => tableAttr; }
 
         /// <summary>
         /// EntityType
         /// </summary>
-        public Type EntityType { get => entityType; set => entityType = value; }
+        public Type EntityType { get => entityType; }
+
+        /// <summary>
+        /// 表对象名称
+        /// </summary>
+        public string PrimaryTableName { get => primaryTableName; }
+
+        /// <summary>
+        /// 类属性名与属性,字段关系映射列表
+        /// </summary>
+        public Dictionary<string, FieldMapping> FieldMappings { get => fieldMappings; }
+
+        /// <summary>
+        /// 主键字段映射Map
+        /// </summary>
+        public FieldMapping PkField { get => pkField; }
+
+        /// <summary>
+        /// 是否为自增主键
+        /// </summary>
+        public bool IsAutoIncrementPk { get => isAutoIncrementPk; }
 
         /// <summary>
         /// EntityConvertorDelegate 实际值为 EntityConvertorDelegate(T)
@@ -120,26 +61,117 @@ namespace Jc.Database.Query
         /// </summary>
         public object EntityConvertor { get => entityConvertor; set => entityConvertor = value; }
 
+        #endregion
+
+        #region  Ctor
+        /// <summary>
+        /// Ctor
+        /// </summary>
+        public TableMapping(Type entityType)
+        {
+            this.entityType = entityType;
+            this.primaryTableName = TableAttribute.GetTableName(entityType);
+
+            this.tableAttr = Attribute.GetCustomAttribute(entityType, typeof(TableAttribute)) as TableAttribute;
+
+            InitFieldMapping(entityType, tableAttr);
+        }
+
+        private void InitFieldMapping(Type type,TableAttribute tableAttr)
+        {
+            PropertyInfo[] piList = type.GetProperties();
+            foreach (PropertyInfo pi in piList)
+            {
+                FieldMapping fieldMap = new FieldMapping(pi, tableAttr);
+                this.fieldMappings.Add(fieldMap.PiName, fieldMap);
+            }
+            this.pkField = GetTablePkField(fieldMappings);
+            this.isAutoIncrementPk = CheckIsAutoIncreament(pkField);
+        }
+        #endregion
+
+        /// <summary>
+        /// 获得指定成员的特性对象
+        /// </summary>
+        /// <typeparam name="T">要获取属性的类型</typeparam>
+        /// <param name="pInfo">属性原型</param>
+        /// <returns>返回T对象</returns>
+        private static T GetCustomAttribute<T>(PropertyInfo pInfo) where T : Attribute, new()
+        {
+            Type attributeType = typeof(T);
+            Attribute attrObj = Attribute.GetCustomAttribute(pInfo, attributeType);
+            T rAttrObj = attrObj as T;
+            return rAttrObj;
+        }
+
+        /// <summary>
+        /// 获取PkField
+        /// </summary>
+        /// <returns></returns>
+        private FieldMapping GetTablePkField(Dictionary<string, FieldMapping> fieldMappings)
+        {
+            FieldMapping mapping = null;
+            KeyValuePair<string, FieldMapping> pkFieldPair = fieldMappings.Where(map => map.Value.FieldAttribute.IsPk == true).FirstOrDefault();
+            if (pkFieldPair.Key != null)
+            {
+                mapping = fieldMappings[pkFieldPair.Key];
+            }
+            else
+            {
+                string pkFiledName = !string.IsNullOrEmpty(TableAttr?.PkField) ? TableAttr.PkField : "Id";
+
+                pkFieldPair = fieldMappings.Where(map => map.Key.ToLower() == pkFiledName.ToLower()).FirstOrDefault();
+                if (pkFieldPair.Key != null)
+                {
+                    mapping = fieldMappings[pkFieldPair.Key];
+                    mapping.FieldAttribute.IsPk = true;
+                }
+                else
+                {
+                    throw new Exception($"请为 Class {EntityType.Name} 设置主键字段");
+                }
+            }
+            return mapping;
+        }
+
+        /// <summary>
+        /// 检查是否为自增字段
+        /// </summary>
+        /// <param name="field"></param>
+        /// <returns></returns>
+        private bool CheckIsAutoIncreament(FieldMapping field)
+        {
+            bool result = false;
+            if (field != null)
+            {
+                if (field.PropertyType == typeof(int) || field.PropertyType == typeof(int?))
+                {   //自增Id
+                    result = true;
+                }
+                else if (field.PropertyType == typeof(long) || field.PropertyType == typeof(long?))
+                {
+                    result = true;
+                }
+            }
+            return result;
+        }
+
         /// <summary>
         /// 获取表名称
         /// </summary>
         /// <returns></returns>
-        public string GetTableName(string subTableArg = null)
+        public string GetTableName(object subTableArg = null)
         {
-            string tableName = TableAttr?.Name;
-            if (!string.IsNullOrEmpty(tableName) && tableName.Contains("{0}"))
-            {
-                if (string.IsNullOrEmpty(subTableArg))
+            string targetTableName = primaryTableName;
+            if (targetTableName.Contains("{0}"))
+            {   // 处理分表情况
+                if (subTableArg == null)
                 {
                     throw new Exception($"对象{EntityType.Name},分表参数不能为空,请使用分表DbContext.调用GetSubTableDbContext获取分表DbContext");
                 }
-                tableName = string.Format(tableName, subTableArg);
+                targetTableName = string.Format(targetTableName, subTableArg.ToString().ToLower());
             }
-            else if(string.IsNullOrEmpty(tableName))
-            {   //未设置表名称.则以类名称作为表名称
-                tableName = EntityType.Name.ToLower();
-            }
-            return tableName;
+            return targetTableName;
         }
     }
 }

@@ -19,8 +19,15 @@ namespace Jc.Core.TestApp
             Console.WriteLine("测试即将开始,请按任意键继续.");
             Console.ReadKey();
 
-            PgSqlQueryTest test = new PgSqlQueryTest();
-            test.Test();
+            try
+            {
+                PgSqlQueryTest test = new PgSqlQueryTest();
+                test.Test();
+            }
+            catch(Exception ex)
+            {
+                LogHelper.Error($"执行失败:", ex);
+            }
             Console.WriteLine("测试完成,请按任意键继续.");
             Console.ReadKey();
         }

@@ -36,10 +36,10 @@ namespace Jc.Database
                 throw new Exception("操作对象不能为空.");
             }
             int rowCount = 0;
-            DtoMapping dtoDbMapping = DtoMappingHelper.GetDtoMapping<T>();
-            object pkValue = dtoDbMapping.PkMap.Pi.GetValue(dto);
+            TableMapping dtoDbMapping = DtoMappingHelper.GetDtoMapping<T>();
+            object pkValue = dtoDbMapping.PkField.Pi.GetValue(dto);
             
-            if (CheckIsNullOrEmpty(pkValue, dtoDbMapping.PkMap.PropertyType))
+            if (CheckIsNullOrEmpty(pkValue, dtoDbMapping.PkField.PropertyType))
             {
                 rowCount = Add(dto, select);
             }
@@ -66,10 +66,10 @@ namespace Jc.Database
                 return 0;
             }
             int rowCount = 0;
-            DtoMapping dtoDbMapping = DtoMappingHelper.GetDtoMapping<T>();
+            TableMapping dtoDbMapping = DtoMappingHelper.GetDtoMapping<T>();
 
-            object pkValue = dtoDbMapping.PkMap.Pi.GetValue(list[0]);
-            if (CheckIsNullOrEmpty(pkValue, dtoDbMapping.PkMap.PropertyType))
+            object pkValue = dtoDbMapping.PkField.Pi.GetValue(list[0]);
+            if (CheckIsNullOrEmpty(pkValue, dtoDbMapping.PkField.PropertyType))
             {
                 rowCount = AddList(list, select, useTransaction, progress);
             }
@@ -97,15 +97,15 @@ namespace Jc.Database
                 return 0;
             }
             int rowCount = 0;
-            DtoMapping dtoDbMapping = DtoMappingHelper.GetDtoMapping<T>();
+            TableMapping dtoDbMapping = DtoMappingHelper.GetDtoMapping<T>();
             List<T> addList = new List<T>();
             List<T> updateList = new List<T>();
 
             #region 拆分新增或更新对象List
             for (int i = 0; i < list.Count; i++)
             {
-                object pkValue = dtoDbMapping.PkMap.Pi.GetValue(list[i]);
-                if (CheckIsNullOrEmpty(pkValue, dtoDbMapping.PkMap.PropertyType))
+                object pkValue = dtoDbMapping.PkField.Pi.GetValue(list[i]);
+                if (CheckIsNullOrEmpty(pkValue, dtoDbMapping.PkField.PropertyType))
                 {
                     addList.Add(list[i]);
                 }
@@ -161,25 +161,25 @@ namespace Jc.Database
                 throw new Exception("待保存对象不能为空");
             }
             int rowCount = 0;
-            DtoMapping dtoDbMapping = DtoMappingHelper.GetDtoMapping<T>();
-            List<PiMap> piMapList = DtoMappingHelper.GetPiMapList<T>(select);
-            if (dtoDbMapping.TableAttr.AutoCreate)
+            TableMapping dtoDbMapping = DtoMappingHelper.GetDtoMapping<T>();
+            List<FieldMapping> piMapList = DtoMappingHelper.GetPiMapList<T>(select);
+            if (dtoDbMapping.TableAttr?.AutoCreate == true)
             {   //如果是自动建表
                 if (!CheckTableExists<T>())
                 {
                     CreateTable<T>();
                 }
             }
-            object pkValue = dtoDbMapping.PkMap.Pi.GetValue(dto);
+            object pkValue = dtoDbMapping.PkField.Pi.GetValue(dto);
             if (!dtoDbMapping.IsAutoIncrementPk)
             {   //Guid Id
                 if (pkValue == null || (Guid)pkValue == Guid.Empty)
                 {   //生成Guid
-                    dtoDbMapping.PkMap.Pi.SetValue(dto, Guid.NewGuid());
+                    dtoDbMapping.PkField.Pi.SetValue(dto, Guid.NewGuid());
                 }
-                if (!piMapList.Contains(dtoDbMapping.PkMap))
+                if (!piMapList.Contains(dtoDbMapping.PkField))
                 {
-                    piMapList.Insert(0, dtoDbMapping.PkMap);
+                    piMapList.Insert(0, dtoDbMapping.PkField);
                 }
             }
             using (DbCommand dbCommand = dbProvider.GetInsertDbCmd(dto, piMapList, this.GetSubTableArg<T>()))
@@ -187,33 +187,33 @@ namespace Jc.Database
                 try
                 {
                     SetDbConnection(dbCommand); // 添加记录
-                    if ((dtoDbMapping.PkMap.PropertyType == typeof(int)
-                        || dtoDbMapping.PkMap.PropertyType == typeof(int?))
+                    if ((dtoDbMapping.PkField.PropertyType == typeof(int)
+                        || dtoDbMapping.PkField.PropertyType == typeof(int?))
                         && (pkValue == null || (int)pkValue == 0))
                     {
                         dbCommand.CommandText += ";" + dbProvider.GetAutoIdDbCommand().CommandText;
-                        object valueObj = DbCommandExecuter.ExecuteScalar(dbCommand);
+                        object valueObj = DbCommandExecuter.ExecuteScalar(dbCommand, logHelper);
                         if (valueObj == null || valueObj == DBNull.Value)
                         {
                             throw new Exception("插入记录失败.");
                         }
-                        dtoDbMapping.PkMap.Pi.SetValue(dto, Convert.ToInt32(valueObj));
+                        dtoDbMapping.PkField.Pi.SetValue(dto, Convert.ToInt32(valueObj));
                     }
-                    else if ((dtoDbMapping.PkMap.PropertyType == typeof(long) ||
-                        dtoDbMapping.PkMap.PropertyType == typeof(long?))
+                    else if ((dtoDbMapping.PkField.PropertyType == typeof(long) ||
+                        dtoDbMapping.PkField.PropertyType == typeof(long?))
                         && (pkValue == null || (long)pkValue == 0))
                     {
                         dbCommand.CommandText = $"{dbCommand.CommandText};{dbProvider.GetAutoIdDbCommand().CommandText}";
-                        object valueObj = DbCommandExecuter.ExecuteScalar(dbCommand);
+                        object valueObj = DbCommandExecuter.ExecuteScalar(dbCommand, logHelper);
                         if (valueObj == null || valueObj == DBNull.Value)
                         {
                             throw new Exception("插入记录失败.");
                         }
-                        dtoDbMapping.PkMap.Pi.SetValue(dto, Convert.ToInt64(valueObj));
+                        dtoDbMapping.PkField.Pi.SetValue(dto, Convert.ToInt64(valueObj));
                     }
                     else
                     {
-                        rowCount = DbCommandExecuter.ExecuteNonQuery(dbCommand);
+                        rowCount = DbCommandExecuter.ExecuteNonQuery(dbCommand, logHelper);
                         if (rowCount <= 0)
                         {
                             throw new Exception("插入记录失败.");
@@ -246,13 +246,13 @@ namespace Jc.Database
                 return 0;
             }
             int rowCount = 0;
-            DtoMapping dtoDbMapping = DtoMappingHelper.GetDtoMapping<T>();
-            List<PiMap> piMapList = DtoMappingHelper.GetPiMapList<T>(select);
-            if (!dtoDbMapping.IsAutoIncrementPk && !piMapList.Contains(dtoDbMapping.PkMap))
+            TableMapping dtoDbMapping = DtoMappingHelper.GetDtoMapping<T>();
+            List<FieldMapping> piMapList = DtoMappingHelper.GetPiMapList<T>(select);
+            if (!dtoDbMapping.IsAutoIncrementPk && !piMapList.Contains(dtoDbMapping.PkField))
             {
-                piMapList.Insert(0,dtoDbMapping.PkMap);
+                piMapList.Insert(0,dtoDbMapping.PkField);
             }
-            if (dtoDbMapping.TableAttr.AutoCreate)
+            if (dtoDbMapping.TableAttr?.AutoCreate == true)
             {   //如果是自动建表
                 if (!CheckTableExists<T>())
                 {
@@ -276,18 +276,18 @@ namespace Jc.Database
                     {
                         #region 设置Id
                         curItem = list[i];
-                        object pkValue = dtoDbMapping.PkMap.Pi.GetValue(list[i]);
-                        if (dtoDbMapping.PkMap.PropertyType == typeof(int) || dtoDbMapping.PkMap.PropertyType == typeof(int?))
+                        object pkValue = dtoDbMapping.PkField.Pi.GetValue(list[i]);
+                        if (dtoDbMapping.PkField.PropertyType == typeof(int) || dtoDbMapping.PkField.PropertyType == typeof(int?))
                         {   //自增Id
                         }
-                        else if (dtoDbMapping.PkMap.PropertyType == typeof(long) || dtoDbMapping.PkMap.PropertyType == typeof(long?))
+                        else if (dtoDbMapping.PkField.PropertyType == typeof(long) || dtoDbMapping.PkField.PropertyType == typeof(long?))
                         {
                         }
-                        else if (dtoDbMapping.PkMap.PropertyType == typeof(Guid) || dtoDbMapping.PkMap.PropertyType == typeof(Guid?))
+                        else if (dtoDbMapping.PkField.PropertyType == typeof(Guid) || dtoDbMapping.PkField.PropertyType == typeof(Guid?))
                         {   //Guid Id
                             if (pkValue == null || (Guid)pkValue == Guid.Empty)
                             {   //生成Guid
-                                dtoDbMapping.PkMap.Pi.SetValue(list[i], Guid.NewGuid());
+                                dtoDbMapping.PkField.Pi.SetValue(list[i], Guid.NewGuid());
                             }
                         }
                         #endregion
@@ -299,7 +299,7 @@ namespace Jc.Database
                             {
                                 dbCommand.Connection = dbConnection;
                                 dbCommand.Transaction = transaction;
-                                rowCount += DbCommandExecuter.ExecuteNonQuery(dbCommand);
+                                rowCount += DbCommandExecuter.ExecuteNonQuery(dbCommand, logHelper);
                             }
                             curOpList.Clear();
                             if (progress != null)
@@ -329,12 +329,12 @@ namespace Jc.Database
                 {
                     #region 设置Id
                     curItem = list[i];
-                    object pkValue = dtoDbMapping.PkMap.Pi.GetValue(list[i]);
-                    if (dtoDbMapping.PkMap.PropertyType == typeof(Guid) || dtoDbMapping.PkMap.PropertyType == typeof(Guid?))
+                    object pkValue = dtoDbMapping.PkField.Pi.GetValue(list[i]);
+                    if (dtoDbMapping.PkField.PropertyType == typeof(Guid) || dtoDbMapping.PkField.PropertyType == typeof(Guid?))
                     {   //Guid Id
                         if (pkValue == null || (Guid)pkValue == Guid.Empty)
                         {   //生成Guid
-                            dtoDbMapping.PkMap.Pi.SetValue(list[i], Guid.NewGuid());
+                            dtoDbMapping.PkField.Pi.SetValue(list[i], Guid.NewGuid());
                         }
                     }
                     #endregion
@@ -347,7 +347,7 @@ namespace Jc.Database
                             try
                             {
                                 SetDbConnection(dbCommand);
-                                rowCount += DbCommandExecuter.ExecuteNonQuery(dbCommand);
+                                rowCount += DbCommandExecuter.ExecuteNonQuery(dbCommand, logHelper);
                                 CloseDbConnection(dbCommand);
                             }
                             catch (Exception ex)
@@ -396,14 +396,14 @@ namespace Jc.Database
             }
             int rowCount = 0;
 
-            DtoMapping dtoDbMapping = DtoMappingHelper.GetDtoMapping<T>();
-            List<PiMap> piMapList = DtoMappingHelper.GetPiMapList<T>(select);
+            TableMapping dtoDbMapping = DtoMappingHelper.GetDtoMapping<T>();
+            List<FieldMapping> piMapList = DtoMappingHelper.GetPiMapList<T>(select);
             using (DbCommand dbCommand = dbProvider.GetUpdateDbCmd(dto, piMapList, this.GetSubTableArg<T>()))
             {
                 try
                 {
                     SetDbConnection(dbCommand); // 更新记录
-                    rowCount = DbCommandExecuter.ExecuteNonQuery(dbCommand);
+                    rowCount = DbCommandExecuter.ExecuteNonQuery(dbCommand, logHelper);
                     if (rowCount <= 0)
                     {
                         //throw new Exception("没有更新任何记录.");
@@ -443,7 +443,7 @@ namespace Jc.Database
                 try
                 {
                     SetDbConnection(dbCommand); // 更新记录
-                    rowCount = DbCommandExecuter.ExecuteNonQuery(dbCommand);
+                    rowCount = DbCommandExecuter.ExecuteNonQuery(dbCommand, logHelper);
                     if (rowCount <= 0)
                     {
                         //throw new Exception("没有更新任何记录.");
@@ -474,13 +474,13 @@ namespace Jc.Database
                 return 0;
             }
             int rowCount = 0;             
-            DtoMapping dtoDbMapping = DtoMappingHelper.GetDtoMapping<T>();
-            List<PiMap> piMapList = DtoMappingHelper.GetPiMapList<T>(select);
+            TableMapping dtoDbMapping = DtoMappingHelper.GetDtoMapping<T>();
+            List<FieldMapping> piMapList = DtoMappingHelper.GetPiMapList<T>(select);
             if (dtoDbMapping.IsAutoIncrementPk)
             {   //自增列Id不允许更新
-                if (piMapList.Contains(dtoDbMapping.PkMap))
+                if (piMapList.Contains(dtoDbMapping.PkField))
                 {
-                    piMapList.Remove(dtoDbMapping.PkMap);
+                    piMapList.Remove(dtoDbMapping.PkField);
                 }
             }
             //因为参数有2100的限制 待更新字段 + 主键
@@ -503,7 +503,7 @@ namespace Jc.Database
                             {
                                 dbCommand.Connection = dbConnection;
                                 dbCommand.Transaction = transaction;
-                                rowCount += DbCommandExecuter.ExecuteNonQuery(dbCommand);
+                                rowCount += DbCommandExecuter.ExecuteNonQuery(dbCommand, logHelper);
                             }
                             curOpList.Clear();
                             if (progress != null)
@@ -537,7 +537,7 @@ namespace Jc.Database
                             try
                             {
                                 SetDbConnection(dbCommand);
-                                rowCount += DbCommandExecuter.ExecuteNonQuery(dbCommand);
+                                rowCount += DbCommandExecuter.ExecuteNonQuery(dbCommand, logHelper);
                             }
                             catch (Exception ex)
                             {
@@ -583,7 +583,7 @@ namespace Jc.Database
                 try
                 {
                     SetDbConnection(dbCommand); // 删除记录
-                    rowCount = DbCommandExecuter.ExecuteNonQuery(dbCommand);
+                    rowCount = DbCommandExecuter.ExecuteNonQuery(dbCommand, logHelper);
                     if (rowCount <= 0)
                     {
                         //throw new Exception("没有删除任何记录.");
@@ -616,7 +616,7 @@ namespace Jc.Database
                 try
                 {
                     SetDbConnection(dbCommand); // 删除记录
-                    rowCount = DbCommandExecuter.ExecuteNonQuery(dbCommand);
+                    rowCount = DbCommandExecuter.ExecuteNonQuery(dbCommand, logHelper);
                     if (rowCount <= 0)
                     {
                         //throw new Exception("没有删除任何记录.");
@@ -649,7 +649,7 @@ namespace Jc.Database
                 try
                 {
                     SetDbConnection(dbCommand); // 删除记录
-                    rowCount = DbCommandExecuter.ExecuteNonQuery(dbCommand);
+                    rowCount = DbCommandExecuter.ExecuteNonQuery(dbCommand, logHelper);
                     if (rowCount <= 0)
                     {
                         //throw new Exception("没有删除任何记录.");
@@ -674,7 +674,7 @@ namespace Jc.Database
         {
             bool result = false;
             string subTableArg = this.GetSubTableArg<T>();
-            DtoMapping dtoDbMapping = DtoMappingHelper.GetDtoMapping<T>();
+            TableMapping dtoDbMapping = DtoMappingHelper.GetDtoMapping<T>();
             string tableName = dtoDbMapping.GetTableName(subTableArg);
 
             using (DbCommand dbCommand = dbProvider.GetCheckTableExistsDbCommand(tableName))
@@ -682,10 +682,9 @@ namespace Jc.Database
                 try
                 {
                     SetDbConnection(dbCommand);
-                    using (DbDataReader dr = DbCommandExecuter.ExecuteReader(dbCommand))
+                    using (DataTable dt = DbCommandExecuter.ExecuteDataTable(dbCommand, 1, logHelper))
                     {
-                        result = dr.HasRows;
-                        dr.Close();
+                        result = dt.Rows.Count > 0;
                     }
                     CloseDbConnection(dbCommand);
                 }
@@ -710,7 +709,7 @@ namespace Jc.Database
                 try
                 {
                     SetDbConnection(dbCommand); // 创建表
-                    DbCommandExecuter.ExecuteNonQuery(dbCommand);
+                    DbCommandExecuter.ExecuteNonQuery(dbCommand, logHelper);
                     CloseDbConnection(dbCommand);
                 }
                 catch (Exception ex)
@@ -796,7 +795,7 @@ namespace Jc.Database
             {
                 return;
             }
-            DtoMapping dtoDbMapping = DtoMappingHelper.GetDtoMapping<T>();
+            TableMapping dtoDbMapping = DtoMappingHelper.GetDtoMapping<T>();
             string tableName = dtoDbMapping.GetTableName();
             DataTable dt = EntityToDataTable(list);
             dbProvider.BulkCopy(tableName, dt, batchSize, timeout, useTransaction, progress);
@@ -811,17 +810,17 @@ namespace Jc.Database
         private DataTable EntityToDataTable<T>(List<T> list) where T : class, new()
         {
             DataTable dt = GetDataTable<T>(" 1 = 0");
-            DtoMapping dtoDbMapping = DtoMappingHelper.GetDtoMapping<T>();
+            TableMapping dtoDbMapping = DtoMappingHelper.GetDtoMapping<T>();
             string tableName = dtoDbMapping.GetTableName();
-            List<PiMap> piMaps = DtoMappingHelper.GetPiMapList<T>();
+            List<FieldMapping> piMaps = DtoMappingHelper.GetPiMapList<T>();
 
-            Dictionary<DataColumn, PiMap> dtPiDic = new Dictionary<DataColumn, PiMap>();
+            Dictionary<DataColumn, FieldMapping> dtPiDic = new Dictionary<DataColumn, FieldMapping>();
 
             List<DataColumn> columns = dt.Columns.Cast<DataColumn>().ToList();
             for (int i = 0; i < columns.Count; i++)
             {
                 DataColumn column = columns[i];
-                PiMap piMap = piMaps.FirstOrDefault(a => a.FieldName.ToLower() == column.ColumnName.ToLower());
+                FieldMapping piMap = piMaps.FirstOrDefault(a => a.FieldName.ToLower() == column.ColumnName.ToLower());
                 if (piMap != null)
                 {
                     if (piMap.PropertyType != column.DataType)
@@ -851,11 +850,11 @@ namespace Jc.Database
                     object value = null;
                     if (dtPiDic.ContainsKey(column))
                     {
-                        PiMap piMap = dtPiDic[column];
+                        FieldMapping piMap = dtPiDic[column];
 
                         value = piMap.Pi.GetValue(dto);
 
-                        if (piMap == dtoDbMapping.PkMap && !dtoDbMapping.IsAutoIncrementPk)
+                        if (piMap == dtoDbMapping.PkField && !dtoDbMapping.IsAutoIncrementPk)
                         {   //是否需要生成Guid
                             if (value == null || (Guid)value == Guid.Empty)
                             {

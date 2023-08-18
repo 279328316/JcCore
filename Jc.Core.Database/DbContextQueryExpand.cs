@@ -44,7 +44,7 @@ namespace Jc.Database
         public IQuery<T> IQuery<T>(NameValueCollection collection, Dictionary<string, Operand> operandSettings = null) where T : class, new()
         {
             IQuery<T> query = IQuery<T>();
-            List<PiMap> piMapList = DtoMappingHelper.GetPiMapList<T>();
+            List<FieldMapping> piMapList = DtoMappingHelper.GetPiMapList<T>();
             for (int i = 0; i < collection.AllKeys.Length; i++)
             {
                 string queryItemKey = collection.AllKeys[i];
@@ -56,7 +56,7 @@ namespace Jc.Database
                         && queryItemVal.ToLower() != "null"
                         && queryItemVal.ToLower() != "undefined")
                     {
-                        PiMap piMap = piMapList.Where(p => queryItemKey.ToLower() == p.PiName.ToLower()
+                        FieldMapping piMap = piMapList.Where(p => queryItemKey.ToLower() == p.PiName.ToLower()
                                 || queryItemKey.ToLower() == ($"min{p.PiName}").ToLower()
                                 || queryItemKey.ToLower() == ($"max{p.PiName}").ToLower()
                                 || queryItemKey.ToLower() == ($"{p.PiName}s").ToLower()).FirstOrDefault();
@@ -189,7 +189,7 @@ namespace Jc.Database
                 try
                 {
                     SetDbConnection(dbCommand); // 执行Sql
-                    rowCount = DbCommandExecuter.ExecuteNonQuery(dbCommand);
+                    rowCount = DbCommandExecuter.ExecuteNonQuery(dbCommand, logHelper);
                     CloseDbConnection(dbCommand);
                 }
                 catch (Exception ex)
@@ -217,7 +217,7 @@ namespace Jc.Database
                     try
                     {
                         SetDbConnection(dbCommand);
-                        result = DbCommandExecuter.ExecuteScalar(dbCommand);
+                        result = DbCommandExecuter.ExecuteScalar(dbCommand, logHelper);
                         CloseDbConnection(dbCommand);
                     }
                     catch (Exception ex)
@@ -236,48 +236,6 @@ namespace Jc.Database
         internal virtual void CloseDbConnection(DbCommand dbCmd)
         {
             if (dbCmd != null) { CloseDbConnection(dbCmd.Connection); }
-        }
-
-        /// <summary>
-        /// 将DataReader转换为DataTable
-        /// </summary>
-        /// <param name="dr">DataReader</param>
-        /// <param name="loadAmount">加载数量</param>
-        /// <returns></returns>
-        internal DataTable ConvertDataReaderToDataTable(DbDataReader dr, int? loadAmount = null)
-        {
-            try
-            {
-                DataTable dt = new DataTable();
-                int fieldCount = dr.FieldCount;
-                for (int intCounter = 0; intCounter < fieldCount; ++intCounter)
-                {
-                    dt.Columns.Add(dr.GetName(intCounter), dr.GetFieldType(intCounter));
-                }
-                dt.BeginLoadData();
-
-                object[] objValues = new object[fieldCount];
-                int rowsCount = 0;
-                while (dr.Read())
-                {
-                    rowsCount++;
-                    dr.GetValues(objValues);
-                    dt.LoadDataRow(objValues, true);
-
-                    if (loadAmount.HasValue && rowsCount >= loadAmount)
-                    {
-                        break;
-                    }
-                }
-                dr.Close();
-                dt.EndLoadData();
-                return dt;
-            }
-            catch (Exception ex)
-            {
-                throw new Exception($"读取数据出错:{ex.Message}", ex);
-            }
-
         }
 
         /// <summary>
@@ -315,15 +273,14 @@ namespace Jc.Database
         public T GetById<T>(object id,Expression<Func<T, object>> select = null) where T : class, new()
         {
             T dto = null;
-            List<PiMap> piMapList = DtoMappingHelper.GetPiMapList<T>(select);
+            List<FieldMapping> piMapList = DtoMappingHelper.GetPiMapList<T>(select);
             using (DbCommand dbCommand = dbProvider.GetQueryByIdDbCommand<T>(id, piMapList, this.GetSubTableArg<T>()))
             {
                 try
                 {
                     SetDbConnection(dbCommand);
-                    using (DbDataReader dr = DbCommandExecuter.ExecuteReader(dbCommand))
+                    using (DataTable dt = DbCommandExecuter.ExecuteDataTable(dbCommand, 1, logHelper))
                     {
-                        DataTable dt = ConvertDataReaderToDataTable(dr, 1);
                         if (dt != null && dt.Rows.Count > 0)
                         {
                             dto = dt.Rows[0].ToEntity<T>();
@@ -365,9 +322,8 @@ namespace Jc.Database
                 try
                 {
                     SetDbConnection(dbCommand);
-                    using (DbDataReader dr = DbCommandExecuter.ExecuteReader(dbCommand))
+                    using (DataTable dt = DbCommandExecuter.ExecuteDataTable(dbCommand, 1, logHelper))
                     {
-                        DataTable dt = ConvertDataReaderToDataTable(dr, 1);
                         if (dt != null && dt.Rows.Count > 0)
                         {
                             dto = dt.Rows[0].ToEntity<T>();
@@ -468,10 +424,9 @@ namespace Jc.Database
                 try
                 {
                     SetDbConnection(dbCommand);
-                    using (DbDataReader dr = DbCommandExecuter.ExecuteReader(dbCommand))
+                    using (DataTable dt = DbCommandExecuter.ExecuteDataTable(dbCommand, null, logHelper))
                     {
-                        DataTable dt = ConvertDataReaderToDataTable(dr);
-                        list = dt.ToList<T>();
+                        list = dt?.ToList<T>();
                     }
                     CloseDbConnection(dbCommand);
                 }
@@ -505,8 +460,8 @@ namespace Jc.Database
         /// <returns></returns>
         public int Count<T>(Expression<Func<T, bool>> where = null) where T : class, new()
         {
-            DtoMapping dtoDbMapping = DtoMappingHelper.GetDtoMapping<T>();
-            if (dtoDbMapping.TableAttr.AutoCreate)
+            TableMapping dtoDbMapping = DtoMappingHelper.GetDtoMapping<T>();
+            if (dtoDbMapping.TableAttr?.AutoCreate == true)
             {   //如果是自动建表
                 if (!CheckTableExists<T>())
                 {
@@ -567,10 +522,7 @@ namespace Jc.Database
                 try
                 {
                     SetDbConnection(dbCommand);
-                    using (DbDataReader dr = DbCommandExecuter.ExecuteReader(dbCommand))
-                    {
-                        dt = ConvertDataReaderToDataTable(dr);
-                    }
+                    dt = DbCommandExecuter.ExecuteDataTable(dbCommand, null, logHelper);
                     CloseDbConnection(dbCommand);
                 }
                 catch (Exception ex)
@@ -596,10 +548,7 @@ namespace Jc.Database
                 try
                 {
                     this.SetDbConnection(dbCommand);
-                    using (DbDataReader dr = DbCommandExecuter.ExecuteReader(dbCommand))
-                    {
-                        dt = this.ConvertDataReaderToDataTable(dr);
-                    }
+                    dt = DbCommandExecuter.ExecuteDataTable(dbCommand, null, logHelper);
                     CloseDbConnection(dbCommand);
                 }
                 catch (Exception ex)
@@ -628,7 +577,7 @@ namespace Jc.Database
         public List<FieldModel> GetTableFieldList<T>()
         {
             string subTableArg = this.GetSubTableArg<T>();
-            DtoMapping dtoDbMapping = DtoMappingHelper.GetDtoMapping<T>();
+            TableMapping dtoDbMapping = DtoMappingHelper.GetDtoMapping<T>();
             string tableName = dtoDbMapping.GetTableName(subTableArg);
             return GetTableFieldList(tableName);
         }

@@ -31,6 +31,7 @@ namespace Jc.Database
         public TransactionDbContext GetTransactionDbContext(IsolationLevel? level = null)
         {
             TransactionDbContext dbContext = new TransactionDbContext(this.ConnectString, this.DbType, level);
+            dbContext.InitLogger(this.logHelper?.Logger, this.LogHelper?.ErrorLogger);
             return dbContext;
         }
     }

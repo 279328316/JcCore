@@ -31,129 +31,53 @@ namespace Jc.Database.Query
         /// <summary>
         /// 获取Dto的DtoDbMapping,获取第一次后会放入一个缓存列表中
         /// </summary>
-        public static DtoMapping GetDtoMapping<T>()
+        public static TableMapping GetDtoMapping<T>()
         {
-            Type t = typeof(T);
-            if (!dtoMappingCache.ContainsKey(t))
+            Type type = typeof(T);
+            if (!dtoMappingCache.ContainsKey(type))
             {
                 lock (lockForDtoMappingObj)
                 {   //获取写入锁后再次判断
-                    if (!dtoMappingCache.ContainsKey(t))
+                    if (!dtoMappingCache.ContainsKey(type))
                     {
-                        DtoMapping mapping = new DtoMapping();
-                        SetDtoMappingDic<T>(mapping);
-                        mapping.EntityType = t;
-                        mapping.TableAttr = GetDtoTableAttr<T>();
-                        dtoMappingCache.TryAdd(t, mapping);
+                        TableMapping mapping = InitDtoMapping<T>();
+                        dtoMappingCache.TryAdd(type, mapping);
                     }
                 }
             }
-            return (DtoMapping)dtoMappingCache[t];
+            return (TableMapping)dtoMappingCache[type];
         }
         
         /// <summary>
         /// 通过解析获得Dto的对象的参数,Key:为类的属性名
         /// </summary>
         /// <returns>返回Dto参数</returns>
-        public static void SetDtoMappingDic<T>(DtoMapping mapping)
+        public static TableMapping InitDtoMapping<T>()
         {
-            Dictionary<string, FieldAttribute> fieldDic = new Dictionary<string, FieldAttribute>();
-            Dictionary<string, PropertyInfo> piDic = new Dictionary<string, PropertyInfo>();
             Type type = typeof(T);
-            PropertyInfo[] piList = type.GetProperties();
-            foreach (PropertyInfo pi in piList)
-            {
-                FieldAttribute attr = GetCustomAttribute<FieldAttribute>(pi);
-                NoMappingAttribute noMappingAttr = GetCustomAttribute<NoMappingAttribute>(pi);
-                if (attr != null)
-                {   //如果列名没有赋值,则将列名定义和属性名一样的值
-                    if (string.IsNullOrEmpty(attr.Name))
-                    {
-                        attr.Name = pi.Name;
-                        attr.PiName = pi.Name;
-                    }
-                }
-                else
-                {   //如果实体没定义Field信息,则自动添加
-                    attr = new FieldAttribute()
-                    {
-                        Name = pi.Name,
-                        PiName = pi.Name,
-                    };
-                }
-                if(!pi.CanRead || !pi.CanWrite)
-                {   //如果只读或只写,则该字段IsIgnore属性设置为True
-                    attr.IsIgnore = true;
-                }
-                if (noMappingAttr != null)
-                {   //如果发现NoMapping,则该字段IsIgnore属性设置为True
-                    attr.IsIgnore = true;
-                }
-                PiMap piMap = new PiMap(pi, attr);
-                mapping.PiMapDic.Add(piMap.PiName, piMap);
-            }
+            TableMapping mapping = new TableMapping(type);
+            return mapping;
         }
 
         /// <summary>
         /// 获取表名
         /// </summary>
-        private static string GetDtoTableName<T>()
+        private static string GetTableName<T>()
         {
-            string tableName = "";
-            Type type = typeof(T);
-            TableAttribute attr = type.GetCustomAttribute<TableAttribute>();
-            if (attr == null)
-            {   //如果未设置,默认使用类名称
-                attr = new TableAttribute();
-                attr.Name = type.ToString();
-                tableName = attr.Name;
-            }
-            else
-            {   //如果表名没有赋值,则将列名定义和属性名一样的值
-                if (string.IsNullOrEmpty(attr.Name))
-                {
-                    attr.Name = type.Name;
-                }
-                tableName = attr.Name;
-            }
+            string tableName = TableAttribute.GetTableName<T>();
             return tableName;
         }
 
         /// <summary>
         /// 获取表名
         /// </summary>
-        public static TableAttribute GetDtoTableAttr<T>()
+        public static TableAttribute GetTableAttr<T>()
         {
             Type type = typeof(T);
             TableAttribute attr = type.GetCustomAttribute<TableAttribute>();
-            if (attr == null)
-            {   //如果未设置,默认使用类名称
-                attr = new TableAttribute();
-                attr.Name = type.Name.ToLower();
-                attr.DisplayText = type.Name;
-            }
-            else if (string.IsNullOrEmpty(attr.Name))
-            {
-                attr.Name = type.Name.ToLower();
-            }
             return attr;
         }
 
-
-
-        /// <summary>
-        /// 获得指定成员的特性对象
-        /// </summary>
-        /// <typeparam name="T">要获取属性的类型</typeparam>
-        /// <param name="pInfo">属性原型</param>
-        /// <returns>返回T对象</returns>
-        private static T GetCustomAttribute<T>(PropertyInfo pInfo) where T : Attribute, new()
-        {
-            Type attributeType = typeof(T);
-            Attribute attrObj = Attribute.GetCustomAttribute(pInfo, attributeType);
-            T rAttrObj = attrObj as T;
-            return rAttrObj;
-        }
 
         /// <summary>
         /// 根据查询表达式获取查询属性,转换为表字段
@@ -162,33 +86,33 @@ namespace Jc.Database.Query
         /// <param name="select">查询表达式</param>
         /// <param name="unSelect">排除查询表达式</param>
         /// <returns></returns>
-        public static List<PiMap> GetPiMapList<T>(Expression select = null, Expression unSelect = null)
+        public static List<FieldMapping> GetPiMapList<T>(Expression select = null, Expression unSelect = null)
         {
-            List<PiMap> result = new List<PiMap>();
+            List<FieldMapping> result = new List<FieldMapping>();
             List<string> inPiList = null;
             List<string> exPiList = null;
-            DtoMapping dtoMapping = GetDtoMapping<T>();
+            TableMapping dtoMapping = GetDtoMapping<T>();
             if (select != null)
             {
                 inPiList = ExpressionHelper.GetPiList((Expression<Func<T, object>>)select);
                 for (int i = 0; i < inPiList.Count; i++)
                 {
-                    if (!dtoMapping.PiMapDic.Keys.Contains(inPiList[i]))
+                    if (!dtoMapping.FieldMappings.Keys.Contains(inPiList[i]))
                     {
                         continue;
                         //throw new Exception("属性:" + inPiList[i] + "未包含在目标对象" + typeof(T).Name + "中.");
                     }
-                    if (dtoMapping.PiMapDic[inPiList[i]].IsIgnore)
+                    if (dtoMapping.FieldMappings[inPiList[i]].IsIgnore)
                     {   //如果是忽略字段
                         continue;
                     }
-                    result.Add(dtoMapping.PiMapDic[inPiList[i]]);
+                    result.Add(dtoMapping.FieldMappings[inPiList[i]]);
                 }
             }
             else if (unSelect != null)
             {
                 exPiList = ExpressionHelper.GetPiList((Expression<Func<T, object>>)unSelect);
-                foreach (KeyValuePair<string, PiMap> piMapItem in dtoMapping.PiMapDic)
+                foreach (KeyValuePair<string, FieldMapping> piMapItem in dtoMapping.FieldMappings)
                 {
                     if (exPiList.Contains(piMapItem.Key))
                     {   //如果包含在排除列表,则跳过该属性
@@ -203,7 +127,7 @@ namespace Jc.Database.Query
             }
             else
             {   //排除忽略字段
-                result = dtoMapping.PiMapDic.Where(piMap => !piMap.Value.IsIgnore).Select(piMap => piMap.Value).ToList();
+                result = dtoMapping.FieldMappings.Where(piMap => !piMap.Value.IsIgnore).Select(piMap => piMap.Value).ToList();
             }
             return result;
         }
@@ -214,9 +138,9 @@ namespace Jc.Database.Query
         /// </summary>
         /// <param name="filter">filter过滤</param>
         /// <returns></returns>
-        public static List<PiMap> GetPiMapList<T>(QueryFilter filter)
+        public static List<FieldMapping> GetPiMapList<T>(QueryFilter filter)
         {
-            List<PiMap> result = new List<PiMap>();
+            List<FieldMapping> result = new List<FieldMapping>();
             if (filter != null && filter.PiMapList != null)
             {   //如果Filter已设置过piMapList 不再重新生成.
                 result = filter.PiMapList;
@@ -244,7 +168,7 @@ namespace Jc.Database.Query
         /// 为查询时,获取PiMapList缓存
         /// Key {typeof(T).FullName}-S{select}-Un{unSelect}
         /// </summary>
-        private static ConcurrentDictionary<string, List<PiMap>> piMappingCache = new ConcurrentDictionary<string, List<PiMap>>();
+        private static ConcurrentDictionary<string, List<FieldMapping>> piMappingCache = new ConcurrentDictionary<string, List<FieldMapping>>();
 
         /// <summary>
         /// 根据查询表达式获取查询属性,转换为表字段
@@ -253,7 +177,7 @@ namespace Jc.Database.Query
         /// <param name="select">查询表达式</param>
         /// <param name="unSelect">排除查询表达式</param>
         /// <returns></returns>
-        public static List<PiMap> GetPiMapListWithCatch<T>(Expression select = null, Expression unSelect = null)
+        public static List<FieldMapping> GetPiMapListWithCache<T>(Expression select = null, Expression unSelect = null)
         {
             string cacheKey = $"{typeof(T).FullName}-S{select}-Un{unSelect}";
             if (piMappingCache.Keys.Contains(cacheKey))
@@ -261,31 +185,31 @@ namespace Jc.Database.Query
                 return piMappingCache[cacheKey];
             }
 
-            List<PiMap> result = new List<PiMap>();
+            List<FieldMapping> result = new List<FieldMapping>();
             List<string> inPiList = null;
             List<string> exPiList = null;
-            DtoMapping dtoMapping = GetDtoMapping<T>();
+            TableMapping dtoMapping = GetDtoMapping<T>();
             if (select != null)
             {
                 inPiList = ExpressionHelper.GetPiList((Expression<Func<T, object>>)select);
                 for (int i = 0; i < inPiList.Count; i++)
                 {
-                    if (!dtoMapping.PiMapDic.Keys.Contains(inPiList[i]))
+                    if (!dtoMapping.FieldMappings.Keys.Contains(inPiList[i]))
                     {
                         continue;
                         //throw new Exception("属性:" + inPiList[i] + "未包含在目标对象" + typeof(T).Name + "中.");
                     }
-                    if (dtoMapping.PiMapDic[inPiList[i]].IsIgnore)
+                    if (dtoMapping.FieldMappings[inPiList[i]].IsIgnore)
                     {   //如果是忽略字段
                         continue;
                     }
-                    result.Add(dtoMapping.PiMapDic[inPiList[i]]);
+                    result.Add(dtoMapping.FieldMappings[inPiList[i]]);
                 }
             }
             else if (unSelect != null)
             {
                 exPiList = ExpressionHelper.GetPiList((Expression<Func<T, object>>)unSelect);
-                foreach (KeyValuePair<string, PiMap> piMapItem in dtoMapping.PiMapDic)
+                foreach (KeyValuePair<string, FieldMapping> piMapItem in dtoMapping.FieldMappings)
                 {
                     if (exPiList.Contains(piMapItem.Key))
                     {   //如果包含在排除列表,则跳过该属性
@@ -300,7 +224,7 @@ namespace Jc.Database.Query
             }
             else
             {   //排除忽略字段
-                result = dtoMapping.PiMapDic.Where(piMap => !piMap.Value.IsIgnore).Select(piMap => piMap.Value).ToList();
+                result = dtoMapping.FieldMappings.Where(piMap => !piMap.Value.IsIgnore).Select(piMap => piMap.Value).ToList();
             }
 
             try

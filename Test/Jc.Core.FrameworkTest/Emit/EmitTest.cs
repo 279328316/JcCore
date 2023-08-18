@@ -52,8 +52,8 @@ namespace Jc.Core.FrameworkTest
             il.Emit(OpCodes.Callvirt, typeof(DataTable).GetMethod("get_Columns"));
             il.Emit(OpCodes.Stloc_1); //var columns = dr.Table.Columns
 
-            List<PiMap> piMapList = DtoMappingHelper.GetPiMapList<T>();
-            foreach (PiMap piMap in piMapList)
+            List<FieldMapping> piMapList = DtoMappingHelper.GetPiMapList<T>();
+            foreach (FieldMapping piMap in piMapList)
             {
                 if (piMap.IsIgnore || piMap.Pi.SetMethod == null)
                 {
@@ -170,8 +170,8 @@ namespace Jc.Core.FrameworkTest
             il.Emit(OpCodes.Stloc, errorRobj); //errorRobj = errorRobj;
 
             il.BeginExceptionBlock();
-            List<PiMap> piMapList = DtoMappingHelper.GetPiMapList<T>();
-            foreach (PiMap piMap in piMapList)
+            List<FieldMapping> piMapList = DtoMappingHelper.GetPiMapList<T>();
+            foreach (FieldMapping piMap in piMapList)
             {
                 if (piMap.IsIgnore || piMap.Pi.SetMethod == null)
                 {

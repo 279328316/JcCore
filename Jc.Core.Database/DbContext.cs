@@ -6,6 +6,7 @@ using System.Data.Common;
 using Jc.Database.Provider;
 using log4net;
 using System.IO;
+using log4net.Repository.Hierarchy;
 
 namespace Jc.Database
 {
@@ -19,24 +20,23 @@ namespace Jc.Database
 
         internal bool isTransaction = false; //是否为事务
 
-        /// <summary>
-        /// static Ctor
-        /// 读取当前目录下applog.config,DbContextLogger配置来生成日志
-        /// 也可以通过DbContext.InitLoggger来配置日志输出
-        /// </summary>
-        static DbContext()
-        {   // 通过配置文件初始化Logger
-            InitLoggger();
-        }
+        internal DbLogHelper logHelper = null; // logHelper
+
+        internal DbLogHelper LogHelper { get => logHelper; }
 
         /// <summary>
         /// Ctor
         /// <param name="connectString">数据库连接串或数据库名称</param>
         /// <param name="dbType">数据库类型</param>
+        /// <param name="dbLog">记录日志</param>
         /// </summary>
-        internal DbContext(string connectString, DatabaseType dbType = DatabaseType.MsSql)
+        internal DbContext(string connectString, DatabaseType dbType = DatabaseType.MsSql, bool dbLog = false)
         {
             this.dbProvider = DbProviderHelper.GetDbProvider(connectString, dbType);
+            if(dbLog)
+            {
+                this.InitLogger();
+            }
         }
 
         /// <summary>
@@ -44,13 +44,14 @@ namespace Jc.Database
         /// </summary>
         /// <param name="connectString">数据库连接串或数据库名称</param>
         /// <param name="dbType">数据库类型</param>
+        /// <param name="dbLog">记录数据库日志</param>
         /// <returns></returns>
-        public static DbContext CreateDbContext(string connectString, DatabaseType dbType = DatabaseType.MsSql)
+        public static DbContext CreateDbContext(string connectString, DatabaseType dbType = DatabaseType.MsSql,bool dbLog = false)
         {
             DbContext dbContext;
             try
             {
-                dbContext = new DbContext(connectString, dbType);
+                dbContext = new DbContext(connectString, dbType, dbLog);
             }
             catch (Exception ex)
             {
@@ -136,7 +137,7 @@ namespace Jc.Database
                 try
                 {
                     SetDbConnection(dbCommand);
-                    DbCommandExecuter.ExecuteNonQuery(dbCommand);
+                    DbCommandExecuter.ExecuteNonQuery(dbCommand, logHelper);
                     CloseDbConnection(dbCommand);
                 }
                 catch (Exception ex)
@@ -162,42 +163,73 @@ namespace Jc.Database
                 } 
                 catch(Exception ex)
                 {
-                    DbLogHelper.Error($"CloseDbConnection Error:{ ex.Message }");
+                    logHelper?.Error($"CloseDbConnection Error:{ ex.Message }");
                 }
             }
         }
 
+        #region 开启日志记录
         /// <summary>
+        /// 输出日志,需要在Config AppSetting中,设置 DbContextLog = true
+        /// 并在CreateDbContext时,启用日志或使用InitLogger初始化Logger
         /// 初始化 DbLogger 记录日志
-        /// 也可以通过配置目录下applog.config,DbContextLogger配置设置日志输出
-        /// 配置appSettings节点下DbContextLog为true
+        /// 默认输出到当前目录,Log/Db/ ,Log/Db/Error 目录
+        /// 需要使用dbLog.Config做为配置文件
         /// </summary>
-        /// <param name="logger">info logger</param>
-        /// <param name="errorLogger"> error logger </param>
-        public static void InitLogger(ILog logger, ILog errorLogger = null)
+        public void InitLogger()
         {
-            DbLogHelper.InitLogger(logger, errorLogger);
+            bool dbLogOpen = ConfigHelper.GetAppSetting("DbContextLog")?.ToLower() == "true";
+            if (dbLogOpen)
+            {
+                logHelper = new DbLogHelper();
+
+                string configFilePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory,"dbLog.Config");
+                InitLogger(configFilePath);
+            }
         }
 
         /// <summary>
-        /// 通过配置初始化Logger
+        /// 输出日志,需要在Config AppSetting中,设置 DbContextLog = true
+        /// 并在CreateDbContext时,启用日志或使用InitLogger初始化Logger
         /// </summary>
-        private static void InitLoggger()
+        /// <param name="logger">info logger</param>
+        /// <param name="errorLogger"> error logger </param>
+        public void InitLogger(ILog logger, ILog errorLogger = null)
+        {
+            bool dbLogOpen = ConfigHelper.GetAppSetting("DbContextLog")?.ToLower() == "true";
+            if (dbLogOpen)
+            {
+                logHelper = new DbLogHelper();
+                logHelper.InitLogger(logger, errorLogger);
+            }
+        }
+
+        /// <summary>
+        /// 输出日志,需要在Config AppSetting中,设置 DbContextLog = true
+        /// 并在CreateDbContext时,启用日志或使用InitLogger初始化Logger
+        /// 默认通过设置logConfigPath来读取,当前目录下dblog.config配置来生成日志,
+        /// </summary>
+        /// <param name="logConfigPath"></param>
+        /// <param name="logger"></param>
+        /// <param name="errorLogger"></param>
+        public void InitLogger(string logConfigPath, string logger = "Logger",string errorLogger = "ErrorLogger")
         {
             try
             {
                 //初始化DbContextLogger
-                string logConfigPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "applog.config");
                 bool dbLogOpen = ConfigHelper.GetAppSetting("DbContextLog")?.ToLower() == "true";
                 if (dbLogOpen && File.Exists(logConfigPath))
                 {
-                    DbLogHelper.InitLogger(logConfigPath, "DbRepository", "DbContextLogger");
+                    logHelper = new DbLogHelper();
+                    logHelper.InitLogger(logConfigPath, $"DbRepository_{DbName}", logger, errorLogger);
                 }
             }
             catch (Exception ex)
             {
             }
         }
+        #endregion
+
         #endregion
     }
 }

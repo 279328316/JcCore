@@ -24,7 +24,7 @@ namespace Jc.Database.Query
         Expression select = null; //查询属性表达式 Expression<Func<T, object>>
         Expression unSelect = null; //排除查询属性表达式 Expression<Func<T, object>>
 
-        private List<PiMap> piMapList = null;    //查询属性mapList
+        private List<FieldMapping> piMapList = null;    //查询属性mapList
 
         private Pager pager = null;    //分页信息
         
@@ -131,7 +131,7 @@ namespace Jc.Database.Query
         /// <summary>
         /// 查询属性List
         /// </summary>
-        public List<PiMap> PiMapList
+        public List<FieldMapping> PiMapList
         {
             get
             {

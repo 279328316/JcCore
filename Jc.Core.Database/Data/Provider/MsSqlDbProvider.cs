@@ -85,9 +85,9 @@ namespace Jc.Database.Provider
             string queryStr = null;
             string orderStr = null;
 
-            DtoMapping dtoDbMapping = DtoMappingHelper.GetDtoMapping<T>();
-            List<PiMap> piMapList = DtoMappingHelper.GetPiMapList<T>(filter);
-            foreach (PiMap piMap in piMapList)
+            TableMapping dtoDbMapping = DtoMappingHelper.GetDtoMapping<T>();
+            List<FieldMapping> piMapList = DtoMappingHelper.GetPiMapList<T>(filter);
+            foreach (FieldMapping piMap in piMapList)
             {
                 selectParams += string.IsNullOrEmpty(selectParams) ? "t2.Num,t1." + piMap.FieldName : ",t1." + piMap.FieldName;
             }
@@ -124,7 +124,7 @@ namespace Jc.Database.Provider
             outDbParameter.ParameterName = "@RecCount";
             outDbParameter.Size = 8;
             dbCommand.Parameters.Add(outDbParameter); //RecCount 总记录数
-            dbCommand.CommandText = string.Format(sqlStr, dtoDbMapping.GetTableName(subTableArg), selectParams, dtoDbMapping.PkMap.FieldName);
+            dbCommand.CommandText = string.Format(sqlStr, dtoDbMapping.GetTableName(subTableArg), selectParams, dtoDbMapping.PkField.FieldName);
             return dbCommand;
         }
 
@@ -137,7 +137,7 @@ namespace Jc.Database.Provider
         public override DbCommand GetCheckTableExistsDbCommand<T>(string subTableArg = null)
         {
             DbCommand dbCommand = CreateDbCommand();
-            DtoMapping dtoDbMapping = DtoMappingHelper.GetDtoMapping<T>();
+            TableMapping dtoDbMapping = DtoMappingHelper.GetDtoMapping<T>();
             string tableName = dtoDbMapping.GetTableName(subTableArg);
             dbCommand.CommandText = $"Select id from dbo.sysobjects where id = object_id(N'[dbo].[{tableName}]')";
             return dbCommand;
@@ -214,8 +214,8 @@ namespace Jc.Database.Provider
         public override string GetCreateTableSql<T>(string subTableArg = null)
         {
             //表名 查询字段名 主键字段名
-            DtoMapping dtoDbMapping = DtoMappingHelper.GetDtoMapping<T>();
-            List<PiMap> piMapList = DtoMappingHelper.GetPiMapList<T>();
+            TableMapping dtoDbMapping = DtoMappingHelper.GetDtoMapping<T>();
+            List<FieldMapping> piMapList = DtoMappingHelper.GetPiMapList<T>();
 
             string tableName = dtoDbMapping.GetTableName(subTableArg);
 
@@ -242,13 +242,13 @@ namespace Jc.Database.Provider
         /// <param name="piMap">字段属性Map</param>
         /// <param name="isLastField">是否为最后一个字段</param>
         /// <returns></returns>
-        private string CreateField(PiMap piMap, bool isLastField = false)
+        private string CreateField(FieldMapping piMap, bool isLastField = false)
         {
             string fieldStr = "";
             if (piMap.IsIgnore != true)
             {
                 StringBuilder strBuilder = new StringBuilder();
-                FieldAttribute attr = piMap.FieldAttr;
+                FieldAttribute attr = piMap.FieldAttribute;
                 if (string.IsNullOrEmpty(attr.FieldType))
                 {
                     throw new Exception($"自动创建表,需指定字段[{piMap.FieldName}]的FieldDbType属性.");

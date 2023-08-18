@@ -178,5 +178,51 @@ namespace Jc
                 return Encoding.UTF8.GetString(outputArray);
             }
         }
+
+        /// <summary>
+        /// 转换为小写字符串 遇到大写字母,转换为小写,并使用分隔符连接,
+        /// </summary>
+        /// <param name="str"></param>
+        /// <param name="upperSplitChar"></param>
+        /// <returns></returns>
+        public static string ConvertToLowerString(string str, string upperSplitChar)
+        {
+            if (string.IsNullOrEmpty(str))
+            {
+                return str;
+            }
+            string result = str;
+            if (!string.IsNullOrEmpty(upperSplitChar))
+            {
+                StringBuilder stringBuilder = new StringBuilder();
+                for (int i = 0; i < str.Length; i++)
+                {
+                    char curChar = str[i];
+                    if (i == 0)
+                    {
+                        if (char.IsUpper(curChar))
+                        {
+                            curChar = char.ToLower(curChar);
+                        }
+                        stringBuilder.Append(curChar);
+                    }
+                    else
+                    {
+                        if (char.IsUpper(curChar))
+                        {
+                            curChar = char.ToLower(curChar);
+                        }
+                        stringBuilder.Append(upperSplitChar);
+                        stringBuilder.Append(curChar);
+                    }
+                }
+                result = stringBuilder.ToString();
+            }
+            else
+            {
+                result = str.ToLower();
+            }
+            return str;
+        }
     }
 }

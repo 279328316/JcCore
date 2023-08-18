@@ -14,51 +14,23 @@ namespace Jc.Database
     /// </summary>
     internal class DbLogHelper
     {
-        private static ILog logger;
-        private static ILog errorLogger;
-
-        internal static bool DbLogOn
-        {
-            get
-            {
-                return logger != null;
-            }
-        }
+        private ILog logger;
+        private ILog errorLogger;
 
         /// <summary>
         /// 日志记录
         /// </summary>
-        internal static ILog Logger
-        {
-            get
-            {
-                return logger;
-            }
-            set
-            {
-                logger = value;
-            }
-        }
+        internal ILog Logger { get => logger; set { logger = value; } }
 
         /// <summary>
         /// Error日志记录
         /// </summary>
-        internal static ILog ErrorLogger
-        {
-            get
-            {
-                return errorLogger;
-            }
-            set
-            {
-                errorLogger = value;
-            }
-        }
+        internal ILog ErrorLogger { get => errorLogger; set { errorLogger = value; } }
 
         /// <summary>
         /// 初始化Logger
         /// </summary>
-        internal static void SetLogger(string repositoryName, string loggerName)
+        internal void SetLogger(string repositoryName, string loggerName)
         {
             ILoggerRepository repository = LogManager.GetAllRepositories().FirstOrDefault(a => a.Name == repositoryName);
             if (repository != null)
@@ -70,7 +42,7 @@ namespace Jc.Database
         /// <summary>
         /// 初始化ErrorLogger
         /// </summary>
-        internal static void SetErrorLogger(string repositoryName, string errorLoggerName)
+        internal void SetErrorLogger(string repositoryName, string errorLoggerName)
         {
             ILoggerRepository repository = LogManager.GetAllRepositories().FirstOrDefault(a => a.Name == repositoryName);
             if (repository != null)
@@ -82,7 +54,7 @@ namespace Jc.Database
         /// <summary>
         /// 初始化Logger
         /// </summary>
-        internal static void InitLogger(ILog logger, ILog errorLogger = null)
+        internal void InitLogger(ILog logger, ILog errorLogger = null)
         {
             Logger = logger;
             ErrorLogger = errorLogger;
@@ -91,7 +63,7 @@ namespace Jc.Database
         /// <summary>
         /// 初始化Logger
         /// </summary>
-        internal static void InitLogger(string logConfigPath, string repositoryName, string loggerName, string errorLoggerName = null)
+        internal void InitLogger(string logConfigPath, string repositoryName, string loggerName, string errorLoggerName = null)
         {
             if (logger == null)
             {
@@ -109,7 +81,7 @@ namespace Jc.Database
         /// 获取LogRepository
         /// </summary>
         /// <returns></returns>
-        private static ILoggerRepository GetLogRepository(string logConfigPath, string repositoryName)
+        private ILoggerRepository GetLogRepository(string logConfigPath, string repositoryName)
         {
             ILoggerRepository repository = LogManager.GetAllRepositories().FirstOrDefault(a => a.Name == repositoryName);
             if (repository == null)
@@ -123,7 +95,7 @@ namespace Jc.Database
         /// 记录日志
         /// </summary>
         /// <param name="msg"></param>
-        internal static void WriteLog(string msg)
+        internal void WriteLog(string msg)
         {
             Info(msg);
         }
@@ -132,7 +104,7 @@ namespace Jc.Database
         /// 记录日志
         /// </summary>
         /// <param name="msg"></param>
-        internal static void Info(string msg)
+        internal void Info(string msg)
         {
             if (Logger != null)
             {
@@ -151,7 +123,7 @@ namespace Jc.Database
         /// 记录日志
         /// </summary>
         /// <param name="msg"></param>
-        internal static void Warn(string msg)
+        internal void Warn(string msg)
         {
             if (Logger != null)
             {
@@ -170,12 +142,13 @@ namespace Jc.Database
         /// 记录日志
         /// </summary>
         /// <param name="msg"></param>
-        internal static void Error(string msg)
+        internal void Error(string msg)
         {
             try
             {
                 if (ErrorLogger != null)
                 {
+                    Info(msg);
                     ErrorLogger.Error(msg);
                 }
                 else
@@ -192,7 +165,7 @@ namespace Jc.Database
         /// 记录日志
         /// </summary>
         /// <param name="msg"></param>
-        internal static void Error(string msg ,Exception ex)
+        internal void Error(string msg ,Exception ex)
         {
             try
             {
@@ -208,7 +181,7 @@ namespace Jc.Database
         /// 记录日志
         /// </summary>
         /// <param name="msg"></param>
-        internal static void Error(Exception ex)
+        internal void Error(Exception ex)
         {
             try
             {
@@ -225,7 +198,7 @@ namespace Jc.Database
         /// </summary>
         /// <param name="ex"></param>
         /// <returns></returns>
-        private static string GetExceptionInfo(Exception ex)
+        private string GetExceptionInfo(Exception ex)
         {
             string msg = $"{ex.Message}\r\n{ex.StackTrace}";
             Exception innerEx = ex.InnerException;

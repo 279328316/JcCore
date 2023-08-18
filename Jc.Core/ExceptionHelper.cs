@@ -128,7 +128,22 @@ namespace Jc
             }
             return result;
         }
-    
+
+        /// <summary>
+        /// 获取Exception InnerException
+        /// </summary>
+        /// <param name="ex"></param>
+        /// <returns></returns>
+        public static Exception GetInnerException(Exception ex)
+        {
+            Exception innerEx = ex.InnerException;
+            while (innerEx != null)
+            {
+                innerEx = innerEx.InnerException;
+            }
+            return innerEx;
+        }
+
         /// <summary>
         /// 获取Exception详细异常
         /// </summary>
@@ -148,8 +163,7 @@ namespace Jc
                 msg += $"\r\n{ex.StackTrace}";
             }
             Exception innerEx = ex.InnerException;
-            int innerExCount = 0;
-            while (innerEx != null && innerExCount < 5)
+            while (innerEx != null)
             {
                 msg += $"\r\n{innerEx.Message}";
                 if (withStackTrace)
@@ -157,7 +171,6 @@ namespace Jc
                     msg += $"\r\n{innerEx.StackTrace}";
                 }
                 innerEx = innerEx.InnerException;
-                innerExCount++;
             }
             return msg;
         }
