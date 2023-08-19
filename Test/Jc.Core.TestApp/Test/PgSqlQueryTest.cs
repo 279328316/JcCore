@@ -10,6 +10,21 @@ namespace Jc.Core.TestApp.Test
 {
     public class PgSqlQueryTest
     {
+        private class QueryObj
+        {
+            public int? Id { get; set; }
+            public string UserName { get; set; }
+            public List<int?> Ids { get; set; }
+
+            public int MinId { get; set; }
+            public int MaxId { get; set; }
+
+            public DateTime MinDt { get; set; }
+            public DateTime MaxDt { get; set; }
+
+            public QueryObj Query { get; set; }
+        }
+
         public void Test()
         {
             NTest();
@@ -21,7 +36,8 @@ namespace Jc.Core.TestApp.Test
 
         public void ContainsTest()
         {
-            var queryObj = new { UserName = "Abc", Ids = new List<int?> { 1, 2, 3 } };
+            var queryObj = new QueryObj (){ UserName = "Abc", Ids = new List<int?> { 1, 2, 3 } };
+            queryObj.Query = queryObj;
 
             List<PgUserDto> list = null;
             list = Dbc.PgTestDb.GetList<PgUserDto>(a => a.UserName.Contains("a"));
@@ -40,10 +56,10 @@ namespace Jc.Core.TestApp.Test
 
             List<int?> ids = new List<int?> { 1, 2, 3 };
             list = Dbc.PgTestDb.GetList<PgUserDto>(a => ids.Contains(a.Id));
-            list = Dbc.PgTestDb.GetList<PgUserDto>(a => ids.Contains(a.Id.Value));
+            list = Dbc.PgTestDb.GetList<PgUserDto>(a => ids.Contains(a.Id));
 
             list = Dbc.PgTestDb.GetList<PgUserDto>(a => queryObj.Ids.Contains(a.Id));
-            list = Dbc.PgTestDb.GetList<PgUserDto>(a => queryObj.Ids.Contains(a.Id.Value));
+            list = Dbc.PgTestDb.GetList<PgUserDto>(a => queryObj.Ids.Contains(a.Id));
 
             List<string> userNames = new List<string> { "abc", "test" };
             list = Dbc.PgTestDb.GetList<PgUserDto>(a => userNames.Contains(a.UserName.ToLower()));
@@ -59,10 +75,20 @@ namespace Jc.Core.TestApp.Test
 
         private void NTest()
         {
-            var queryObj = new { UserName = "Abc", Ids = new List<int?> { 1, 2, 3 } };
-            // 目前不支持,后续处理 必须字段在前面
+            var queryObj = new QueryObj() { UserName = "Abc",Id = 1, Ids = new List<int?> { 1, 2, 3 },MinDt = DateTime.Now};
+            queryObj.Query = queryObj;
+
             List<PgUserDto> list = null;
-            list = Dbc.PgTestDb.GetList<PgUserDto>(a => queryObj.UserName.ToLower() == a.UserName.ToLower());
+            list = Dbc.PgTestDb.GetList<PgUserDto>(a => a.UserName == queryObj.UserName);
+            list = Dbc.PgTestDb.GetList<PgUserDto>(a => a.UserName == queryObj.Query.UserName);
+            list = Dbc.PgTestDb.GetList<PgUserDto>(a => a.UserName.ToLower() == queryObj.UserName.ToLower());
+            list = Dbc.PgTestDb.GetList<PgUserDto>(a => a.Id == 1);
+            list = Dbc.PgTestDb.GetList<PgUserDto>(a => a.Id == queryObj.Id);
+            list = Dbc.PgTestDb.GetList<PgUserDto>(a => queryObj.Ids.Contains(a.Id));
+            list = Dbc.PgTestDb.GetList<PgUserDto>(a => queryObj.Ids.Contains(a.Id) && a.IsActived
+                                                                    && a.LastUpdateDate >= DateTime.Parse(DateTime.Now.ToString("yyyy-MM-01"))
+                                                                    && a.LastUpdateDate >= queryObj.MinDt.AddDays(1));
+
             list = Dbc.PgTestDb.GetList<PgUserDto>(a => "Abc".ToLower() == a.UserName.ToLower());
             list = Dbc.PgTestDb.GetList<PgUserDto>(a => "Abcd".Substring(0, 3).ToLower() == a.UserName.ToLower());
             list = Dbc.PgTestDb.GetList<PgUserDto>(a => queryObj.UserName.Substring(0, 3).ToLower() == a.UserName.ToLower());
@@ -72,7 +98,7 @@ namespace Jc.Core.TestApp.Test
         {
             int minId = 1;
             int maxId = 4;
-            var queryObj = new { UserName = "Abc", Ids = new List<int?> { 1, 2, 3 }, MinId = minId, MaxId = maxId };
+            var queryObj = new QueryObj() { UserName = "Abc", Ids = new List<int?> { 1, 2, 3 }, MinId = minId, MaxId = maxId };
 
             List<PgUserDto> list = null;
             list = Dbc.PgTestDb.GetList<PgUserDto>(a => a.Id == 1);
@@ -133,7 +159,7 @@ namespace Jc.Core.TestApp.Test
             int maxId = 4;
             DateTime minDt = DateTime.Parse("2022-06-20");
             DateTime maxDt = DateTime.Parse("2022-06-30");
-            var queryObj = new
+            var queryObj = new QueryObj()
             {
                 UserName = "Abc",
                 Ids = new List<int?> { 1, 2, 3 },

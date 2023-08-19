@@ -248,75 +248,64 @@ namespace Jc.Database.Query
         /// </summary>
         /// <param name="exp"></param>
         /// <returns></returns>
+        private bool IsFieldExpressionOrgin(Expression exp)
+        {
+            if (exp is null)
+            {
+                return false;
+            }
+            bool result = false;
+            result = (exp is MemberExpression
+                    && ((MemberExpression)exp).Expression != null
+                    && !((MemberExpression)exp).Expression.ToString().StartsWith("value"))
+                    || (exp is MethodCallExpression 
+                    && ((MethodCallExpression)exp).Object is MemberExpression
+                    && ((MemberExpression)((MethodCallExpression)exp).Object).Expression != null
+                    && !((MemberExpression)((MethodCallExpression)exp).Object).Expression.ToString().StartsWith("value")) 
+                    || (exp is UnaryExpression
+                    && ((UnaryExpression)exp).Operand is MemberExpression
+                    && ((MemberExpression)((UnaryExpression)exp).Operand).Expression != null
+                    && !((MemberExpression)((UnaryExpression)exp).Operand).Expression.ToString().StartsWith("value"));
+            return result;
+        }
+
+        /// <summary>
+        /// 判断是否为Field Expression
+        /// </summary>
+        /// <param name="exp"></param>
+        /// <returns></returns>
         private bool IsFieldExpression(Expression exp)
         {
-            bool result = false;
-            string expStr = exp.ToString();
-            if (expStr.StartsWith("value"))
+            if (exp is null)
             {
-                result = false;
+                return false;
             }
-            else
+            bool result = false;            
+            if (exp is MemberExpression)   //表示访问字段或属性
             {
-                if (exp is MemberExpression)   //表示访问字段或属性
+                MemberExpression me = exp as MemberExpression;
+                result = me.Expression != null && !me.Expression.ToString().StartsWith("value");
+            }
+            else if (exp is UnaryExpression) //表示创建一个新数组，并可能初始化该新数组的元素
+            {   // a.Id = int? exp="Convert(a.Id, Nullable`1)"
+                UnaryExpression unaryExp = exp as UnaryExpression;
+                if(unaryExp.Operand is MemberExpression)
                 {
-                    MemberExpression me = exp as MemberExpression;
-                    if (me.Expression != null)
-                    {   // a.Name is MemberExpression, me.Expression is a , not null
-                        result = true;
-                    }
-                    else
-                    {   // DateTime.Now is MemberExpression but me.Expression is null
-                        result = false;
-                    }
+                    MemberExpression me = unaryExp.Operand as MemberExpression;
+                    result = me.Expression != null && !me.Expression.ToString().StartsWith("value");
                 }
-                else if (exp is ConstantExpression) //表示具有常数值的表达式
+            }
+            else if (exp is MethodCallExpression)   //介绍 lambda 表达式。 它捕获一个类似于 .NET 方法主体的代码块
+            {   // a.UserName.ToLower()
+                MethodCallExpression callExpression = exp as MethodCallExpression;
+                if (callExpression.Object is MemberExpression)
                 {
-                    result = false;
-                }
-                else if (exp is LambdaExpression)   //介绍 lambda 表达式。 它捕获一个类似于 .NET 方法主体的代码块
-                {
-                    LambdaExpression le = exp as LambdaExpression;
-                    result = IsFieldExpression(le.Body);
-                }
-                else if (exp is NewArrayExpression) //表示创建一个新数组，并可能初始化该新数组的元素
-                {
-                    result = false;
-                }
-                else if (exp is ParameterExpression)    //表示一个命名的参数表达式。
-                {
-                    result = false;
-                }
-                else if (exp is UnaryExpression) //表示创建一个新数组，并可能初始化该新数组的元素
-                {
-                    UnaryExpression unaryExp = exp as UnaryExpression;
-                    result = IsFieldExpression(unaryExp.Operand);
-                }
-                else if (exp is MethodCallExpression)   //介绍 lambda 表达式。 它捕获一个类似于 .NET 方法主体的代码块
-                {
-                    MethodCallExpression callExpression = exp as MethodCallExpression;
-                    if (callExpression.Object is MemberExpression)
-                    {
-                        result = true;
-                    }
-                    else if (callExpression.Object is ConstantExpression)
-                    {
-                        result = false;
-                    }
-                    else
-                    {
-                        result = IsFieldExpression(callExpression.Object);
-                    }
-                }
-                else
-                {
-                    result = false;
+                    MemberExpression me = callExpression.Object as MemberExpression;
+                    result = me.Expression != null && !me.Expression.ToString().StartsWith("value");
                 }
             }
             return result;
         }
-
-
 
         /// <summary>
         /// 处理FilterExpression 添加查询条件

@@ -9,7 +9,7 @@ https://github.com/279328316/JcCore</Description>
     <Copyright>MIT</Copyright>
     <PackageProjectUrl>https://github.com/279328316/JcCore</PackageProjectUrl>
     <RepositoryUrl>https://github.com/279328316/JcCore</RepositoryUrl>
-    <Version>1.1.8.0</Version>
+    <Version>1.1.9.0</Version>
     <PackageTags>Jc;JcCore;Orm</PackageTags>
   </PropertyGroup>
 
