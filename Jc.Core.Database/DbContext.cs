@@ -7,6 +7,15 @@ using Jc.Database.Provider;
 using log4net;
 using System.IO;
 using log4net.Repository.Hierarchy;
+using log4net.Appender;
+using log4net.Core;
+using log4net.Filter;
+using System.Runtime.InteropServices.ComTypes;
+using System.Xml.Linq;
+using log4net.Config;
+using log4net.Layout;
+using log4net.Repository;
+using System.Linq;
 
 namespace Jc.Database
 {
@@ -30,13 +39,9 @@ namespace Jc.Database
         /// <param name="dbType">数据库类型</param>
         /// <param name="dbLog">记录日志</param>
         /// </summary>
-        internal DbContext(string connectString, DatabaseType dbType = DatabaseType.MsSql, bool dbLog = false)
+        internal DbContext(string connectString, DatabaseType dbType = DatabaseType.MsSql)
         {
             this.dbProvider = DbProviderHelper.GetDbProvider(connectString, dbType);
-            if(dbLog)
-            {
-                this.InitLogger();
-            }
         }
 
         /// <summary>
@@ -46,12 +51,13 @@ namespace Jc.Database
         /// <param name="dbType">数据库类型</param>
         /// <param name="dbLog">记录数据库日志</param>
         /// <returns></returns>
-        public static DbContext CreateDbContext(string connectString, DatabaseType dbType = DatabaseType.MsSql,bool dbLog = false)
+        public static DbContext CreateDbContext(string connectString, DatabaseType dbType = DatabaseType.MsSql)
         {
             DbContext dbContext;
             try
             {
-                dbContext = new DbContext(connectString, dbType, dbLog);
+                dbContext = new DbContext(connectString, dbType);
+                dbContext.InitLogger();
             }
             catch (Exception ex)
             {
@@ -178,13 +184,18 @@ namespace Jc.Database
         /// </summary>
         public void InitLogger()
         {
-            bool dbLogOpen = ConfigHelper.GetAppSetting("DbContextLog")?.ToLower() == "true";
-            if (dbLogOpen)
+            try
             {
-                logHelper = new DbLogHelper();
+                bool dbLogOpen = ConfigHelper.GetAppSetting("DbContextLog")?.ToLower() == "true";
+                if (dbLogOpen)
+                {
+                    logHelper = new DbLogHelper();
+                    logHelper.InitLogger(DbName);
+                }
+            }
+            catch(Exception ex)
+            {
 
-                string configFilePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory,"dbLog.Config");
-                InitLogger(configFilePath);
             }
         }
 

@@ -21,7 +21,7 @@ namespace Jc.Core.TestApp
         /// <summary>
         /// PgNiceDb
         /// </summary>
-        public static DbContext PgTestDb = DbContext.CreateDbContext("PgTestDb", DatabaseType.PostgreSql,true);
+        public static DbContext PgTestDb = DbContext.CreateDbContext("PgTestDb", DatabaseType.PostgreSql);
 
         /// <summary>
         /// Db

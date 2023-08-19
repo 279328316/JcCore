@@ -1,11 +1,18 @@
 ﻿using log4net;
+using log4net.Appender;
 using log4net.Config;
+using log4net.Core;
+using log4net.Filter;
+using log4net.Layout;
 using log4net.Repository;
+using log4net.Repository.Hierarchy;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text;
+using System.Xml.Linq;
 
 namespace Jc.Database
 {
@@ -14,6 +21,9 @@ namespace Jc.Database
     /// </summary>
     internal class DbLogHelper
     {
+        [DllImport("kernel32.dll")]
+        static extern IntPtr GetConsoleWindow();
+
         private ILog logger;
         private ILog errorLogger;
 
@@ -49,6 +59,95 @@ namespace Jc.Database
             {
                 ErrorLogger = LogManager.GetLogger(repository.Name, errorLoggerName);
             }
+        }
+
+
+
+        /// <summary>
+        /// 初始化Logger
+        /// </summary>
+        internal void InitLogger(string dbName)
+        {
+            try
+            {
+                bool isConsoleApp = GetConsoleWindow() != IntPtr.Zero;
+                string repositoryName = $"{dbName}_DbRepository";
+                string loggerName = "Logger";
+                string errorLoggerName = "ErrorLogger";
+                string logDir = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, $"DbLog/{dbName}/");
+                string errorLogDir = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, $"DbLog/{dbName}/Error/");
+                ILoggerRepository repository = LogManager.GetAllRepositories().FirstOrDefault(a => a.Name == repositoryName);
+                if (repository == null)
+                {
+                    repository = LogManager.CreateRepository(repositoryName);
+                }
+                Hierarchy hierarchy = (Hierarchy)repository;
+                Logger logger = (Logger)hierarchy.GetLogger(loggerName);
+                if (logger.Appenders.Count <= 0)
+                {
+                    logger.AddAppender(GetFileAppender(logDir));
+                    if (isConsoleApp)
+                    {
+                        logger.AddAppender(new ConsoleAppender());
+                    }
+                }
+
+                Logger errorLogger = (Logger)hierarchy.GetLogger(errorLoggerName);
+                if (errorLogger.Appenders.Count <= 0)
+                {
+                    errorLogger = hierarchy.LoggerFactory.CreateLogger(hierarchy, errorLoggerName);
+                    errorLogger.AddAppender(GetFileAppender(errorLogDir, "'Error_'yyyy-MM-dd'.log'"));
+                    if (isConsoleApp)
+                    {
+                        errorLogger.AddAppender(new ConsoleAppender());
+                    }
+                }
+                hierarchy.Configured = true;
+                // logger.Additivity = false;   // loggingEvent won't be bubbled to its parent logger in this case.
+
+                this.logger = LogManager.GetLogger(repository.Name, loggerName); 
+                this.errorLogger = LogManager.GetLogger(repository.Name, errorLoggerName); 
+            }
+            catch(Exception ex)
+            {
+
+            }
+        }
+
+        /// <summary>
+        /// 获取 File Appender
+        /// </summary>
+        /// <param name="logDir"></param>
+        /// <param name="dataPattern"></param>
+        /// <param name="maximumFileSize"></param>
+        private RollingFileAppender GetFileAppender(string logDir,string dataPattern = "'Log_'yyyy-MM-dd'.log'", string maximumFileSize = "10MB")
+        {
+            //配置输出日志格式。%m表示message即日志信息。%n表示newline换行
+            PatternLayout layout = new PatternLayout(@"%date{yyyy-MM-dd HH:mm:ss} %-5level %message%newline");
+            layout.ActivateOptions();
+
+            //配置日志级别为所有级别
+            LevelMatchFilter filter = new LevelMatchFilter();
+            filter.LevelToMatch = Level.All;
+            filter.ActivateOptions();
+
+            //配置日志【循环附加，累加】
+            RollingFileAppender appender = new RollingFileAppender();
+
+            appender.File = logDir;
+            appender.ImmediateFlush = true;
+            appender.MaxSizeRollBackups = 50;
+            appender.MaximumFileSize = maximumFileSize;
+            appender.RollingStyle = RollingFileAppender.RollingMode.Composite;
+            appender.StaticLogFileName = false;
+            appender.DatePattern = dataPattern;
+            appender.LockingModel = new FileAppender.MinimalLock();
+            appender.PreserveLogFileNameExtension = true;
+            appender.AddFilter(filter);
+            appender.Layout = layout;
+            appender.AppendToFile = true;
+            appender.ActivateOptions();
+            return appender;
         }
 
         /// <summary>
@@ -91,6 +190,7 @@ namespace Jc.Database
             }
             return repository;
         }
+
         /// <summary>
         /// 记录日志
         /// </summary>
