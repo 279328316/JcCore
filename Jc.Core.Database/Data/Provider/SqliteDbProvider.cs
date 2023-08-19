@@ -53,6 +53,7 @@ namespace Jc.Database.Provider
             {
                 dbName = connectString.Substring(dbNameStartIndex + 1);
             }
+            dbName = dbName.Replace("|", "_").Replace("/", "_").Replace("\\", "_");
             return dbName;
         }
 
