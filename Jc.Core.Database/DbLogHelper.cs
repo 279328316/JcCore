@@ -21,9 +21,6 @@ namespace Jc.Database
     /// </summary>
     internal class DbLogHelper
     {
-        [DllImport("kernel32.dll")]
-        static extern IntPtr GetConsoleWindow();
-
         private ILog logger;
         private ILog errorLogger;
 
@@ -70,7 +67,6 @@ namespace Jc.Database
         {
             try
             {
-                bool isConsoleApp = GetConsoleWindow() != IntPtr.Zero;
                 string repositoryName = $"{dbName}_DbRepository";
                 string loggerName = "Logger";
                 string errorLoggerName = "ErrorLogger";
@@ -86,10 +82,6 @@ namespace Jc.Database
                 if (logger.Appenders.Count <= 0)
                 {
                     logger.AddAppender(GetFileAppender(logDir));
-                    if (isConsoleApp)
-                    {
-                        logger.AddAppender(new ConsoleAppender());
-                    }
                 }
 
                 Logger errorLogger = (Logger)hierarchy.GetLogger(errorLoggerName);
@@ -97,10 +89,6 @@ namespace Jc.Database
                 {
                     errorLogger = hierarchy.LoggerFactory.CreateLogger(hierarchy, errorLoggerName);
                     errorLogger.AddAppender(GetFileAppender(errorLogDir, "'Error_'yyyy-MM-dd'.log'"));
-                    if (isConsoleApp)
-                    {
-                        errorLogger.AddAppender(new ConsoleAppender());
-                    }
                 }
                 hierarchy.Configured = true;
                 // logger.Additivity = false;   // loggingEvent won't be bubbled to its parent logger in this case.
