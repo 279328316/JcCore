@@ -172,7 +172,7 @@ namespace Jc.Database
             Pager pager = new Pager(1,1);
             if (orderByClauseList == null || orderByClauseList.Count <= 0)
             {
-                TableMapping dtoDbMapping = DtoMappingHelper.GetDtoMapping<T>();
+                EntityMapping dtoDbMapping = EntityMappingHelper.GetMapping<T>();
                 if (dtoDbMapping != null && dtoDbMapping.PkField != null)
                 {
                     orderByClauseList.Add(new OrderByClause(dtoDbMapping.PkField.FieldName));
@@ -487,7 +487,7 @@ namespace Jc.Database
         {
             if (!string.IsNullOrEmpty(sort))
             {
-                List<FieldMapping> piMapList = DtoMappingHelper.GetPiMapList<T>();
+                List<FieldMapping> piMapList = EntityMappingHelper.GetPiMapList<T>();
                 if (piMapList != null && piMapList.Count > 0)
                 {
                     FieldMapping piMap = piMapList.FirstOrDefault(a => a.PiName.ToLower() == sort.ToLower() && a.IsIgnore == false);
@@ -525,7 +525,7 @@ namespace Jc.Database
         /// <returns></returns>
         public IQuery<T> OrderBy(Expression<Func<T, object>> expr)
         {
-            List<FieldMapping> piMapList = DtoMappingHelper.GetPiMapList<T>(expr);
+            List<FieldMapping> piMapList = EntityMappingHelper.GetPiMapList<T>(expr);
             if (piMapList != null && piMapList.Count > 0)
             {
                 for (int i = 0; i < piMapList.Count; i++)
@@ -548,7 +548,7 @@ namespace Jc.Database
         /// <returns></returns>
         public IQuery<T> OrderByDesc(Expression<Func<T, object>> expr)
         {
-            List<FieldMapping> piMapList = DtoMappingHelper.GetPiMapList<T>(expr);
+            List<FieldMapping> piMapList = EntityMappingHelper.GetPiMapList<T>(expr);
             if (piMapList != null && piMapList.Count > 0)
             {
                 for (int i = 0; i < piMapList.Count; i++)

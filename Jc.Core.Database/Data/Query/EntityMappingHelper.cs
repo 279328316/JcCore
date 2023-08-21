@@ -10,52 +10,52 @@ using System.Collections.Concurrent;
 namespace Jc.Database.Query
 {
     /// <summary>
-    /// Dto实体的解析接口
+    /// 实体的解析接口
     /// </summary>
-    public static class DtoMappingHelper
+    public static class EntityMappingHelper
     {
-        private static object lockForDtoMappingObj = new object();  //字典缓存写入锁
+        private static object lockForMappingObj = new object();  //字典缓存写入锁
 
         /// <summary>
         /// 实体类缓存,静态变量是保存为了减少反射次数
         /// object 为DtoMapping
         /// </summary>
-        private static ConcurrentDictionary<Type, object> dtoMappingCache = new ConcurrentDictionary<Type, object>();
+        private static ConcurrentDictionary<Type, object> mappingCache = new ConcurrentDictionary<Type, object>();
 
         private static object lockForPiMappingCacheObj = new object();  //字典缓存写入锁
 
-        static DtoMappingHelper()
+        static EntityMappingHelper()
         {
         }
 
         /// <summary>
-        /// 获取Dto的DtoDbMapping,获取第一次后会放入一个缓存列表中
+        /// 获取Entity的EntityMapping,获取第一次后会放入一个缓存列表中
         /// </summary>
-        public static TableMapping GetDtoMapping<T>()
+        public static EntityMapping GetMapping<T>()
         {
             Type type = typeof(T);
-            if (!dtoMappingCache.ContainsKey(type))
+            if (!mappingCache.ContainsKey(type))
             {
-                lock (lockForDtoMappingObj)
+                lock (lockForMappingObj)
                 {   //获取写入锁后再次判断
-                    if (!dtoMappingCache.ContainsKey(type))
+                    if (!mappingCache.ContainsKey(type))
                     {
-                        TableMapping mapping = InitDtoMapping<T>();
-                        dtoMappingCache.TryAdd(type, mapping);
+                        EntityMapping mapping = InitMapping<T>();
+                        mappingCache.TryAdd(type, mapping);
                     }
                 }
             }
-            return (TableMapping)dtoMappingCache[type];
+            return (EntityMapping)mappingCache[type];
         }
         
         /// <summary>
         /// 通过解析获得Dto的对象的参数,Key:为类的属性名
         /// </summary>
         /// <returns>返回Dto参数</returns>
-        public static TableMapping InitDtoMapping<T>()
+        public static EntityMapping InitMapping<T>()
         {
             Type type = typeof(T);
-            TableMapping mapping = new TableMapping(type);
+            EntityMapping mapping = new EntityMapping(type);
             return mapping;
         }
 
@@ -91,7 +91,7 @@ namespace Jc.Database.Query
             List<FieldMapping> result = new List<FieldMapping>();
             List<string> inPiList = null;
             List<string> exPiList = null;
-            TableMapping dtoMapping = GetDtoMapping<T>();
+            EntityMapping dtoMapping = GetMapping<T>();
             if (select != null)
             {
                 inPiList = ExpressionHelper.GetPiList((Expression<Func<T, object>>)select);
@@ -188,7 +188,7 @@ namespace Jc.Database.Query
             List<FieldMapping> result = new List<FieldMapping>();
             List<string> inPiList = null;
             List<string> exPiList = null;
-            TableMapping dtoMapping = GetDtoMapping<T>();
+            EntityMapping dtoMapping = GetMapping<T>();
             if (select != null)
             {
                 inPiList = ExpressionHelper.GetPiList((Expression<Func<T, object>>)select);

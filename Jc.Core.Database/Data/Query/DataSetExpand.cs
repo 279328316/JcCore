@@ -15,7 +15,7 @@ namespace Jc.Database.Query
             List<T> list = new List<T>();
             if (dt != null && dt.Rows.Count > 0)
             {
-                TableMapping dtoMapping = DtoMappingHelper.GetDtoMapping<T>();
+                EntityMapping dtoMapping = EntityMappingHelper.GetMapping<T>();
                 foreach (DataRow dr in dt.Rows)
                 {
                     list.Add(dr.ToEntity<T>());
@@ -32,7 +32,7 @@ namespace Jc.Database.Query
         /// <returns></returns>
         public static T ToEntity<T>(this DataRow dr) where T : class, new()
         {
-            TableMapping dtoMapping = DtoMappingHelper.GetDtoMapping<T>();
+            EntityMapping dtoMapping = EntityMappingHelper.GetMapping<T>();
             if (dtoMapping.EntityConvertor == null)
             {
                 dtoMapping.EntityConvertor = EntityConvertor.CreateEntityConvertor<T>();   //存入dtoMapping中,缓存起来

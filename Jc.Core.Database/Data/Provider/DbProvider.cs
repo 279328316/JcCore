@@ -194,7 +194,7 @@ namespace Jc.Database.Provider
         internal DbCommand GetInsertDbCmd<T>(T dto, List<FieldMapping> piMapList, string subTableArg = null) where T : class, new()
         {
             DbCommand dbCommand = CreateDbCommand();
-            TableMapping dtoMapping = DtoMappingHelper.GetDtoMapping<T>();
+            EntityMapping dtoMapping = EntityMappingHelper.GetMapping<T>();
             #region 设置DbCommand
             string sqlStr = "Insert into {0} ({1}) values({2})";
             string fieldParams = null;
@@ -234,7 +234,7 @@ namespace Jc.Database.Provider
         internal DbCommand GetInsertDbCmd<T>(List<T> list, List<FieldMapping> piMapList, string subTableArg = null) where T : class, new()
         {
             DbCommand dbCommand = CreateDbCommand();
-            TableMapping dtoDbMapping = DtoMappingHelper.GetDtoMapping<T>();
+            EntityMapping dtoDbMapping = EntityMappingHelper.GetMapping<T>();
             #region 设置DbCommand
             string sqlStr = "Insert into {0} ({1}) values{2}";
             string fieldParams = null;
@@ -291,7 +291,7 @@ namespace Jc.Database.Provider
         internal DbCommand GetImportDbCmd<T>(T dto, List<FieldMapping> piMapList, string subTableArg = null) where T : class, new()
         {
             DbCommand dbCommand = CreateDbCommand();
-            TableMapping dtoDbMapping = DtoMappingHelper.GetDtoMapping<T>();
+            EntityMapping dtoDbMapping = EntityMappingHelper.GetMapping<T>();
             #region 设置DbCommand
             string sqlStr = "Insert into {0} ({1}) values({2})";
             string fieldParams = null;
@@ -326,7 +326,7 @@ namespace Jc.Database.Provider
         internal DbCommand GetUpdateDbCmd<T>(T dto, List<FieldMapping> piMapList, string subTableArg = null)
         {
             DbCommand dbCommand = CreateDbCommand();
-            TableMapping dtoDbMapping = DtoMappingHelper.GetDtoMapping<T>();
+            EntityMapping dtoDbMapping = EntityMappingHelper.GetMapping<T>();
             #region 设置DbCommand
             string sqlStr = "Update {0} set {1} where {2};";
             string setParams = null;
@@ -376,7 +376,7 @@ namespace Jc.Database.Provider
         internal DbCommand GetUpdateDbCmd<T>(T dto, QueryFilter filter, string subTableArg = null)
         {
             DbCommand dbCommand = CreateDbCommand();
-            TableMapping dtoDbMapping = DtoMappingHelper.GetDtoMapping<T>();
+            EntityMapping dtoDbMapping = EntityMappingHelper.GetMapping<T>();
             #region 设置DbCommand
             string sqlStr = "Update {0} set {1}";
 
@@ -396,7 +396,7 @@ namespace Jc.Database.Provider
                     dbCommand.Parameters.Add(dbParameter);
                 }
             }
-            List<FieldMapping> piMapList = DtoMappingHelper.GetPiMapList<T>(filter);
+            List<FieldMapping> piMapList = EntityMappingHelper.GetPiMapList<T>(filter);
             foreach (FieldMapping piMap in piMapList)
             {
                 if (piMap == dtoDbMapping.PkField && dtoDbMapping.IsAutoIncrementPk)
@@ -434,7 +434,7 @@ namespace Jc.Database.Provider
         internal DbCommand GetUpdateDbCmd<T>(List<T> list, List<FieldMapping> piMapList, string subTableArg = null)
         {
             DbCommand dbCommand = CreateDbCommand();
-            TableMapping dtoDbMapping = DtoMappingHelper.GetDtoMapping<T>();
+            EntityMapping dtoDbMapping = EntityMappingHelper.GetMapping<T>();
             #region 设置DbCommand
 
             StringBuilder strBuilder = new StringBuilder();
@@ -495,7 +495,7 @@ namespace Jc.Database.Provider
 
             string sqlStr = "Delete From {0} Where {1}";
             string whereParams = null;
-            TableMapping dtoDbMapping = DtoMappingHelper.GetDtoMapping<T>();
+            EntityMapping dtoDbMapping = EntityMappingHelper.GetMapping<T>();
 
             DbParameter dbParameter = dbCommand.CreateParameter();
             dbParameter.Direction = ParameterDirection.Input;
@@ -526,7 +526,7 @@ namespace Jc.Database.Provider
 
             string sqlStr = "Delete From {0} ";
 
-            TableMapping dtoDbMapping = DtoMappingHelper.GetDtoMapping<T>();
+            EntityMapping dtoDbMapping = EntityMappingHelper.GetMapping<T>();
 
             if (filter != null && filter.FilterParameters.Count > 0)
             {
@@ -562,7 +562,7 @@ namespace Jc.Database.Provider
 
             string sqlStr = "Delete From {0} Where {1}";
             string whereParams = null;
-            TableMapping dtoDbMapping = DtoMappingHelper.GetDtoMapping<T>();
+            EntityMapping dtoDbMapping = EntityMappingHelper.GetMapping<T>();
 
             DbParameter dbParameter = dbCommand.CreateParameter();
             dbParameter.Direction = ParameterDirection.Input;
@@ -590,8 +590,8 @@ namespace Jc.Database.Provider
             DbCommand dbCommand = CreateDbCommand();
             string sqlStr = "Select {1} From {0}";
             string selectParams = null;
-            TableMapping dtoDbMapping = DtoMappingHelper.GetDtoMapping<T>();
-            List<FieldMapping> piMapList = DtoMappingHelper.GetPiMapList<T>(filter);
+            EntityMapping dtoDbMapping = EntityMappingHelper.GetMapping<T>();
+            List<FieldMapping> piMapList = EntityMappingHelper.GetPiMapList<T>(filter);
             foreach (FieldMapping piMap in piMapList)
             {
                 selectParams += string.IsNullOrEmpty(selectParams) ? piMap.FieldName : $",{piMap.FieldName}";
@@ -632,8 +632,8 @@ namespace Jc.Database.Provider
         {
             DbCommand dbCommand = CreateDbCommand();
             string sqlStr = "Select * From {0}";
-            TableMapping dtoDbMapping = DtoMappingHelper.GetDtoMapping<T>();
-            List<FieldMapping> piMapList = DtoMappingHelper.GetPiMapList<T>(filter);
+            EntityMapping dtoDbMapping = EntityMappingHelper.GetMapping<T>();
+            List<FieldMapping> piMapList = EntityMappingHelper.GetPiMapList<T>(filter);
             if (filter != null && filter.ItemList.Count > 0)
             {
                 sqlStr += filter.FilterSQLString;
@@ -669,7 +669,7 @@ namespace Jc.Database.Provider
         internal DbCommand GetQueryByIdDbCommand<T>(object id, List<FieldMapping> piMapList, string subTableArg = null)
         {
             DbCommand dbCommand = CreateDbCommand();
-            TableMapping dtoDbMapping = DtoMappingHelper.GetDtoMapping<T>();
+            EntityMapping dtoDbMapping = EntityMappingHelper.GetMapping<T>();
             string sqlStr = "Select {1} From {0} where {2}";
             string selectParams = null;
             string whereParams = null;
@@ -702,8 +702,8 @@ namespace Jc.Database.Provider
             DbCommand dbCommand = CreateDbCommand();
             string sqlStr = "Select Sum({1}) as Total From {0}";
             string selectParams = null;
-            TableMapping dtoDbMapping = DtoMappingHelper.GetDtoMapping<T>();
-            FieldMapping piMap = DtoMappingHelper.GetPiMapList<T>(filter).FirstOrDefault();
+            EntityMapping dtoDbMapping = EntityMappingHelper.GetMapping<T>();
+            FieldMapping piMap = EntityMappingHelper.GetPiMapList<T>(filter).FirstOrDefault();
             if (piMap == null)
             {
                 throw new Exception("求和字段不能为空");
@@ -742,8 +742,8 @@ namespace Jc.Database.Provider
             DbCommand dbCommand = CreateDbCommand();
             string sqlStr = "Select Min({1}) as Total From {0}";
             string selectParams = null;
-            TableMapping dtoDbMapping = DtoMappingHelper.GetDtoMapping<T>();
-            FieldMapping piMap = DtoMappingHelper.GetPiMapList<T>(filter).FirstOrDefault();
+            EntityMapping dtoDbMapping = EntityMappingHelper.GetMapping<T>();
+            FieldMapping piMap = EntityMappingHelper.GetPiMapList<T>(filter).FirstOrDefault();
             if (piMap == null)
             {
                 throw new Exception("计算字段不能为空");
@@ -781,8 +781,8 @@ namespace Jc.Database.Provider
             DbCommand dbCommand = CreateDbCommand();
             string sqlStr = "Select Max({1}) as Total From {0}";
             string selectParams = null;
-            TableMapping dtoDbMapping = DtoMappingHelper.GetDtoMapping<T>();
-            FieldMapping piMap = DtoMappingHelper.GetPiMapList<T>(filter).FirstOrDefault();
+            EntityMapping dtoDbMapping = EntityMappingHelper.GetMapping<T>();
+            FieldMapping piMap = EntityMappingHelper.GetPiMapList<T>(filter).FirstOrDefault();
             if (piMap == null)
             {
                 throw new Exception("计算字段不能为空");
@@ -820,7 +820,7 @@ namespace Jc.Database.Provider
             DbCommand dbCommand = CreateDbCommand();
             string sqlStr = "Select Count(*) as RecCount From {0} {1}";
             string queryStr = "";
-            TableMapping dtoDbMapping = DtoMappingHelper.GetDtoMapping<T>();
+            EntityMapping dtoDbMapping = EntityMappingHelper.GetMapping<T>();
             if (filter != null && filter.ItemList.Count > 0)
             {
                 queryStr = filter.FilterSQLString;

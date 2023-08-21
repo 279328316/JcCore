@@ -79,7 +79,7 @@ namespace Jc.Database.Query
             //begin try
             Label tryLabel = il.BeginExceptionBlock();
 
-            List<FieldMapping> piMapList = DtoMappingHelper.GetPiMapList<T>();
+            List<FieldMapping> piMapList = EntityMappingHelper.GetPiMapList<T>();
             foreach (FieldMapping piMap in piMapList)
             {
                 if (piMap.IsIgnore || piMap.Pi.SetMethod == null)

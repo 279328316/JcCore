@@ -57,9 +57,9 @@ namespace Jc.Core.TestApp.Test
             for (int i = 0; i < runCount; i++)
             {
                 JcLogHelper.WriteLog($"正在执行:{i+1}");
-                DtoMappingHelper.GetPiMapList<ApiDto>(exp);
-                DtoMappingHelper.GetPiMapList<ApiDto>(null,unexp);
-                DtoMappingHelper.GetPiMapList<ApiDto>(exp,unexp);
+                EntityMappingHelper.GetPiMapList<ApiDto>(exp);
+                EntityMappingHelper.GetPiMapList<ApiDto>(null,unexp);
+                EntityMappingHelper.GetPiMapList<ApiDto>(exp,unexp);
             }
             while (curCount>0)
             {
@@ -99,9 +99,9 @@ namespace Jc.Core.TestApp.Test
             for (int i = 0; i < runCount; i++)
             {
                 JcLogHelper.WriteLog($"正在执行:{i + 1}");                
-                DtoMappingHelper.GetPiMapListWithCache<ApiDto>(exp);
-                DtoMappingHelper.GetPiMapListWithCache<ApiDto>(null, unexp);
-                DtoMappingHelper.GetPiMapListWithCache<ApiDto>(exp, unexp);
+                EntityMappingHelper.GetPiMapListWithCache<ApiDto>(exp);
+                EntityMappingHelper.GetPiMapListWithCache<ApiDto>(null, unexp);
+                EntityMappingHelper.GetPiMapListWithCache<ApiDto>(exp, unexp);
                 //curCount--;
             }
             while (curCount > 0)
@@ -153,9 +153,9 @@ namespace Jc.Core.TestApp.Test
                 {
                     try
                     {
-                        DtoMappingHelper.GetPiMapList<ApiDto>(exp);
-                        DtoMappingHelper.GetPiMapList<ApiDto>(null,unexp);
-                        DtoMappingHelper.GetPiMapList<ApiDto>(exp, unexp);
+                        EntityMappingHelper.GetPiMapList<ApiDto>(exp);
+                        EntityMappingHelper.GetPiMapList<ApiDto>(null,unexp);
+                        EntityMappingHelper.GetPiMapList<ApiDto>(exp, unexp);
                     }
                     catch (Exception ex)
                     {
@@ -213,9 +213,9 @@ namespace Jc.Core.TestApp.Test
                 {
                     try
                     {
-                        DtoMappingHelper.GetPiMapListWithCache<ApiDto>(exp);
-                        DtoMappingHelper.GetPiMapListWithCache<ApiDto>(null, unexp);
-                        DtoMappingHelper.GetPiMapListWithCache<ApiDto>(exp, unexp);
+                        EntityMappingHelper.GetPiMapListWithCache<ApiDto>(exp);
+                        EntityMappingHelper.GetPiMapListWithCache<ApiDto>(null, unexp);
+                        EntityMappingHelper.GetPiMapListWithCache<ApiDto>(exp, unexp);
                     }
                     catch (Exception ex)
                     {

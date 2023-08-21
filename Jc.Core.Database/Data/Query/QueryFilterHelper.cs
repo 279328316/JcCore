@@ -15,7 +15,7 @@ namespace Jc.Database.Query
     /// </summary>
     public class QueryFilterBuilder
     {
-        TableMapping dtoDbMapping = null;
+        EntityMapping dtoDbMapping = null;
         private QueryFilter filter = new QueryFilter();
 
         private QueryFilterBuilder()
@@ -737,7 +737,7 @@ namespace Jc.Database.Query
             }
             if (orderByClauseList == null || orderByClauseList.Count <= 0)
             {
-                TableMapping dtoDbMapping = DtoMappingHelper.GetDtoMapping<T>();
+                EntityMapping dtoDbMapping = EntityMappingHelper.GetMapping<T>();
                 if (dtoDbMapping != null && dtoDbMapping.PkField != null)
                 {
                     orderByClauseList.Add(new OrderByClause(dtoDbMapping.PkField.FieldName));
@@ -773,7 +773,7 @@ namespace Jc.Database.Query
             Pager pager = null,
             Expression<Func<T, object>> unSelect = null) where T : class, new()
         {
-            dtoDbMapping = DtoMappingHelper.GetDtoMapping<T>();
+            dtoDbMapping = EntityMappingHelper.GetMapping<T>();
 
             #region 处理查询条件
             if (query != null)

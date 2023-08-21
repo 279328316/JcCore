@@ -1,9 +1,0 @@
-bool isFieldOp = left is MemberExpression && right is MemberExpression
-                    && ((MemberExpression)left).Expression != null
-                    && ((MemberExpression)right).Expression != null
-                    && !((MemberExpression)left).Expression.ToString().StartsWith("value")
-                    && !((MemberExpression)right).Expression.ToString().StartsWith("value");
-					
-					
-					
-					

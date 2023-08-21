@@ -84,8 +84,8 @@ namespace Jc.Database.Provider
 
             string queryStr = null;
             string orderStr = null;
-            TableMapping dtoDbMapping = DtoMappingHelper.GetDtoMapping<T>();
-            List<FieldMapping> piMapList = DtoMappingHelper.GetPiMapList<T>(filter);
+            EntityMapping dtoDbMapping = EntityMappingHelper.GetMapping<T>();
+            List<FieldMapping> piMapList = EntityMappingHelper.GetPiMapList<T>(filter);
             foreach (FieldMapping piMap in piMapList)
             {
                 selectParams += string.IsNullOrEmpty(selectParams) ? piMap.FieldName : "," + piMap.FieldName;
@@ -184,7 +184,7 @@ namespace Jc.Database.Provider
         public override DbCommand GetCheckTableExistsDbCommand<T>(string subTableArg = null)
         {
             DbCommand dbCommand = CreateDbCommand();
-            TableMapping dtoDbMapping = DtoMappingHelper.GetDtoMapping<T>();
+            EntityMapping dtoDbMapping = EntityMappingHelper.GetMapping<T>();
             string tableName = dtoDbMapping.GetTableName(subTableArg);
             dbCommand.CommandText = $"Select * from information_schema.tables where table_schema = '{DbName}' and table_name ='{tableName}';";
             return dbCommand;
@@ -211,8 +211,8 @@ namespace Jc.Database.Provider
         public override string GetCreateTableSql<T>(string subTableArg = null)
         {
             //表名 查询字段名 主键字段名
-            TableMapping dtoDbMapping = DtoMappingHelper.GetDtoMapping<T>();
-            List<FieldMapping> piMapList = DtoMappingHelper.GetPiMapList<T>();
+            EntityMapping dtoDbMapping = EntityMappingHelper.GetMapping<T>();
+            List<FieldMapping> piMapList = EntityMappingHelper.GetPiMapList<T>();
             string tableName = dtoDbMapping.GetTableName(subTableArg);            
             StringBuilder sqlBuilder = new StringBuilder();
             sqlBuilder.Append($"Create table {tableName}(\r\n");

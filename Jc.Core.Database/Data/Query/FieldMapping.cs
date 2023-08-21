@@ -10,8 +10,7 @@ using System.Threading.Tasks;
 namespace Jc.Database.Query
 {
     /// <summary>
-    /// 属性映射对象
-    /// 对PropertyInfo的封装
+    /// 属性映射对象 Pi=>Field
     /// </summary>
     public class FieldMapping
     {

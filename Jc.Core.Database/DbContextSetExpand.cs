@@ -36,7 +36,7 @@ namespace Jc.Database
                 throw new Exception("操作对象不能为空.");
             }
             int rowCount = 0;
-            TableMapping dtoDbMapping = DtoMappingHelper.GetDtoMapping<T>();
+            EntityMapping dtoDbMapping = EntityMappingHelper.GetMapping<T>();
             object pkValue = dtoDbMapping.PkField.Pi.GetValue(dto);
             
             if (CheckIsNullOrEmpty(pkValue, dtoDbMapping.PkField.PropertyType))
@@ -66,7 +66,7 @@ namespace Jc.Database
                 return 0;
             }
             int rowCount = 0;
-            TableMapping dtoDbMapping = DtoMappingHelper.GetDtoMapping<T>();
+            EntityMapping dtoDbMapping = EntityMappingHelper.GetMapping<T>();
 
             object pkValue = dtoDbMapping.PkField.Pi.GetValue(list[0]);
             if (CheckIsNullOrEmpty(pkValue, dtoDbMapping.PkField.PropertyType))
@@ -97,7 +97,7 @@ namespace Jc.Database
                 return 0;
             }
             int rowCount = 0;
-            TableMapping dtoDbMapping = DtoMappingHelper.GetDtoMapping<T>();
+            EntityMapping dtoDbMapping = EntityMappingHelper.GetMapping<T>();
             List<T> addList = new List<T>();
             List<T> updateList = new List<T>();
 
@@ -161,8 +161,8 @@ namespace Jc.Database
                 throw new Exception("待保存对象不能为空");
             }
             int rowCount = 0;
-            TableMapping dtoDbMapping = DtoMappingHelper.GetDtoMapping<T>();
-            List<FieldMapping> piMapList = DtoMappingHelper.GetPiMapList<T>(select);
+            EntityMapping dtoDbMapping = EntityMappingHelper.GetMapping<T>();
+            List<FieldMapping> piMapList = EntityMappingHelper.GetPiMapList<T>(select);
             if (dtoDbMapping.TableAttr?.AutoCreate == true)
             {   //如果是自动建表
                 if (!CheckTableExists<T>())
@@ -246,8 +246,8 @@ namespace Jc.Database
                 return 0;
             }
             int rowCount = 0;
-            TableMapping dtoDbMapping = DtoMappingHelper.GetDtoMapping<T>();
-            List<FieldMapping> piMapList = DtoMappingHelper.GetPiMapList<T>(select);
+            EntityMapping dtoDbMapping = EntityMappingHelper.GetMapping<T>();
+            List<FieldMapping> piMapList = EntityMappingHelper.GetPiMapList<T>(select);
             if (!dtoDbMapping.IsAutoIncrementPk && !piMapList.Contains(dtoDbMapping.PkField))
             {
                 piMapList.Insert(0,dtoDbMapping.PkField);
@@ -396,8 +396,8 @@ namespace Jc.Database
             }
             int rowCount = 0;
 
-            TableMapping dtoDbMapping = DtoMappingHelper.GetDtoMapping<T>();
-            List<FieldMapping> piMapList = DtoMappingHelper.GetPiMapList<T>(select);
+            EntityMapping dtoDbMapping = EntityMappingHelper.GetMapping<T>();
+            List<FieldMapping> piMapList = EntityMappingHelper.GetPiMapList<T>(select);
             using (DbCommand dbCommand = dbProvider.GetUpdateDbCmd(dto, piMapList, this.GetSubTableArg<T>()))
             {
                 try
@@ -474,8 +474,8 @@ namespace Jc.Database
                 return 0;
             }
             int rowCount = 0;             
-            TableMapping dtoDbMapping = DtoMappingHelper.GetDtoMapping<T>();
-            List<FieldMapping> piMapList = DtoMappingHelper.GetPiMapList<T>(select);
+            EntityMapping dtoDbMapping = EntityMappingHelper.GetMapping<T>();
+            List<FieldMapping> piMapList = EntityMappingHelper.GetPiMapList<T>(select);
             if (dtoDbMapping.IsAutoIncrementPk)
             {   //自增列Id不允许更新
                 if (piMapList.Contains(dtoDbMapping.PkField))
@@ -674,7 +674,7 @@ namespace Jc.Database
         {
             bool result = false;
             string subTableArg = this.GetSubTableArg<T>();
-            TableMapping dtoDbMapping = DtoMappingHelper.GetDtoMapping<T>();
+            EntityMapping dtoDbMapping = EntityMappingHelper.GetMapping<T>();
             string tableName = dtoDbMapping.GetTableName(subTableArg);
 
             using (DbCommand dbCommand = dbProvider.GetCheckTableExistsDbCommand(tableName))
@@ -795,7 +795,7 @@ namespace Jc.Database
             {
                 return;
             }
-            TableMapping dtoDbMapping = DtoMappingHelper.GetDtoMapping<T>();
+            EntityMapping dtoDbMapping = EntityMappingHelper.GetMapping<T>();
             string tableName = dtoDbMapping.GetTableName();
             DataTable dt = EntityToDataTable(list);
             dbProvider.BulkCopy(tableName, dt, batchSize, timeout, useTransaction, progress);
@@ -810,9 +810,9 @@ namespace Jc.Database
         private DataTable EntityToDataTable<T>(List<T> list) where T : class, new()
         {
             DataTable dt = GetDataTable<T>(" 1 = 0");
-            TableMapping dtoDbMapping = DtoMappingHelper.GetDtoMapping<T>();
+            EntityMapping dtoDbMapping = EntityMappingHelper.GetMapping<T>();
             string tableName = dtoDbMapping.GetTableName();
-            List<FieldMapping> piMaps = DtoMappingHelper.GetPiMapList<T>();
+            List<FieldMapping> piMaps = EntityMappingHelper.GetPiMapList<T>();
 
             Dictionary<DataColumn, FieldMapping> dtPiDic = new Dictionary<DataColumn, FieldMapping>();
 

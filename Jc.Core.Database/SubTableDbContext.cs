@@ -45,7 +45,7 @@ namespace Jc.Database
             {
                 throw new Exception($"不能为类型{typeof(T).Name}重复添加分表参数");
             }
-            TableMapping dtoDbMapping = DtoMappingHelper.GetDtoMapping<T>();
+            EntityMapping dtoDbMapping = EntityMappingHelper.GetMapping<T>();
             string primaryTableName = dtoDbMapping.PrimaryTableName;
             if (string.IsNullOrEmpty(primaryTableName) || !primaryTableName.Contains("{0}"))
             {

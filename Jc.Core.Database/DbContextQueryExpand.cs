@@ -44,7 +44,7 @@ namespace Jc.Database
         public IQuery<T> IQuery<T>(NameValueCollection collection, Dictionary<string, Operand> operandSettings = null) where T : class, new()
         {
             IQuery<T> query = IQuery<T>();
-            List<FieldMapping> piMapList = DtoMappingHelper.GetPiMapList<T>();
+            List<FieldMapping> piMapList = EntityMappingHelper.GetPiMapList<T>();
             for (int i = 0; i < collection.AllKeys.Length; i++)
             {
                 string queryItemKey = collection.AllKeys[i];
@@ -273,7 +273,7 @@ namespace Jc.Database
         public T GetById<T>(object id,Expression<Func<T, object>> select = null) where T : class, new()
         {
             T dto = null;
-            List<FieldMapping> piMapList = DtoMappingHelper.GetPiMapList<T>(select);
+            List<FieldMapping> piMapList = EntityMappingHelper.GetPiMapList<T>(select);
             using (DbCommand dbCommand = dbProvider.GetQueryByIdDbCommand<T>(id, piMapList, this.GetSubTableArg<T>()))
             {
                 try
@@ -460,7 +460,7 @@ namespace Jc.Database
         /// <returns></returns>
         public int Count<T>(Expression<Func<T, bool>> where = null) where T : class, new()
         {
-            TableMapping dtoDbMapping = DtoMappingHelper.GetDtoMapping<T>();
+            EntityMapping dtoDbMapping = EntityMappingHelper.GetMapping<T>();
             if (dtoDbMapping.TableAttr?.AutoCreate == true)
             {   //如果是自动建表
                 if (!CheckTableExists<T>())
@@ -577,7 +577,7 @@ namespace Jc.Database
         public List<FieldModel> GetTableFieldList<T>()
         {
             string subTableArg = this.GetSubTableArg<T>();
-            TableMapping dtoDbMapping = DtoMappingHelper.GetDtoMapping<T>();
+            EntityMapping dtoDbMapping = EntityMappingHelper.GetMapping<T>();
             string tableName = dtoDbMapping.GetTableName(subTableArg);
             return GetTableFieldList(tableName);
         }

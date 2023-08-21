@@ -10,10 +10,9 @@ using System.Threading.Tasks;
 namespace Jc.Database.Query
 {
     /// <summary>
-    /// 对象参数
-    /// 解析后的 tableAttr 与 fieldMapList
+    /// 对象 Entity Mapping To Table
     /// </summary>
-    public class TableMapping
+    public class EntityMapping
     {
         private Type entityType;  //T Type
         private TableAttribute tableAttr;   //Table Attr
@@ -67,7 +66,7 @@ namespace Jc.Database.Query
         /// <summary>
         /// Ctor
         /// </summary>
-        public TableMapping(Type entityType)
+        public EntityMapping(Type entityType)
         {
             this.entityType = entityType;
             this.primaryTableName = TableAttribute.GetTableName(entityType);
