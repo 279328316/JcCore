@@ -58,6 +58,11 @@ namespace Jc.Core.TestApp.Test
             list = Dbc.PgTestDb.GetList<PgUserDto>(a => ids.Contains(a.Id));
             list = Dbc.PgTestDb.GetList<PgUserDto>(a => ids.Contains(a.Id));
 
+            list = Dbc.PgTestDb.GetList<PgUserDto>(a => ids[0] == a.Id);
+            list = Dbc.PgTestDb.GetList<PgUserDto>(a => a.Id == ids[0]);
+            list = Dbc.PgTestDb.GetList<PgUserDto>(a => ids[0].Equals(a.Id));
+            list = Dbc.PgTestDb.GetList<PgUserDto>(a => a.Id.Equals(ids[0]));
+
             list = Dbc.PgTestDb.GetList<PgUserDto>(a => queryObj.Ids.Contains(a.Id));
             list = Dbc.PgTestDb.GetList<PgUserDto>(a => queryObj.Ids.Contains(a.Id));
 

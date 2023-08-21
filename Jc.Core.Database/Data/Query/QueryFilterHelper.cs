@@ -287,7 +287,7 @@ namespace Jc.Database.Query
                 result = me.Expression != null && !me.Expression.ToString().StartsWith("value");
             }
             else if (exp is UnaryExpression) //表示创建一个新数组，并可能初始化该新数组的元素
-            {   // a.Id = int? exp="Convert(a.Id, Nullable`1)"
+            {   // a.Id = int? exp="Convert(a.Id, Nullable`1)"  Convert,Not
                 UnaryExpression unaryExp = exp as UnaryExpression;
                 if(unaryExp.Operand is MemberExpression)
                 {
@@ -458,25 +458,23 @@ namespace Jc.Database.Query
             switch (mce.Method.Name)
             {
                 case "Equals":
-                    name = AtomExpressionRouter(mce.Object);
-                    value = AtomExpressionRouter(mce.Arguments[0]);
+                    if (IsFieldExpression(mce.Object))
+                    {
+                        name = AtomExpressionRouter(mce.Object);
+                        value = AtomExpressionRouter(mce.Arguments[0]);
+                    }
+                    else
+                    {
+                        name = AtomExpressionRouter(mce.Arguments[0]);
+                        value = AtomExpressionRouter(mce.Object);
+                    }
                     op = isNotOprand ? Operand.NotEqual : Operand.Equal;
                     parameterDbType = DbTypeConvertor.GetDbType(value);
                     break;
                 case "Contains":
                     if (mce.Object != null && mce.Arguments?.Count == 1)
-                    {   // 是否可以简化为 mce.Object 根据!mce.Object.ToString().StartsWith("value")判断
-                        // 来决定采用mce.Object或mce.Arguments[0]作为字段
-                        if (mce.Object is MemberExpression && ((MemberExpression)mce.Object).Member.MemberType == MemberTypes.Property
-                            && !mce.Object.ToString().StartsWith("value"))
-                        {   // task.Name.Contains("T1"); task.Name.Contains(keywords);
-                            name = AtomExpressionRouter(mce.Object);
-                            value = AtomExpressionRouter(mce.Arguments[0]);
-                            op = isNotOprand ? Operand.NotLike : Operand.Like;
-                            parameterDbType = DbTypeConvertor.GetDbType(value);
-                        }
-                        else if (mce.Object is MethodCallExpression && 
-                            (((MethodCallExpression)mce.Object).Object as MemberExpression)?.Member.MemberType == MemberTypes.Property)
+                    {   // 来决定采用mce.Object或mce.Arguments[0]作为字段
+                        if (IsFieldExpression(mce.Object))
                         {   // a.UserName.ToLower().Contains("ABC".ToLower()) or a.UserName.ToLower().Contains("ABC")
                             // or a.UserName.ToLower().Contains(queryObj.UserName)
                             name = AtomExpressionRouter(mce.Object);
