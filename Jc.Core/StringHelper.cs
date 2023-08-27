@@ -211,9 +211,13 @@ namespace Jc
                         if (char.IsUpper(curChar))
                         {
                             curChar = char.ToLower(curChar);
+                            stringBuilder.Append(upperSplitChar);
+                            stringBuilder.Append(curChar);
                         }
-                        stringBuilder.Append(upperSplitChar);
-                        stringBuilder.Append(curChar);
+                        else
+                        {
+                            stringBuilder.Append(curChar);
+                        }
                     }
                 }
                 result = stringBuilder.ToString();
@@ -222,7 +226,7 @@ namespace Jc
             {
                 result = str.ToLower();
             }
-            return str;
+            return result;
         }
     }
 }
