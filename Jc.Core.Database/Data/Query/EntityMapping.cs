@@ -47,7 +47,12 @@ namespace Jc.Database.Query
         /// <summary>
         /// 主键字段映射Map
         /// </summary>
-        public FieldMapping PkField { get => pkField; }
+        private FieldMapping PkField { get => pkField; }
+
+        /// <summary>
+        /// 主键字段映射Map
+        /// </summary>
+        public bool HasPkField { get => pkField != null; }
 
         /// <summary>
         /// 是否为自增主键
@@ -127,10 +132,23 @@ namespace Jc.Database.Query
                 }
                 else
                 {
-                    throw new Exception($"请为 Class {EntityType.Name} 设置主键字段");
+                    // throw new Exception($"请为 Class {EntityType.Name} 设置主键字段");
                 }
             }
             return mapping;
+        }
+
+        /// <summary>
+        /// 获取PKField
+        /// </summary>
+        /// <returns></returns>
+        public FieldMapping GetPkField()
+        {
+            if(pkField == null)
+            {
+                throw new Exception($"Entity {EntityType.Name} dose not have primary key");
+            }
+            return pkField;
         }
 
         /// <summary>

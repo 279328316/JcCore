@@ -173,9 +173,9 @@ namespace Jc.Database
             if (orderByClauseList == null || orderByClauseList.Count <= 0)
             {
                 EntityMapping dtoDbMapping = EntityMappingHelper.GetMapping<T>();
-                if (dtoDbMapping != null && dtoDbMapping.PkField != null)
+                if (dtoDbMapping?.HasPkField == true)
                 {
-                    orderByClauseList.Add(new OrderByClause(dtoDbMapping.PkField.FieldName));
+                    orderByClauseList.Add(new OrderByClause(dtoDbMapping.GetPkField().FieldName));
                 }
             }
             QueryFilter filter = QueryFilterBuilder.GetPageFilter(query, select, orderByClauseList,pager, unSelect);

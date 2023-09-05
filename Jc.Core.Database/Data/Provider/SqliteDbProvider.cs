@@ -117,7 +117,7 @@ namespace Jc.Database.Provider
                     dbCommand.Parameters.Add(dbParameter);
                 }
             }
-            dbCommand.CommandText = string.Format(sqlStr, dtoDbMapping.GetTableName(subTableArg), selectParams, dtoDbMapping.PkField.FieldName);
+            dbCommand.CommandText = string.Format(sqlStr, dtoDbMapping.GetTableName(subTableArg), selectParams, dtoDbMapping.GetPkField().FieldName);
             return dbCommand;
         }
 

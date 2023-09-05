@@ -737,10 +737,10 @@ namespace Jc.Database.Query
             }
             if (orderByClauseList == null || orderByClauseList.Count <= 0)
             {
-                EntityMapping dtoDbMapping = EntityMappingHelper.GetMapping<T>();
-                if (dtoDbMapping != null && dtoDbMapping.PkField != null)
+                EntityMapping dtoDbMapping = EntityMappingHelper.GetMapping<T>();                
+                if (dtoDbMapping?.HasPkField == true)
                 {
-                    orderByClauseList.Add(new OrderByClause(dtoDbMapping.PkField.FieldName));
+                    orderByClauseList.Add(new OrderByClause(dtoDbMapping.GetPkField().FieldName));
                 }
                 else
                 {

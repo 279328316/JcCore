@@ -124,7 +124,7 @@ namespace Jc.Database.Provider
             outDbParameter.ParameterName = "@RecCount";
             outDbParameter.Size = 8;
             dbCommand.Parameters.Add(outDbParameter); //RecCount 总记录数
-            dbCommand.CommandText = string.Format(sqlStr, dtoDbMapping.GetTableName(subTableArg), selectParams, dtoDbMapping.PkField.FieldName);
+            dbCommand.CommandText = string.Format(sqlStr, dtoDbMapping.GetTableName(subTableArg), selectParams, dtoDbMapping.GetPkField().FieldName);
             return dbCommand;
         }
 

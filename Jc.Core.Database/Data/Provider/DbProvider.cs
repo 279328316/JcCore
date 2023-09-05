@@ -199,11 +199,12 @@ namespace Jc.Database.Provider
             string sqlStr = "Insert into {0} ({1}) values({2})";
             string fieldParams = null;
             string valueParams = null;
+            FieldMapping pkField = dtoMapping.GetPkField();
             foreach (FieldMapping piMap in piMapList)
             {
                 PropertyInfo pi = piMap.Pi;
                 if (piMap.FieldAttribute.ReadOnly) continue;  //跳过只读字段
-                if (piMap == dtoMapping.PkField && dtoMapping.IsAutoIncrementPk)
+                if (piMap == pkField && dtoMapping.IsAutoIncrementPk)
                 {   //如果是自动设置Id 主键是int or long 自增Id 为null or 0 跳过插入
                     continue;
                 }
@@ -231,7 +232,7 @@ namespace Jc.Database.Provider
         /// <param name="piMapList">查询属性MapList</param>
         /// <param name="subTableArg">表名称参数.如果TableAttr设置Name.则根据Name格式化</param>
         /// <returns></returns>
-        internal DbCommand GetInsertDbCmd<T>(List<T> list, List<FieldMapping> piMapList, string subTableArg = null) where T : class, new()
+        internal DbCommand GetInsertListDbCmd<T>(List<T> list, List<FieldMapping> piMapList, string subTableArg = null) where T : class, new()
         {
             DbCommand dbCommand = CreateDbCommand();
             EntityMapping dtoDbMapping = EntityMappingHelper.GetMapping<T>();
@@ -240,11 +241,12 @@ namespace Jc.Database.Provider
             string fieldParams = null;
             string valueParams = null;
 
+            FieldMapping pkField = dtoDbMapping.GetPkField();
             foreach (FieldMapping piMap in piMapList)
             {
                 PropertyInfo pi = piMap.Pi;
                 if (piMap.FieldAttribute.ReadOnly) continue;  //跳过只读字段
-                if(piMap == dtoDbMapping.PkField && dtoDbMapping.IsAutoIncrementPk)
+                if(piMap == pkField && dtoDbMapping.IsAutoIncrementPk)
                 {   //如果是自增主键 跳过插入
                     continue;
                 }
@@ -259,7 +261,7 @@ namespace Jc.Database.Provider
                 {
                     PropertyInfo pi = piMap.Pi;
                     if (piMap.FieldAttribute.ReadOnly) continue;  //跳过只读字段
-                    if (piMap == dtoDbMapping.PkField && dtoDbMapping.IsAutoIncrementPk)
+                    if (piMap == pkField && dtoDbMapping.IsAutoIncrementPk)
                     {   //如果是自增主键 跳过插入
                         continue;
                     }
@@ -331,9 +333,10 @@ namespace Jc.Database.Provider
             string sqlStr = "Update {0} set {1} where {2};";
             string setParams = null;
             string whereParams = null;
+            FieldMapping pkField = dtoDbMapping.GetPkField();
             foreach (FieldMapping piMap in piMapList)
             {
-                if (piMap == dtoDbMapping.PkField && dtoDbMapping.IsAutoIncrementPk)
+                if (piMap == pkField && dtoDbMapping.IsAutoIncrementPk)
                 {   //如果是自增主键 跳过更新
                     continue;
                 }
@@ -353,11 +356,11 @@ namespace Jc.Database.Provider
             
             DbParameter whereParameter = dbCommand.CreateParameter();
             whereParameter.Direction = ParameterDirection.Input;
-            whereParameter.ParameterName = $"@where{dtoDbMapping.PkField.FieldName}";
-            object pkValue = dtoDbMapping.PkField.Pi.GetValue(dto);
+            whereParameter.ParameterName = $"@where{pkField.FieldName}";
+            object pkValue = pkField.Pi.GetValue(dto);
             whereParameter.Value = pkValue != null ? pkValue : DBNull.Value;
             dbCommand.Parameters.Add(whereParameter);
-            whereParams = $"{dtoDbMapping.PkField.FieldName}={whereParameter.ParameterName}";
+            whereParams = $"{pkField.FieldName}={whereParameter.ParameterName}";
 
             dbCommand.CommandText = string.Format(sqlStr, dtoDbMapping.GetTableName(subTableArg), setParams, whereParams);
             #endregion
@@ -397,9 +400,10 @@ namespace Jc.Database.Provider
                 }
             }
             List<FieldMapping> piMapList = EntityMappingHelper.GetPiMapList<T>(filter);
+            FieldMapping pkField = dtoDbMapping.GetPkField();
             foreach (FieldMapping piMap in piMapList)
             {
-                if (piMap == dtoDbMapping.PkField && dtoDbMapping.IsAutoIncrementPk)
+                if (piMap == pkField && dtoDbMapping.IsAutoIncrementPk)
                 {   //如果是自增主键 跳过更新
                     continue;
                 }
@@ -439,6 +443,7 @@ namespace Jc.Database.Provider
 
             StringBuilder strBuilder = new StringBuilder();
             string sqlStr = "Update {0} set {1} where {2};";
+            FieldMapping pkField = dtoDbMapping.GetPkField();
             for (int i = 0; i < list.Count; i++)
             {
                 string setParams = null;
@@ -446,7 +451,7 @@ namespace Jc.Database.Provider
                 T dto = list[i];
                 foreach (FieldMapping piMap in piMapList)
                 {
-                    if (piMap == dtoDbMapping.PkField && dtoDbMapping.IsAutoIncrementPk)
+                    if (piMap == pkField && dtoDbMapping.IsAutoIncrementPk)
                     {   //如果是自增主键 跳过更新
                         continue;
                     }
@@ -465,11 +470,11 @@ namespace Jc.Database.Provider
                 }
                 DbParameter whereParameter = dbCommand.CreateParameter();
                 whereParameter.Direction = ParameterDirection.Input;
-                whereParameter.ParameterName = $"@where{dtoDbMapping.PkField.FieldName}{i}";
-                object pkValue = dtoDbMapping.PkField.Pi.GetValue(dto);
+                whereParameter.ParameterName = $"@where{pkField.FieldName}{i}";
+                object pkValue = pkField.Pi.GetValue(dto);
                 whereParameter.Value = pkValue != null ? pkValue : DBNull.Value;
                 dbCommand.Parameters.Add(whereParameter);
-                whereParams = $"{dtoDbMapping.PkField.FieldName}={whereParameter.ParameterName}";
+                whereParams = $"{pkField.FieldName}={whereParameter.ParameterName}";
                 
                 string updateStr = string.Format(sqlStr, dtoDbMapping.GetTableName(subTableArg), setParams, whereParams);
                 strBuilder.Append(updateStr);
@@ -496,15 +501,16 @@ namespace Jc.Database.Provider
             string sqlStr = "Delete From {0} Where {1}";
             string whereParams = null;
             EntityMapping dtoDbMapping = EntityMappingHelper.GetMapping<T>();
+            FieldMapping pkField = dtoDbMapping.GetPkField();
 
             DbParameter dbParameter = dbCommand.CreateParameter();
             dbParameter.Direction = ParameterDirection.Input;
-            dbParameter.ParameterName = "@" + dtoDbMapping.PkField.FieldName;
-            dbParameter.Value = dtoDbMapping.PkField.Pi.GetValue(dto);
-            dbParameter.DbType = dtoDbMapping.PkField.DbType;
+            dbParameter.ParameterName = "@" + pkField.FieldName;
+            dbParameter.Value = pkField.Pi.GetValue(dto);
+            dbParameter.DbType = pkField.DbType;
             dbCommand.Parameters.Add(dbParameter);
 
-            whereParams = dtoDbMapping.PkField.FieldName + "=@" + dtoDbMapping.PkField.FieldName;
+            whereParams = pkField.FieldName + "=@" + pkField.FieldName;
             dbCommand.CommandText = string.Format(sqlStr, dtoDbMapping.GetTableName(subTableArg), whereParams);
             #endregion
 
@@ -563,15 +569,16 @@ namespace Jc.Database.Provider
             string sqlStr = "Delete From {0} Where {1}";
             string whereParams = null;
             EntityMapping dtoDbMapping = EntityMappingHelper.GetMapping<T>();
+            FieldMapping pkField = dtoDbMapping.GetPkField();
 
             DbParameter dbParameter = dbCommand.CreateParameter();
             dbParameter.Direction = ParameterDirection.Input;
-            dbParameter.ParameterName = "@" + dtoDbMapping.PkField.FieldName;
+            dbParameter.ParameterName = "@" + pkField.FieldName;
             dbParameter.Value = pkValue;
-            dbParameter.DbType = dtoDbMapping.PkField.DbType;
+            dbParameter.DbType = pkField.DbType;
             dbCommand.Parameters.Add(dbParameter);
 
-            whereParams = dtoDbMapping.PkField.FieldName + "=@" + dtoDbMapping.PkField.FieldName;
+            whereParams = pkField.FieldName + "=@" + pkField.FieldName;
             dbCommand.CommandText = string.Format(sqlStr, dtoDbMapping.GetTableName(subTableArg), whereParams);
             #endregion
 
@@ -670,6 +677,7 @@ namespace Jc.Database.Provider
         {
             DbCommand dbCommand = CreateDbCommand();
             EntityMapping dtoDbMapping = EntityMappingHelper.GetMapping<T>();
+            FieldMapping pkField = dtoDbMapping.GetPkField();
             string sqlStr = "Select {1} From {0} where {2}";
             string selectParams = null;
             string whereParams = null;
@@ -679,12 +687,12 @@ namespace Jc.Database.Provider
             }
             DbParameter dbParameter = dbCommand.CreateParameter();
             dbParameter.Direction = ParameterDirection.Input;
-            dbParameter.ParameterName = "@" + dtoDbMapping.PkField.FieldName;
+            dbParameter.ParameterName = "@" + pkField.FieldName;
             dbParameter.Value = id;
-            dbParameter.DbType = dtoDbMapping.PkField.DbType;
+            dbParameter.DbType = pkField.DbType;
             dbCommand.Parameters.Add(dbParameter);
 
-            whereParams = dtoDbMapping.PkField.FieldName + "=@" + dtoDbMapping.PkField.FieldName;
+            whereParams = pkField.FieldName + "=@" + pkField.FieldName;
 
             dbCommand.CommandText = string.Format(sqlStr, dtoDbMapping.GetTableName(subTableArg), selectParams, whereParams);
             return dbCommand;
