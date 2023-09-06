@@ -108,7 +108,7 @@ namespace Jc.Database.Query
         /// <param name="expType"></param>
         /// <param name="isFieldOp">是否两个字段比较</param>
         /// <returns></returns>
-        private Operand GetOperand(ExpressionType expType, bool isFieldOp)
+        private Operand GetOperand(ExpressionType expType, bool isFieldOp = false)
         {
             Operand operand = Operand.Equal;
             switch (expType)
@@ -206,7 +206,9 @@ namespace Jc.Database.Query
                 object paramValue = null;
 
                 bool leftIsField = IsFieldExpression(left);
-                bool rightIsField = IsFieldExpression(right);
+
+                // 取消对表达式在右侧,不规范写法支持
+                //bool rightIsField = IsFieldExpression(right);
 
                 if (leftIsField)
                 {
@@ -215,11 +217,14 @@ namespace Jc.Database.Query
                 }
                 else
                 {
-                    paramValue = AtomExpressionRouter(left);
-                    param = AtomExpressionRouter(right);
+                    //paramValue = AtomExpressionRouter(left);
+                    //param = AtomExpressionRouter(right);
+
+                    //取消对表达式在右侧,不规范写法支持
+                    throw new Exception("Unsupported non-standard expressions");
                 }
-                bool isFieldOp = leftIsField && rightIsField;
-                Operand operand = GetOperand(expType, isFieldOp);
+                //bool isFieldOp = leftIsField && rightIsField;   // 取消对与字段比较支持
+                Operand operand = GetOperand(expType);
                 if (paramValue == null)
                 {   //只有null时使用
                     if (operand == Operand.Equal)
@@ -733,20 +738,7 @@ namespace Jc.Database.Query
             if (pager == null)
             {
                 //pager = new Pager(1, 30);
-                throw new Exception("分页查询未指定分页信息");
-            }
-            if (orderByClauseList == null || orderByClauseList.Count <= 0)
-            {
-                EntityMapping dtoDbMapping = EntityMappingHelper.GetMapping<T>();                
-                if (dtoDbMapping?.HasPkField == true)
-                {
-                    orderByClauseList.Add(new OrderByClause(dtoDbMapping.GetPkField().FieldName));
-                }
-                else
-                {
-                    throw new Exception("分页查询未指定排序信息");
-                }
-                //throw new Exception("分页查询未指定排序信息");
+                throw new Exception("Paging query must specify pagination information");
             }
             QueryFilterBuilder filterHelper = new QueryFilterBuilder();
             filterHelper.FillFilter(query, select,  orderByClauseList, pager, unSelect);

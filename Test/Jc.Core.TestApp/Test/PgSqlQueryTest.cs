@@ -94,8 +94,8 @@ namespace Jc.Core.TestApp.Test
                                                                     && a.LastUpdateDate >= DateTime.Parse(DateTime.Now.ToString("yyyy-MM-01"))
                                                                     && a.LastUpdateDate >= queryObj.MinDt.AddDays(1));
 
-            list = Dbc.PgTestDb.GetList<PgUserDto>(a => "Abc".ToLower() == a.UserName.ToLower());
-            list = Dbc.PgTestDb.GetList<PgUserDto>(a => "Abcd".Substring(0, 3).ToLower() == a.UserName.ToLower());
+            //list = Dbc.PgTestDb.GetList<PgUserDto>(a => "Abc".ToLower() == a.UserName.ToLower());
+            //list = Dbc.PgTestDb.GetList<PgUserDto>(a => "Abcd".Substring(0, 3).ToLower() == a.UserName.ToLower());
             list = Dbc.PgTestDb.GetList<PgUserDto>(a => queryObj.UserName.Substring(0, 3).ToLower() == a.UserName.ToLower());
         }
 
