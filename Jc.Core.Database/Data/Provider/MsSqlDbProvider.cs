@@ -77,6 +77,69 @@ namespace Jc.Database.Provider
             DbCommand dbCommand = CreateDbCommand();
 
             //表名 查询字段名 主键字段名
+            string sqlStr = "Select {1} From {0} t1 @OrderStr offset @LowRecNum rows fetch next @PageSize rows only";
+            string selectParams = null;
+
+            string queryStr = null;
+            string orderStr = null;
+
+            EntityMapping dtoDbMapping = EntityMappingHelper.GetMapping<T>();
+            List<FieldMapping> piMapList = EntityMappingHelper.GetPiMapList<T>(filter);
+            foreach (FieldMapping piMap in piMapList)
+            {
+                selectParams += string.IsNullOrEmpty(selectParams) ? "t2.Num,t1." + piMap.FieldName : ",t1." + piMap.FieldName;
+            }
+            if (filter != null && filter.ItemList.Count>0)
+            {
+                queryStr = filter.FilterSQLString;
+            }
+            if (filter != null && !string.IsNullOrEmpty(filter.OrderSQLString))
+            {
+                orderStr = filter.OrderSQLString;
+            }
+            else
+            {   //默认By 主键 Asc
+                if (dtoDbMapping.HasPkField)
+                {
+                    orderStr = $"order by {dtoDbMapping.GetPkField().FieldName} asc";
+                }
+                else
+                {
+                    throw new Exception("Paging queries for sqlserver must specify sorting fields");
+                }
+            }
+            sqlStr = sqlStr.Replace("@QueryStr", queryStr);
+            sqlStr = sqlStr.Replace("@LowRecNum", filter.FilterStartIndex.ToString());
+            sqlStr = sqlStr.Replace("@PageSize", filter.PageSize.ToString());
+            sqlStr = sqlStr.Replace("@OrderStr", orderStr);
+            if (filter != null)
+            {
+                for (int i = 0; i < filter.FilterParameters.Count; i++)
+                {
+                    DbParameter dbParameter = dbCommand.CreateParameter();
+                    dbParameter.Direction = ParameterDirection.Input;
+                    dbParameter.ParameterName = filter.FilterParameters[i].ParameterName;
+                    dbParameter.Value = filter.FilterParameters[i].ParameterValue;
+                    dbParameter.DbType = filter.FilterParameters[i].ParameterDbType;
+                    dbCommand.Parameters.Add(dbParameter);
+                }
+            }
+            dbCommand.CommandText = string.Format(sqlStr, dtoDbMapping.GetTableName(subTableArg), selectParams);
+            return dbCommand;
+        }
+
+        /// <summary>
+        /// 获取分页查询DbCommand
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="filter">过滤条件</param>
+        /// <param name="subTableArg">表名称,如果为空,则使用T对应表名称</param>
+        /// <returns></returns>
+        public DbCommand GetQueryRecordsPageDbCommandBak<T>(QueryFilter filter, string subTableArg = null)
+        {
+            DbCommand dbCommand = CreateDbCommand();
+
+            //表名 查询字段名 主键字段名
             string sqlStr = "Select {1} From {0} t1" +
                 ",(Select Top (@UpRecNum) row_number() OVER (@OrderStr) Num,{2} From {0} @QueryStr) t2" +
                 " Where t1.{2}=t2.{2} And t2.Num>@LowRecNum Order By t2.Num Asc";

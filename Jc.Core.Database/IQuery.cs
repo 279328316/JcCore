@@ -170,14 +170,7 @@ namespace Jc.Database
         public T FirstOrDefault()
         {
             Pager pager = new Pager(1,1);
-            if (orderByClauseList == null || orderByClauseList.Count <= 0)
-            {
-                EntityMapping dtoDbMapping = EntityMappingHelper.GetMapping<T>();
-                if (dtoDbMapping?.HasPkField == true)
-                {
-                    orderByClauseList.Add(new OrderByClause(dtoDbMapping.GetPkField().FieldName));
-                }
-            }
+
             QueryFilter filter = QueryFilterBuilder.GetPageFilter(query, select, orderByClauseList,pager, unSelect);
             
             T dto = null;
@@ -419,8 +412,8 @@ namespace Jc.Database
             try
             {
                 if (!filter.IsPage)
-                {
-                    throw new Exception("分页查询未指定分页信息");
+                {   // 分页查询必须设置分页信息
+                    throw new Exception("Paging query must specify pagination information");
                 }
                 else
                 {

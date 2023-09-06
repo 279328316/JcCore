@@ -82,7 +82,7 @@ namespace Jc.Database.Provider
             string sqlStr = "Select {1} From {0} @QueryStr @OrderStr limit @PageSize offset @LowRecNum";
             string selectParams = null;
             string queryStr = null;
-            string orderStr = null;
+            string orderStr = "";
 
             EntityMapping dtoDbMapping = EntityMappingHelper.GetMapping<T>();
             List<FieldMapping> piMapList = EntityMappingHelper.GetPiMapList<T>(filter);
@@ -97,10 +97,6 @@ namespace Jc.Database.Provider
             if (filter != null && !string.IsNullOrEmpty(filter.OrderSQLString))
             {
                 orderStr = filter.OrderSQLString;
-            }
-            else
-            {   //默认By 主键 Asc
-                orderStr = "order by {2} asc";
             }
             sqlStr = sqlStr.Replace("@QueryStr", queryStr);
             sqlStr = sqlStr.Replace("@LowRecNum", filter.FilterStartIndex.ToString());
