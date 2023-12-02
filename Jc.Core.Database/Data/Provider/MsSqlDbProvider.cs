@@ -77,7 +77,7 @@ namespace Jc.Database.Provider
             DbCommand dbCommand = CreateDbCommand();
 
             //表名 查询字段名 主键字段名
-            string sqlStr = "Select {1} From {0} t1 @OrderStr offset @LowRecNum rows fetch next @PageSize rows only";
+            string sqlStr = "Select {1} From {0} t1 @QueryStr @OrderStr offset @LowRecNum rows fetch next @PageSize rows only";
             string selectParams = null;
 
             string queryStr = null;
@@ -87,7 +87,7 @@ namespace Jc.Database.Provider
             List<FieldMapping> piMapList = EntityMappingHelper.GetPiMapList<T>(filter);
             foreach (FieldMapping piMap in piMapList)
             {
-                selectParams += string.IsNullOrEmpty(selectParams) ? "t2.Num,t1." + piMap.FieldName : ",t1." + piMap.FieldName;
+                selectParams += string.IsNullOrEmpty(selectParams) ? $"t1.{piMap.FieldName}" : $",t1.{piMap.FieldName}";
             }
             if (filter != null && filter.ItemList.Count>0)
             {
