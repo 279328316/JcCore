@@ -13,6 +13,28 @@ namespace Jc
     public class StringHelper
     {
         /// <summary>
+        /// Generate a random key
+        /// </summary>
+        /// <param name="n">key length，IV is 16，Key is 32</param>
+        /// <returns>return random value</returns>
+        public static string GetRandomStr(int length)
+        {
+            char[] arrChar = new char[]{
+               'a','b','d','c','e','f','g','h','i','j','k','l','m','n','p','r','q','s','t','u','v','w','z','y','x',
+               '0','1','2','3','4','5','6','7','8','9',
+               'A','B','C','D','E','F','G','H','I','J','K','L','M','N','Q','P','R','T','S','V','U','W','X','Y','Z'
+              };
+
+            StringBuilder num = new StringBuilder();
+            Random random = new Random();
+            for (int i = 0; i < length; i++)
+            {
+                num.Append(arrChar[random.Next(0, arrChar.Length)].ToString());
+            }
+            return num.ToString();
+        }
+
+        /// <summary>
         /// 转全角的函数(SBC case)
         /// 任意字符串
         /// 全角空格为12288，半角空格为32 其他字符半角(33-126)与全角(65281-65374)的对应关系是：均相差65248
