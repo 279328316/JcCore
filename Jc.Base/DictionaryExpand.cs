@@ -10,7 +10,7 @@ namespace Jc
     /// <summary>
     /// Object 扩展
     /// </summary>
-    public static class DictionaryHelper
+    public static class DictionaryExpand
     {
         /// <summary>
         /// 追加元素到字典
