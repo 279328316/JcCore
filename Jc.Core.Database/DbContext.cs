@@ -186,7 +186,7 @@ namespace Jc.Database
         {
             try
             {
-                bool dbLogOpen = ConfigHelper.GetAppSetting("DbContextLog")?.ToLower() == "true";
+                bool dbLogOpen = ConfigHelper.GetAppSetting("DbLog")?.ToLower() == "true";
                 if (dbLogOpen)
                 {
                     logHelper = new DbLogHelper();
@@ -207,7 +207,7 @@ namespace Jc.Database
         /// <param name="errorLogger"> error logger </param>
         public void InitLogger(ILog logger, ILog errorLogger = null)
         {
-            bool dbLogOpen = ConfigHelper.GetAppSetting("DbContextLog")?.ToLower() == "true";
+            bool dbLogOpen = ConfigHelper.GetAppSetting("DbLog")?.ToLower() == "true";
             if (dbLogOpen)
             {
                 logHelper = new DbLogHelper();
@@ -228,11 +228,11 @@ namespace Jc.Database
             try
             {
                 //初始化DbContextLogger
-                bool dbLogOpen = ConfigHelper.GetAppSetting("DbContextLog")?.ToLower() == "true";
+                bool dbLogOpen = ConfigHelper.GetAppSetting("DbLog")?.ToLower() == "true";
                 if (dbLogOpen && File.Exists(logConfigPath))
                 {
                     logHelper = new DbLogHelper();
-                    logHelper.InitLogger(logConfigPath, $"DbRepository_{DbName}", logger, errorLogger);
+                    logHelper.InitLogger(logConfigPath, $"JcDbRepository_{DbName}", logger, errorLogger);
                 }
             }
             catch (Exception ex)

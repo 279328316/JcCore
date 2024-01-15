@@ -178,6 +178,26 @@ namespace Jc.Database
         }
 
         /// <summary>
+        /// 添加查询条件
+        /// 参数类型只支持int guid string double float bool datetime
+        /// </summary>
+        /// <param name="queryObj"></param>
+        /// <param name="operandSettings"></param>
+        public IQuery<T> IQuery<T>(object queryObj, Dictionary<string, Operand> operandSettings = null) where T : class, new()
+        {
+            NameValueCollection nvCollection = new NameValueCollection();
+            if (queryObj != null)
+            {
+                List<PropertyInfo> piList = queryObj.GetType().GetProperties().ToList();
+                foreach (PropertyInfo pi in piList)
+                {
+                    nvCollection.Add(pi.Name, pi.GetValue(queryObj)?.ToString());
+                }
+            }
+            return IQuery<T>(nvCollection, operandSettings);
+        }
+
+        /// <summary>
         /// 执行客户命令
         /// </summary>
         /// <returns>受影响记录数</returns>
