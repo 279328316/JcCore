@@ -193,23 +193,41 @@ namespace Jc.Database.Provider
         {
             //表名 查询字段名 主键字段名
             EntityMapping dtoDbMapping = EntityMappingHelper.GetMapping<T>();
-            List<FieldMapping> piMapList = EntityMappingHelper.GetPiMapList<T>();
-            string tableName = dtoDbMapping.GetTableName(subTableArg);            
-            StringBuilder sqlBuilder = new StringBuilder();
-            sqlBuilder.Append($"Create table {tableName}(\r\n");
-            for (int i = 0; i < piMapList.Count; i++)
+            string createTableSql = "";
+            if (!string.IsNullOrEmpty(dtoDbMapping.TableAttr?.CreateTableSql))
             {
-                if (i < piMapList.Count - 1)
-                {
-                    sqlBuilder.Append(CreateField(piMapList[i]));
-                }
-                else
-                {
-                    sqlBuilder.Append(CreateField(piMapList[i], true));
+                createTableSql = dtoDbMapping.TableAttr.CreateTableSql;
+
+                if (createTableSql.Contains("{0}"))
+                {   // 处理分表情况
+                    if (subTableArg == null)
+                    {
+                        throw new Exception($"对象{dtoDbMapping.EntityType.Name},分表参数不能为空,请使用分表DbContext.调用GetSubTableDbContext获取分表DbContext");
+                    }
+                    createTableSql = string.Format(createTableSql, subTableArg.ToString().ToLower());
                 }
             }
-            sqlBuilder.Append(")\r\n");
-            return sqlBuilder.ToString();
+            else
+            {
+                string tableName = dtoDbMapping.GetTableName(subTableArg);
+                List<FieldMapping> piMapList = EntityMappingHelper.GetPiMapList<T>();
+                StringBuilder sqlBuilder = new StringBuilder();
+                sqlBuilder.Append($"Create table [{tableName}](\r\n");
+                for (int i = 0; i < piMapList.Count; i++)
+                {
+                    if (i < piMapList.Count - 1)
+                    {
+                        sqlBuilder.Append(CreateField(piMapList[i]));
+                    }
+                    else
+                    {
+                        sqlBuilder.Append(CreateField(piMapList[i], true));
+                    }
+                }
+                sqlBuilder.Append(")\r\n");
+                createTableSql = sqlBuilder.ToString();
+            }
+            return createTableSql;
         }
 
         /// <summary>
