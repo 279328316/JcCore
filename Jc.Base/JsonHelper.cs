@@ -19,6 +19,11 @@ namespace Jc
     /// </summary>
     public class JsonHelper
     {
+        static JsonHelper() 
+        {
+            JsonConvert.DefaultSettings = () => new JsonSerializerSettings { MaxDepth = 128 };
+        }
+
         /// <summary>
         /// 序列化方法 同SerializeObject
         /// </summary>
