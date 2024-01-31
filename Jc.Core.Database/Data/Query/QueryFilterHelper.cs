@@ -617,8 +617,8 @@ namespace Jc.Database.Query
                     }
                     else
                     {   // 字段情况处理
-                        MemberExpression memberExpression = callExpression.Object as MemberExpression;
-                        object meResult = AtomExpressionRouter(memberExpression);
+                        MemberExpression me = callExpression.Object as MemberExpression;
+                        object meResult = AtomExpressionRouter(me);
                         switch (callExpression.Method.Name)
                         {
                             case "ToLower":
@@ -628,7 +628,15 @@ namespace Jc.Database.Query
                                 result = $"upper({meResult})";
                                 break;
                             default:
-                                throw new Exception($"Unsuport Method {callExpression.Method.Name}");
+                                if (me.Expression != null && !me.Expression.Type.IsValueType)
+                                {
+                                    throw new Exception($"Unsuport Method {callExpression.Method.Name} for expression {callExpression}");
+                                }
+                                else
+                                {   // me.Expression == null DateTime.Now Guid.Empty
+                                    // me.Expression.Type.IsValueType 值类型
+                                    result = Expression.Lambda(exp).Compile().DynamicInvoke();
+                                }
                                 break;
                         }
                     }
