@@ -7,8 +7,6 @@ using System.Reflection;
 using System.Data;
 using System.Linq;
 using Jc.Database.Query;
-using System.Data.SqlClient;
-
 
 namespace Jc.Database.Provider
 {
