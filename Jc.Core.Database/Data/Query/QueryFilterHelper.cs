@@ -417,8 +417,17 @@ namespace Jc.Database.Query
             string memberName = me.Member.Name;
             string expStr = exp.ToString();
             if (expStr.StartsWith("value"))
-            {   //引用其它对象属性类型 如 list.contais(student.Name) , a.HospitalId == hospital.Id 
-                result = Expression.Lambda(exp).Compile().DynamicInvoke();
+            {   //引用其它对象属性类型 如 list.contais(student.Name) , a.HospitalId == hospital.Id, a.TaskState == task.TaskState
+                // 处理student.Name,hospital.Id,task.TaskState
+                object expResult = Expression.Lambda(exp).Compile().DynamicInvoke();
+                if (me.Type.IsEnum)
+                {   // 查询条件中的枚举类型特殊处理,转换为int
+                    result = (int)expResult;
+                }
+                else
+                {
+                    result = expResult;
+                }
             }
             else
             {
