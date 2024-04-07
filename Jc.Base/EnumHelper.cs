@@ -285,7 +285,7 @@ namespace Jc
             {
                 result = attr.DisplayName;
             }
-            if(string.IsNullOrEmpty(result))
+            if(result == null)
             {
                 result = type.Name;
             }
@@ -305,7 +305,7 @@ namespace Jc
             {
                 result = attr.DisplayName;
             }
-            if(string.IsNullOrEmpty(result))
+            if(result == null)
             {
                 result = fieldInfo.Name;
             }

@@ -442,7 +442,14 @@ namespace Jc.Database.Query
                 {
                     if (me.Expression != null && !me.Expression.Type.IsValueType)
                     {
-                        result = dtoDbMapping.FieldMappings[memberName].FieldName;
+                        if (me.Expression.Type == dtoDbMapping.EntityType && dtoDbMapping.FieldMappings.ContainsKey(memberName))
+                        {
+                            result = dtoDbMapping.FieldMappings[memberName].FieldName;
+                        }
+                        else
+                        {
+                            result = Expression.Lambda(exp).Compile().DynamicInvoke();
+                        }
                     }
                     else
                     {   // me.Expression == null DateTime.Now Guid.Empty
