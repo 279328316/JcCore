@@ -55,7 +55,7 @@ namespace Jc
         /// <summary>
         /// 默认日期时间格式
         /// </summary>
-        public string DefaultDateTimeFormat { get; set; } = "yyyy-MM-dd HH:mm:ss.fff";
+        public string DefaultDateTimeFormat { get; set; } = "yyyy-MM-dd HH:mm:ss";
 
         /// <summary>
         /// 用户代理
