@@ -6,7 +6,7 @@
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <Description>简单好用的.net开源Orm框架
 https://github.com/279328316/JcCore</Description>
-    <Version>1.2.1.2</Version>
+    <Version>1.2.1.3</Version>
     <RootNamespace>Jc</RootNamespace>
     <RepositoryUrl>https://github.com/279328316/JcCore</RepositoryUrl>
     <PackageProjectUrl>https://github.com/279328316/JcCore</PackageProjectUrl>
