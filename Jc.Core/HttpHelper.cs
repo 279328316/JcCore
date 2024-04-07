@@ -53,6 +53,11 @@ namespace Jc
         public int Timeout { get; set; } = 10 * 60 * 1000;
 
         /// <summary>
+        /// 默认日期时间格式
+        /// </summary>
+        public string DefaultDateTimeFormat { get; set; } = "yyyy-MM-dd HH:mm:ss.fff";
+
+        /// <summary>
         /// 用户代理
         /// </summary>
         public string UserAgent { get; set; } = ".Net App Client";
@@ -865,8 +870,8 @@ namespace Jc
                     if (requestParams!=null)
                     {
                         #region 写入其他表单参数
-                        IDictionary<string, object> items = GetParameterDictionary(requestParams);
-                        foreach (KeyValuePair<string, object> key in items)
+                        IDictionary<string, string> items = GetParameterDictionary(requestParams);
+                        foreach (KeyValuePair<string, string> key in items)
                         {
                             var p = string.Format(dataFormdataTemplate, key.Key, key.Value);
                             var bp = Encoding.UTF8.GetBytes(p);
@@ -982,8 +987,8 @@ namespace Jc
                     if (requestParams != null)
                     {
                         #region 写入其他表单参数
-                        IDictionary<string, object> items = GetParameterDictionary(requestParams);
-                        foreach (KeyValuePair<string, object> key in items)
+                        IDictionary<string, string> items = GetParameterDictionary(requestParams);
+                        foreach (KeyValuePair<string, string> key in items)
                         {
                             var p = string.Format(dataFormdataTemplate, key.Key, key.Value);
                             var bp = Encoding.UTF8.GetBytes(p);
@@ -1065,11 +1070,11 @@ namespace Jc
                     {
                         if (strBuilder.Length <= 0)
                         {
-                            strBuilder.AppendFormat("{0}={1}", key, dic[key]);
+                            strBuilder.AppendFormat("{0}={1}", key, FormatParameterValue(dic[key]));
                         }
                         else
                         {
-                            strBuilder.AppendFormat("&{0}={1}", key, dic[key]);
+                            strBuilder.AppendFormat("&{0}={1}", key, FormatParameterValue(dic[key]));
                         }
                     }
                     #endregion
@@ -1090,7 +1095,7 @@ namespace Jc
                                 {
                                     strBuilder.AppendFormat("&");
                                 }
-                                strBuilder.AppendFormat("{0}={1}", kv.Key, kv.Value);
+                                strBuilder.AppendFormat("{0}={1}", kv.Key, FormatParameterValue(kv.Value));
                             }
                             #endregion
                         }
@@ -1122,7 +1127,7 @@ namespace Jc
                             }
                             if (value is ValueType || value is string)
                             {
-                                valueStr = value?.ToString();
+                                valueStr = FormatParameterValue(value);
                             }
                             else
                             {
@@ -1148,14 +1153,18 @@ namespace Jc
         /// </summary>
         /// <param name="requestParams">参数 IDictionary,IEnumerable,string,object</param>
         /// <returns></returns>
-        public IDictionary<string, object> GetParameterDictionary(object requestParams)
+        public IDictionary<string, string> GetParameterDictionary(object requestParams)
         {
-            IDictionary<string, object> dic = new Dictionary<string, object>();
+            IDictionary<string, string> dic = new Dictionary<string, string>();
             if (requestParams != null)
             {
                 if (requestParams is IDictionary<string, object>)
                 {   //处理IDictionary<string, object>类型数据
-                    dic = requestParams as IDictionary<string, object>;
+                    IDictionary<string, object> requestDic = (IDictionary<string, object>)requestParams;
+                    foreach (KeyValuePair<string, object> kv in requestDic)
+                    {
+                        dic.Add(kv.Key, FormatParameterValue(kv.Value));
+                    }
                 }
                 else if (requestParams is IEnumerable<object>)
                 {
@@ -1168,7 +1177,7 @@ namespace Jc
                         {   //处理List<KeyValuePair<string, object>> 类型数据
                             foreach (KeyValuePair<string, object> kv in list)
                             {
-                                dic.Add(kv.Key, kv.Value);
+                                dic.Add(kv.Key, FormatParameterValue(kv.Value));
                             }
                         }
                         else
@@ -1180,7 +1189,7 @@ namespace Jc
                 }
                 else if (requestParams is ValueType)
                 {
-                    dic.Add("params", requestParams);
+                    dic.Add("params", FormatParameterValue(requestParams));
                 }
                 else if (requestParams is string)
                 {
@@ -1188,18 +1197,18 @@ namespace Jc
                     if (paramStr.Contains("="))
                     {   //处理 a=value1&b=value2 格式
                         string[] paramArray = paramStr.Split('&');
-                        foreach(string str in paramArray)
+                        foreach (string str in paramArray)
                         {
-                            if(string.IsNullOrEmpty(str))
+                            if (string.IsNullOrEmpty(str))
                             {   //忽略 空字符
                                 continue;
                             }
                             int index = str.IndexOf('=');
-                            if(index!=-1)
+                            if (index != -1)
                             {
                                 string key = str.Substring(0, index);
                                 string value = null;
-                                if(index < str.Length - 1)
+                                if (index < str.Length - 1)
                                 {   //=不是最后一个字符,返回数据;
                                     value = str.Substring(index + 1);
                                 }
@@ -1209,7 +1218,7 @@ namespace Jc
                     }
                     else
                     {
-                        dic.Add("params", requestParams);
+                        dic.Add("params", FormatParameterValue(requestParams));
                     }
                 }
                 else
@@ -1225,7 +1234,7 @@ namespace Jc
                             object value = piList[i].GetValue(requestParams);
                             if (value is ValueType || value is string)
                             {
-                                valueStr = value?.ToString();
+                                valueStr = FormatParameterValue(value);
                             }
                             else
                             {
@@ -1240,5 +1249,26 @@ namespace Jc
             return dic;
         }
 
+        /// <summary>
+        /// 获取ParameterValue Str
+        /// </summary>
+        /// <returns></returns>
+        private string FormatParameterValue(object parameterValue)
+        {
+            string valueStr = null;
+            if (parameterValue != null)
+            {
+                if (parameterValue.GetType() == typeof(DateTime))
+                {
+                    DateTime dt = (DateTime)parameterValue;
+                    valueStr = dt.ToString(DefaultDateTimeFormat);
+                }
+                else
+                {
+                    valueStr = parameterValue.ToString();
+                }
+            }
+            return valueStr;
+        }
     }
 }
