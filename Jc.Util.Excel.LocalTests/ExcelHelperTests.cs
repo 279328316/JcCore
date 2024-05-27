@@ -26,7 +26,17 @@ namespace Jc.Excel.Tests
             builder.Add(new FieldMap("Name", "姓名"));
             builder.Add(new FieldMap("ClassName", "班级"));
 
-            List<FieldMap> fieldMaps = builder.FieldMaps;
+            List<FieldMap> testMaps = builder.FieldMaps;
+
+            List<FieldMap> fieldMaps = new List<FieldMap>
+            {
+                new FieldRowIndexMap(),
+                new FieldMap<Student>(a => a.Name, "姓名"),
+                new FieldMap<Student>(a => a.ClassName, "班级"),
+                new FieldMap("Name", "姓名"),
+                new FieldMap("ClassName", "班级")
+            };
+
             ExcelHelper.ExportToFile(students, fieldMaps, @"D:\1.xlsx");
         }
     }

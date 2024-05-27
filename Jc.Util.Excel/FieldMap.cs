@@ -30,7 +30,7 @@ namespace Jc.Excel
         public string FieldText { get; set; }
         
         /// <summary>
-        /// 列Index
+        /// 列Index 可在导入时,使用
         /// </summary>
         public int ColumnIndex { get; set; }
 
