@@ -26,11 +26,24 @@ namespace Jc.Database
         #region Methods
 
         /// <summary>
+        /// 获取表名
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <returns></returns>
+        public string GetTableName<T>()
+        {
+            string subTableArg = GetSubTableArg<T>();
+            EntityMapping dtoDbMapping = EntityMappingHelper.GetMapping<T>();
+            string tableName = dtoDbMapping.GetTableName(subTableArg);
+            return tableName;
+        }
+
+        /// <summary>
         /// 获取分表表名参数
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <returns></returns>
-        private string GetSubTableArg<T>()
+        public string GetSubTableArg<T>()
         {
             string subTableArg = null;
             if (this.subTableArgList != null)

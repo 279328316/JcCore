@@ -1,6 +1,12 @@
-﻿using System;
+﻿using Jc.Database;
+using Jc.Database.Data;
+using Jc.Database.Query;
+using System;
 using System.Collections.Generic;
+using System.ComponentModel;
+using System.Data;
 using System.Data.SQLite;
+using System.Diagnostics.SymbolStore;
 using System.IO;
 using System.Text;
 
@@ -66,6 +72,61 @@ namespace Jc.Core.Sqlite
         {
             return File.Exists(dbFilePath);
         }
+
+        /// <summary>
+        /// 获取表字段信息
+        /// </summary>
+        /// <returns></returns>
+        public static List<FieldModel> GetTableFieldList<T>(DbContext db)
+        {            
+            string tableName = db.GetTableName<T>();
+            return GetTableFieldList(db, tableName);
+        }
+
+        /// <summary>
+        /// 获取表字段信息
+        /// </summary>
+        /// <returns></returns>
+        public static List<FieldModel> GetTableFieldList(DbContext db, string tableName)
+        {
+            string getFieldSql = $"pragma table_info('{tableName}')";
+            DataTable dataTable = db.GetDataTable(getFieldSql);
+            List<FieldModel> fields = new List<FieldModel>();
+            if (dataTable.Rows.Count > 0)
+            {
+                for (int i = 0; i < dataTable.Rows.Count - 1; i++)
+                {
+                    DataRow dr = dataTable.Rows[i];
+                    FieldModel field = new FieldModel()
+                    {
+                        FieldName = dr["name"].ToString(),
+                        IsNullAble = !Convert.ToBoolean(dr["notnull"]),
+                        IsPk = !Convert.ToBoolean(dr["notnull"]),
+                    };
+                    string fieldTypeStr = dr["type"].ToString();
+                    int typeEndIndex = fieldTypeStr.IndexOf("(");
+                    if (typeEndIndex > 0)
+                    {
+                        field.FieldType = fieldTypeStr.Substring(0, typeEndIndex);
+                        int typeLengthEndIndex = fieldTypeStr.IndexOf(")");
+                        string fieldLengthStr = fieldTypeStr.Substring(typeEndIndex + 1, typeLengthEndIndex - typeEndIndex);
+
+                        int fieldLength;
+                        if (int.TryParse(fieldLengthStr, out fieldLength))
+                        {
+                            field.FieldLength = fieldLength;
+                        }
+                    }
+                    else
+                    {
+                        field.FieldType = fieldTypeStr;
+                    }
+                    fields.Add(field);
+                }
+            }
+            return fields;
+        }
+
 
         /// <summary>
         /// 创建数据库

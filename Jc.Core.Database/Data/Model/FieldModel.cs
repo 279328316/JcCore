@@ -19,10 +19,6 @@ namespace Jc.Database.Data
         private int? fieldLength =null;//字段长度
         private bool isNullAble = false;//可否为空
         private string note =null;//备注
-
-        private string isPkStr = null;//是否主键 Str
-        private string isNullAbleStr = null;//可否为空 Str
-        private string fieldLengthStr = null;//字段长度 Str
         #endregion
 
         #region Ctor
@@ -65,7 +61,6 @@ namespace Jc.Database.Data
         }
         /// <summary>
         ///是否主键 1 主键 0 非主键
-        ///为兼容各种数据库,使用long类型
         /// </summary>
         public bool IsPk
         {
@@ -132,89 +127,6 @@ namespace Jc.Database.Data
             set
             {
                 note=value;
-            }
-        }
-
-
-        /// <summary>
-        ///是否主键 0非主键 1主键
-        /// </summary>
-        public string IsPkStr
-        {
-            get
-            {
-                return isPkStr;
-            }
-            set
-            {
-                isPkStr = value;
-
-                isPk = false;
-                if (!string.IsNullOrEmpty(isPkStr))
-                {
-                    int val = 0;
-                    if (int.TryParse(isPkStr, out val))
-                    {
-                        if(val == 1)
-                        {
-                            isPk = true;
-                        }
-                    }
-                }
-            }
-        }
-        /// <summary>
-        ///是否为空 0不能为空 1可以为空
-        /// </summary>
-        public string IsNullAbleStr
-        {
-            get
-            {
-                return isNullAbleStr;
-            }
-            set
-            {
-                isNullAbleStr = value;
-
-                isNullAble = false;
-                if (!string.IsNullOrEmpty(isNullAbleStr))
-                {
-                    int val = 0;
-                    if (int.TryParse(isNullAbleStr, out val))
-                    {
-                        if (val == 1)
-                        {
-                            isNullAble = true;
-                        }
-                    }
-                }
-            }
-        }
-        /// <summary>
-        ///字段长度Str
-        /// </summary>
-        public string FieldLengthStr
-        {
-            get
-            {
-                return fieldLengthStr;
-            }
-            set
-            {
-                fieldLengthStr = value;
-
-                fieldLength = null;
-                if (!string.IsNullOrEmpty(fieldLengthStr))
-                {
-                    int val = 0;
-                    if (int.TryParse(fieldLengthStr, out val))
-                    {
-                        if (val >0)
-                        {
-                            fieldLength = val;
-                        }
-                    }
-                }
             }
         }
         #endregion

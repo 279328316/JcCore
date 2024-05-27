@@ -153,7 +153,7 @@ namespace Jc.Database.Provider
         public override DbCommand GetFieldListDbCommand(string tableName)
         {
             //pragma table_info('finance_invoice')
-            throw new Exception("Sqlite获取字段列表,请使用pragma.");
+            throw new Exception("Sqlite获取字段列表,需使用pragma.请使用SQLiteHelper.GetTableFieldList");
         }
 
         /// <summary>
@@ -164,11 +164,9 @@ namespace Jc.Database.Provider
         /// <returns></returns>
         public override DbCommand GetCheckTableExistsDbCommand<T>(string subTableArg = null)
         {
-            DbCommand dbCommand = CreateDbCommand();
             EntityMapping dtoDbMapping = EntityMappingHelper.GetMapping<T>();
             string tableName = dtoDbMapping.GetTableName(subTableArg);            
-            dbCommand.CommandText = $"select *  from sqlite_master where type='table' and name = '{tableName}';";
-            return dbCommand;
+            return GetCheckTableExistsDbCommand(tableName);
         }
         
         /// <summary>
