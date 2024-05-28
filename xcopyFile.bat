@@ -1,7 +1,7 @@
 echo off
 cls
 :: 设置变量不能有空格 等号左边不允许有空格，等号右边的所有包括空格会全部赋值给变量。
-set version=1.2.1.3
+set version=1.2.1.4
 echo User Dir %USERPROFILE%   FileVersion : %version%
 
 set curDir="%USERPROFILE%\.nuget\packages\jc.base\%version%\lib\netstandard2.0\"
