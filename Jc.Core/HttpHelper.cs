@@ -664,6 +664,62 @@ namespace Jc
             return result;
         }
 
+
+        /// <summary>
+        ///  Post上传文件,并下载
+        /// </summary>
+        /// <param name="url">请求Url</param>
+        /// <param name="data">数据对象</param>
+        /// <param name="uploadFilePath">上传文件对象</param>
+        /// <param name="downloadPath">下载文件对象</param>
+        /// <param name="progressChanged">下载进度通知</param>
+        /// <returns></returns>
+        public void UploadFileWithDownLoad(string url, object data, string uploadFilePath, string downloadPath, ProgressChangedEventHandler progressChanged = null)
+        {
+            try
+            {
+                FileInfo fileInfo = new FileInfo(uploadFilePath);
+                using (FileStream fileStream = File.OpenRead(uploadFilePath))
+                {
+                    byte[] array = new byte[fileStream.Length];
+                    fileStream.Read(array, 0, (int)fileStream.Length);
+                    using (HttpWebResponse response = CreateUploadFileHttpResponse(url, data, new List<string>() { uploadFilePath }))
+                    {
+                        using (Stream responseStream = response.GetResponseStream())
+                        {
+                            using (Stream stream = new FileStream(downloadPath, FileMode.CreateNew))
+                            {
+                                long totalLength = response.ContentLength;
+                                int createdSize = 0;
+                                int blockSize = 50 * 1024, readSize;
+                                byte[] bArr = new byte[blockSize];
+                                while ((readSize = responseStream.Read(bArr, 0, blockSize)) > 0)
+                                {
+                                    stream.Write(bArr, 0, readSize);
+
+                                    createdSize += readSize;
+                                    if (progressChanged != null && totalLength != 0)
+                                    {
+                                        int progress = (int)(100 * createdSize / totalLength);
+                                        progressChanged(null, new ProgressChangedEventArgs(progress, progress));
+                                    }
+                                }
+                                if (progressChanged != null)
+                                {
+                                    progressChanged(null, new ProgressChangedEventArgs(100, 100));
+                                }
+                            }
+                        }
+                        response.Close();
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+
+        }
         #endregion
 
         #region 创建请求
