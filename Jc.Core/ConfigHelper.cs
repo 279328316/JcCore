@@ -128,7 +128,10 @@ namespace Jc
                 IConfigurationBuilder builder = new ConfigurationBuilder().AddJsonFile(filePath);
                 IConfiguration configuration = builder.Build();
                 IConfigurationSection configSection = configuration.GetSection(section);
-                value = configSection[key];
+                if (configSection != null)
+                {
+                    value = configSection[key];
+                }
             }
             else
             {   //兼容 .netFramework应用程序

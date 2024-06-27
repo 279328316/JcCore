@@ -18,6 +18,12 @@ namespace Jc
         private static ILog errorLogger;
 
         /// <summary>
+        /// 错误日志是否记录到Logger，默认为true
+        /// 即错误日志也会在Logger中记录
+        /// </summary>
+        public static bool IsErrorSaveToLogger { get; set; } = true;
+
+        /// <summary>
         /// 日志记录
         /// </summary>
         public static ILog Logger
@@ -169,6 +175,14 @@ namespace Jc
                 if (ErrorLogger != null)
                 {
                     ErrorLogger.Error(msg);
+                    if (IsErrorSaveToLogger)
+                    {
+                        Logger.Error(msg);
+                    }
+                }
+                else
+                {
+                    Logger.Error(msg);
                 }
             }
             catch
@@ -177,9 +191,9 @@ namespace Jc
         }
 
         /// <summary>
-        /// 记录日志
+        /// 记录错误日志
         /// </summary>
-        /// <param name="msg"></param>
+        /// <param name="ex"></param>
         public static void Error(Exception ex)
         {
             try

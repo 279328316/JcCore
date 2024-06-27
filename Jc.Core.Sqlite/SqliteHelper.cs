@@ -47,10 +47,6 @@ namespace Jc.Core.Sqlite
                 using (SQLiteConnection con = new SQLiteConnection(connectingString))
                 {
                     con.Open();
-                    //if (File.Exists(con.State))
-                    //{
-                    //    result = true;
-                    //}
                     if (con.State == System.Data.ConnectionState.Open)
                     {
                         result = true;
@@ -94,7 +90,7 @@ namespace Jc.Core.Sqlite
             List<FieldModel> fields = new List<FieldModel>();
             if (dataTable.Rows.Count > 0)
             {
-                for (int i = 0; i < dataTable.Rows.Count - 1; i++)
+                for (int i = 0; i <= dataTable.Rows.Count - 1; i++)
                 {
                     DataRow dr = dataTable.Rows[i];
                     FieldModel field = new FieldModel()
