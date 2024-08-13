@@ -1,17 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Net.Security;
-using System.Security.Cryptography.X509Certificates;
-using System.Net;
-using System.IO;
-using System.IO.Compression;
-using System.Text.RegularExpressions;
-using System.Threading.Tasks;
-using System.Reflection;
-using System.Threading;
 using System.ComponentModel;
+using System.IO;
+using System.Linq;
+using System.Net;
+using System.Net.Security;
+using System.Reflection;
+using System.Security.Cryptography.X509Certificates;
+using System.Text;
+using System.Text.RegularExpressions;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace Jc
 {
@@ -24,19 +23,22 @@ namespace Jc
         /// Json
         /// </summary>
         Json = 1,
+
         /// <summary>
         /// Form
         /// </summary>
         Form = 2
     }
+
     /// <summary>
     /// 有关HTTP请求的辅助类
-    /// 如果需要解析中文GBK请在程序启动时注册Encoding 
+    /// 如果需要解析中文GBK请在程序启动时注册Encoding
     /// 调用静态方法RegisterEncodingProvider
     /// </summary>
     public class HttpHelper
     {
         #region Properties
+
         /// <summary>
         /// 请求编码
         /// </summary>
@@ -71,9 +73,11 @@ namespace Jc
         /// 获取或设置 默认Headers
         /// </summary>
         public WebHeaderCollection Headers { get; set; } = new WebHeaderCollection();
+
         #endregion
 
         #region Ctor
+
         /// <summary>
         /// 静态Ctor
         /// 注册字符
@@ -82,13 +86,14 @@ namespace Jc
         {
             Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
         }
+
         #endregion
 
         #region SetMethods
 
         /// <summary>
         /// 构造方法
-        /// 如果需要解析中文GBK请在程序启动时注册Encoding 
+        /// 如果需要解析中文GBK请在程序启动时注册Encoding
         /// 调用静态方法RegisterEncodingProvider
         /// </summary>
         public HttpHelper()
@@ -124,7 +129,7 @@ namespace Jc
         /// <summary>
         /// 设置Header
         /// </summary>
-        public HttpHelper SetHeaders(string key,string value)
+        public HttpHelper SetHeaders(string key, string value)
         {
             if (!Headers.AllKeys.Contains(key))
             {
@@ -136,8 +141,8 @@ namespace Jc
             }
             return this;
         }
-        #endregion
 
+        #endregion
 
         #region Download File
 
@@ -149,7 +154,7 @@ namespace Jc
         /// <param name="overWrite">是否覆盖</param>
         /// <param name="progressChanged">进度通知</param>
         /// <returns></returns>
-        public void Download(string url,string filePath,bool overWrite = false, ProgressChangedEventHandler progressChanged = null)
+        public void Download(string url, string filePath, bool overWrite = false, ProgressChangedEventHandler progressChanged = null)
         {
             try
             {
@@ -166,7 +171,7 @@ namespace Jc
                             while ((readSize = responseStream.Read(bArr, 0, blockSize)) > 0)
                             {
                                 stream.Write(bArr, 0, readSize);
-                                
+
                                 createdSize += readSize;
                                 if (progressChanged != null && totalLength != 0)
                                 {
@@ -186,7 +191,7 @@ namespace Jc
             catch (System.Exception ex)
             {
                 throw new System.Exception(ex.Message);
-            }            
+            }
         }
 
         /// <summary>
@@ -197,7 +202,7 @@ namespace Jc
         /// <param name="overWrite">是否覆盖</param>
         /// <param name="progressChanged">进度通知</param>
         /// <returns></returns>
-        public AfterEvent<int> DownloadAsync<T>(string url,string filePath, bool overWrite = false, ProgressChangedEventHandler progressChanged = null)
+        public AfterEvent<int> DownloadAsync<T>(string url, string filePath, bool overWrite = false, ProgressChangedEventHandler progressChanged = null)
         {
             AfterEvent<int> after = null;
             Task t = new Task(() =>
@@ -432,7 +437,6 @@ namespace Jc
 
         #endregion
 
-
         #region UploadFile请求
 
         /// <summary>
@@ -445,7 +449,7 @@ namespace Jc
         /// <param name="requestParams">请求参数</param>
         /// <param name="fileList">文件路径列表</param>
         /// <returns></returns>
-        public T UploadFileList<T>(string url, object requestParams,List<string> fileList)
+        public T UploadFileList<T>(string url, object requestParams, List<string> fileList)
         {
             string resultString = UploadFileList(url, requestParams, fileList);
             return JsonHelper.DeserializeObject<T>(resultString);
@@ -530,7 +534,7 @@ namespace Jc
         /// <param name="fileName">文件名</param>
         /// <param name="fileStream">数据流</param>
         /// <returns></returns>
-        public string UploadFile(string url, object requestParams,string fileName, Stream fileStream)
+        public string UploadFile(string url, object requestParams, string fileName, Stream fileStream)
         {
             string result = "";
             try
@@ -550,7 +554,6 @@ namespace Jc
             return result;
         }
 
-
         /// <summary>
         /// 执行UploadFile请求 以stream方式上传单个文件
         /// 可接受IDictionary&lt;string,object&gt;,IEnumerable&lt;keyvaluePair&lt;string,object&gt;&gt;,
@@ -565,7 +568,7 @@ namespace Jc
         public T UploadFile<T>(string url, object requestParams, string fileName, Stream fileStream)
         {
             string resultString = UploadFile(url, requestParams, fileName, fileStream);
-            return JsonHelper.DeserializeObject<T>(resultString);            
+            return JsonHelper.DeserializeObject<T>(resultString);
         }
 
         /// <summary>
@@ -595,7 +598,6 @@ namespace Jc
             }
             return result;
         }
-
 
         /// <summary>
         /// 执行UploadFile请求 以Byte[]上传单个文件
@@ -652,7 +654,7 @@ namespace Jc
                     reader.Close();
                     reader.Dispose();
                 }
-                for(int i=0;i<response.Cookies.Count;i++)
+                for (int i = 0; i < response.Cookies.Count; i++)
                 {
                     Cookies.Add(response.Cookies[i]);
                 }
@@ -663,7 +665,6 @@ namespace Jc
             }
             return result;
         }
-
 
         /// <summary>
         ///  Post上传文件,并下载
@@ -676,53 +677,45 @@ namespace Jc
         /// <returns></returns>
         public void UploadFileWithDownLoad(string url, object data, string uploadFilePath, string downloadPath, ProgressChangedEventHandler progressChanged = null)
         {
-            try
+            if (string.IsNullOrEmpty(uploadFilePath) || !File.Exists(uploadFilePath))
             {
-                FileInfo fileInfo = new FileInfo(uploadFilePath);
-                using (FileStream fileStream = File.OpenRead(uploadFilePath))
+                throw new Exception("upload file is not exists");
+            }
+            using (HttpWebResponse response = CreateUploadFileHttpResponse(url, data, new List<string>() { uploadFilePath }))
+            {
+                using (Stream responseStream = response.GetResponseStream())
                 {
-                    byte[] array = new byte[fileStream.Length];
-                    fileStream.Read(array, 0, (int)fileStream.Length);
-                    using (HttpWebResponse response = CreateUploadFileHttpResponse(url, data, new List<string>() { uploadFilePath }))
+                    using (Stream stream = new FileStream(downloadPath, FileMode.CreateNew))
                     {
-                        using (Stream responseStream = response.GetResponseStream())
+                        long totalLength = response.ContentLength;
+                        int createdSize = 0;
+                        int blockSize = 50 * 1024, readSize;
+                        byte[] bArr = new byte[blockSize];
+                        while ((readSize = responseStream.Read(bArr, 0, blockSize)) > 0)
                         {
-                            using (Stream stream = new FileStream(downloadPath, FileMode.CreateNew))
-                            {
-                                long totalLength = response.ContentLength;
-                                int createdSize = 0;
-                                int blockSize = 50 * 1024, readSize;
-                                byte[] bArr = new byte[blockSize];
-                                while ((readSize = responseStream.Read(bArr, 0, blockSize)) > 0)
-                                {
-                                    stream.Write(bArr, 0, readSize);
+                            stream.Write(bArr, 0, readSize);
 
-                                    createdSize += readSize;
-                                    if (progressChanged != null && totalLength != 0)
-                                    {
-                                        int progress = (int)(100 * createdSize / totalLength);
-                                        progressChanged(null, new ProgressChangedEventArgs(progress, progress));
-                                    }
-                                }
-                                if (progressChanged != null)
-                                {
-                                    progressChanged(null, new ProgressChangedEventArgs(100, 100));
-                                }
+                            createdSize += readSize;
+                            if (progressChanged != null && totalLength != 0)
+                            {
+                                int progress = (int)(100 * createdSize / totalLength);
+                                progressChanged(null, new ProgressChangedEventArgs(progress, progress));
                             }
                         }
-                        response.Close();
+                        if (progressChanged != null)
+                        {
+                            progressChanged(null, new ProgressChangedEventArgs(100, 100));
+                        }
                     }
                 }
+                response.Close();
             }
-            catch (Exception ex)
-            {
-                throw new Exception(ex.Message);
-            }
-
         }
+
         #endregion
 
         #region 创建请求
+
         /// <summary>
         /// 创建GET方式的HTTP请求
         /// 可接受IDictionary&lt;string,object&gt;,IEnumerable&lt;keyvaluePair&lt;string,object&gt;&gt;,
@@ -731,7 +724,7 @@ namespace Jc
         /// <param name="url">请求URL</param>
         /// <param name="requestParams">请求参数</param>
         /// <returns></returns>
-        public HttpWebResponse CreateGetHttpResponse(string url,object requestParams = null)
+        public HttpWebResponse CreateGetHttpResponse(string url, object requestParams = null)
         {
             if (!url.ToLower().StartsWith("http") && !string.IsNullOrEmpty(BaseUrl))
             {
@@ -742,7 +735,7 @@ namespace Jc
                 throw new ArgumentNullException("url");
             }
             string paramStr = GetParameterString(requestParams);
-            if(!string.IsNullOrEmpty(paramStr))
+            if (!string.IsNullOrEmpty(paramStr))
             {
                 url += (url.IndexOf('?') <= -1 ? "?" : "&") + paramStr;
             }
@@ -755,7 +748,9 @@ namespace Jc
                 request.ServerCertificateValidationCallback = new RemoteCertificateValidationCallback(CheckValidationResult);
             }
             request.Method = "GET";
+
             #region 设置请求Header
+
             request.UserAgent = UserAgent;
             request.AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate;
 
@@ -770,7 +765,9 @@ namespace Jc
             request.ReadWriteTimeout = Timeout;
             request.CookieContainer = new CookieContainer();
             request.CookieContainer.Add(Cookies);
+
             #endregion
+
             return request.GetResponse() as HttpWebResponse;
         }
 
@@ -783,7 +780,7 @@ namespace Jc
         /// <param name="requestParams">请求参数</param>
         /// <param name="contentType">请求内容类型</param>
         /// <returns></returns>
-        public HttpWebResponse CreatePostHttpResponse(string url,object requestParams = null, HttpContentType contentType = HttpContentType.Json)
+        public HttpWebResponse CreatePostHttpResponse(string url, object requestParams = null, HttpContentType contentType = HttpContentType.Json)
         {
             if (!url.ToLower().StartsWith("http") && !string.IsNullOrEmpty(BaseUrl))
             {
@@ -793,7 +790,7 @@ namespace Jc
             {
                 throw new ArgumentNullException("url");
             }
-            HttpWebRequest request = WebRequest.Create(url) as HttpWebRequest;            
+            HttpWebRequest request = WebRequest.Create(url) as HttpWebRequest;
             if (url.StartsWith("https", StringComparison.OrdinalIgnoreCase))
             {   //如果是发送HTTPS请求
                 request.ProtocolVersion = HttpVersion.Version10;
@@ -853,6 +850,32 @@ namespace Jc
             return request.GetResponse() as HttpWebResponse;
         }
 
+        /// <summary>
+        /// 创建UploadFile请求 以stream方式上传单个文件
+        /// 可接受IDictionary&lt;string,object&gt;,IEnumerable&lt;keyvaluePair&lt;string,object&gt;&gt;,
+        /// IEnumerable&lt;object&gt;,string(a=a1&amp;b=b1),object等类型参数
+        /// </summary>
+        /// <param name="url">请求url</param>
+        /// <param name="requestParams">请求参数</param>
+        /// <param name="filePath">文件路径</param>
+        /// <returns></returns>
+        public HttpWebResponse CreateUploadFileHttpResponse(string url, object requestParams, string filePath)
+        {
+            return CreateUploadFileHttpResponse(url, requestParams, new List<string> { filePath });
+        }
+
+        /// <summary>
+        /// 创建UploadFile请求 以stream方式上传单个文件
+        /// 可接受IDictionary&lt;string,object&gt;,IEnumerable&lt;keyvaluePair&lt;string,object&gt;&gt;,
+        /// IEnumerable&lt;object&gt;,string(a=a1&amp;b=b1),object等类型参数
+        /// </summary>
+        /// <param name="url">请求url</param>
+        /// <param name="filePath">文件路径</param>
+        /// <returns></returns>
+        public HttpWebResponse CreateUploadFileHttpResponse(string url, string filePath)
+        {
+            return CreateUploadFileHttpResponse(url, null, new List<string> { filePath });
+        }
 
         /// <summary>
         /// 创建UploadFile请求
@@ -863,7 +886,7 @@ namespace Jc
         /// <param name="requestParams">请求参数</param>
         /// <param name="fileList">文件路径列表</param>
         /// <returns></returns>
-        public HttpWebResponse CreateUploadFileHttpResponse(string url,object requestParams,List<string> fileList)
+        public HttpWebResponse CreateUploadFileHttpResponse(string url, object requestParams, List<string> fileList)
         {
             if (!url.ToLower().StartsWith("http") && !string.IsNullOrEmpty(BaseUrl))
             {
@@ -882,7 +905,7 @@ namespace Jc
 
             request.UserAgent = UserAgent;
             request.AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate;
-            
+
             if (Headers != null && Headers.Count > 0)
             {
                 foreach (string key in Headers.AllKeys)
@@ -901,7 +924,7 @@ namespace Jc
             request.ContentType = "multipart/form-data;boundary=" + boundary;   //请求类型
             request.AllowWriteStreamBuffering = false;  //对发送的数据不使用缓存
 
-            // 最后的结束符  
+            // 最后的结束符
             byte[] endBoundary = Encoding.UTF8.GetBytes("\r\n--" + boundary + "--\r\n");
 
             //文件数据
@@ -910,7 +933,7 @@ namespace Jc
                 "\r\nContent-Disposition: form-data; name=\"file\"; filename=\"{0}\"" +
                 "\r\nContent-Type: application/octet-stream\r\n\r\n";
 
-            //文本数据 
+            //文本数据
             string dataFormdataTemplate =
                 "\r\n--" + boundary +
                 "\r\nContent-Disposition: form-data; name=\"{0}\"" +
@@ -923,9 +946,10 @@ namespace Jc
                 using (Stream stream = request.GetRequestStream())
                 {
                     //如果需要Post数据
-                    if (requestParams!=null)
+                    if (requestParams != null)
                     {
                         #region 写入其他表单参数
+
                         IDictionary<string, string> items = GetParameterDictionary(requestParams);
                         foreach (KeyValuePair<string, string> key in items)
                         {
@@ -933,6 +957,7 @@ namespace Jc
                             var bp = Encoding.UTF8.GetBytes(p);
                             stream.Write(bp, 0, bp.Length);
                         }
+
                         #endregion
                     }
                     if (fileList != null && fileList.Count > 0)
@@ -950,7 +975,7 @@ namespace Jc
                             string strPostHeader = string.Format(fileFormdataTemplate, fileList[i]);
                             byte[] postHeaderBytes = Encoding.UTF8.GetBytes(strPostHeader);
                             stream.Write(postHeaderBytes, 0, postHeaderBytes.Length);  //把头部转为数据流放入到请求流中去
-                            
+
                             // 将文件流转为数据流放入到请求流中去
                             using (FileStream fileStream = new FileStream(fileList[i], FileMode.Open, FileAccess.Read))
                             {
@@ -965,10 +990,11 @@ namespace Jc
                     stream.Write(endBoundaryBytes, 0, endBoundaryBytes.Length);
                 }
             }
+
             #endregion
+
             return request.GetResponse() as HttpWebResponse;
         }
-
 
         /// <summary>
         /// 创建UploadFile请求 以stream方式上传单个文件
@@ -980,7 +1006,7 @@ namespace Jc
         /// <param name="fileName">文件名</param>
         /// <param name="fileData">文件数据</param>
         /// <returns></returns>
-        public HttpWebResponse CreateUploadFileHttpResponse(string url, object requestParams = null,string fileName = "",byte[] fileData = null)
+        public HttpWebResponse CreateUploadFileHttpResponse(string url, object requestParams, string fileName, byte[] fileData)
         {
             if (!url.ToLower().StartsWith("http") && !string.IsNullOrEmpty(BaseUrl))
             {
@@ -1018,7 +1044,7 @@ namespace Jc
             request.ContentType = "multipart/form-data;boundary=" + boundary;   //请求类型
             request.AllowWriteStreamBuffering = false;  //对发送的数据不使用缓存
 
-            // 最后的结束符  
+            // 最后的结束符
             byte[] endBoundary = Encoding.UTF8.GetBytes("\r\n--" + boundary + "--\r\n");
 
             //文件数据
@@ -1027,7 +1053,7 @@ namespace Jc
                 "\r\nContent-Disposition: form-data; name=\"file\"; filename=\"{0}\"" +
                 "\r\nContent-Type: application/octet-stream\r\n\r\n";
 
-            //文本数据 
+            //文本数据
             string dataFormdataTemplate =
                 "\r\n--" + boundary +
                 "\r\nContent-Disposition: form-data; name=\"{0}\"" +
@@ -1043,6 +1069,7 @@ namespace Jc
                     if (requestParams != null)
                     {
                         #region 写入其他表单参数
+
                         IDictionary<string, string> items = GetParameterDictionary(requestParams);
                         foreach (KeyValuePair<string, string> key in items)
                         {
@@ -1050,6 +1077,7 @@ namespace Jc
                             var bp = Encoding.UTF8.GetBytes(p);
                             stream.Write(bp, 0, bp.Length);
                         }
+
                         #endregion
                     }
                     if (fileData != null && fileData.Length > 0)
@@ -1059,14 +1087,16 @@ namespace Jc
                         stream.Write(postHeaderBytes, 0, postHeaderBytes.Length);  //把头部转为数据流放入到请求流中去
 
                         // 将文件数据写入到请求流中去
-                        stream.Write(fileData, 0, fileData.Length);                        
+                        stream.Write(fileData, 0, fileData.Length);
                     }
                     //结尾加上结束分隔符
                     byte[] endBoundaryBytes = Encoding.UTF8.GetBytes("\r\n--" + boundary + "--\r\n");
                     stream.Write(endBoundaryBytes, 0, endBoundaryBytes.Length);
                 }
             }
+
             #endregion
+
             return request.GetResponse() as HttpWebResponse;
         }
 
@@ -1088,6 +1118,7 @@ namespace Jc
             return result;
             //return true; //总是接受
         }
+
         #endregion
 
         /// <summary>
@@ -1099,7 +1130,8 @@ namespace Jc
         private string HandleUnicodeString(string result)
         {
             result = Regex.Replace(result, @"\\u(?<Value>[a-zA-Z0-9]{4})",
-                    m => {
+                    m =>
+                    {
                         return ((char)int.Parse(m.Groups["Value"].Value,
                     System.Globalization.NumberStyles.HexNumber)).ToString();
                     });
@@ -1121,6 +1153,7 @@ namespace Jc
                 if (requestParams is IDictionary<string, object>)
                 {
                     #region 处理IDictionary<string, object>类型数据
+
                     IDictionary<string, object> dic = requestParams as IDictionary<string, object>;
                     foreach (string key in dic.Keys)
                     {
@@ -1133,11 +1166,13 @@ namespace Jc
                             strBuilder.AppendFormat("&{0}={1}", key, FormatParameterValue(dic[key]));
                         }
                     }
+
                     #endregion
                 }
                 else if (requestParams is IEnumerable<object>)
                 {
                     #region 处理数组类型数据
+
                     IEnumerable<object> list = requestParams as IEnumerable<object>;
 
                     if (list.Count() > 0)
@@ -1145,6 +1180,7 @@ namespace Jc
                         if (list.First() is KeyValuePair<string, object>)
                         {
                             #region 处理List<KeyValuePair<string, object>> 类型数据
+
                             foreach (KeyValuePair<string, object> kv in list)
                             {
                                 if (strBuilder.Length > 0)
@@ -1153,6 +1189,7 @@ namespace Jc
                                 }
                                 strBuilder.AppendFormat("{0}={1}", kv.Key, FormatParameterValue(kv.Value));
                             }
+
                             #endregion
                         }
                         else
@@ -1160,6 +1197,7 @@ namespace Jc
                             strBuilder.Append(JsonHelper.SerializeObject(requestParams));
                         }
                     }
+
                     #endregion
                 }
                 else if (requestParams is ValueType || requestParams is string)
@@ -1169,6 +1207,7 @@ namespace Jc
                 else
                 {
                     #region 处理Obj类型数据
+
                     List<PropertyInfo> piList = requestParams.GetType().GetProperties()
                         .Where(pi => pi.CanRead).ToList();
                     if (piList != null && piList.Count > 0)
@@ -1177,7 +1216,7 @@ namespace Jc
                         {
                             string valueStr;
                             object value = piList[i].GetValue(requestParams);
-                            if(value == null)
+                            if (value == null)
                             {
                                 continue;
                             }
@@ -1196,6 +1235,7 @@ namespace Jc
                             strBuilder.AppendFormat("{0}={1}", piList[i].Name.ToLower(), valueStr);
                         }
                     }
+
                     #endregion
                 }
             }
@@ -1225,6 +1265,7 @@ namespace Jc
                 else if (requestParams is IEnumerable<object>)
                 {
                     #region 处理数组类型数据
+
                     IEnumerable<object> list = requestParams as IEnumerable<object>;
 
                     if (list.Count() > 0)
@@ -1241,6 +1282,7 @@ namespace Jc
                             dic.Add("params", JsonHelper.SerializeObject(requestParams));
                         }
                     }
+
                     #endregion
                 }
                 else if (requestParams is ValueType)
@@ -1280,6 +1322,7 @@ namespace Jc
                 else
                 {
                     #region 处理Obj类型数据
+
                     List<PropertyInfo> piList = requestParams.GetType().GetProperties()
                         .Where(pi => pi.CanRead).ToList();
                     if (piList != null && piList.Count > 0)
@@ -1299,6 +1342,7 @@ namespace Jc
                             dic.Add(piList[i].Name.ToLower(), valueStr);
                         }
                     }
+
                     #endregion
                 }
             }

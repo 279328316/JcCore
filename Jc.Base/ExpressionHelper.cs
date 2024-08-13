@@ -1,15 +1,9 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Reflection;
-using System.CodeDom;
-using System.CodeDom.Compiler;
-using Microsoft.CSharp;
-using System.IO;
 using System.Linq.Expressions;
-using System.Collections;
-
+using System.Reflection;
 
 namespace Jc
 {
@@ -71,7 +65,6 @@ namespace Jc
             return expr;
         }
 
-               
         /// <summary>
         /// 创建Lambda表达式
         /// </summary>
@@ -80,14 +73,14 @@ namespace Jc
         /// <param name="piName">属性名称</param>
         /// <param name="value">值</param>
         /// <returns></returns>
-        public static Expression<Func<T, bool>> CreateLambdaExpression<T>(Operand operand,string piName,object value)
+        public static Expression<Func<T, bool>> CreateLambdaExpression<T>(Operand operand, string piName, object value)
         {
             //构建Lambda表达式
             ParameterExpression parameter = Expression.Parameter(typeof(T), "p");
             Expression lambdaExp;
             //表达式左侧 like: p.Name
             MemberExpression left = Expression.PropertyOrField(parameter, piName);
-            
+
             //表达式右侧，(1)值， like '张三' (2)List List.Contains(a.Status);
             Expression right;
             if (value is List<string>)
@@ -111,7 +104,7 @@ namespace Jc
                     {   // 如果为string类型.不需要转换
                         (list as IList).Add(valueStrList[i]);
                     }
-                    else if(leftType.IsEnum)
+                    else if (leftType.IsEnum)
                     {   //枚举类型
                         var objValue = Enum.Parse(leftType, valueStrList[i]);
                         (list as IList).Add(objValue);
@@ -125,7 +118,7 @@ namespace Jc
                 }
                 right = Expression.Constant(list);
                 List<MethodInfo> methodList = leftListType.GetMethods().ToList();
-                MethodInfo method = methodList.Where(m => m.Name == "Contains").FirstOrDefault(); 
+                MethodInfo method = methodList.Where(m => m.Name == "Contains").FirstOrDefault();
                 lambdaExp = Expression.Call(right, method, left);
             }
             else

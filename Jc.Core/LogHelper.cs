@@ -2,10 +2,8 @@
 using log4net.Config;
 using log4net.Repository;
 using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
 
 namespace Jc
 {
@@ -56,7 +54,7 @@ namespace Jc
         /// <summary>
         /// 初始化Logger
         /// </summary>
-        public static void SetLogger(string repositoryName,string loggerName)
+        public static void SetLogger(string repositoryName, string loggerName)
         {
             ILoggerRepository repository = LogManager.GetAllRepositories().FirstOrDefault(a => a.Name == repositoryName);
             if (repository != null)
@@ -80,7 +78,7 @@ namespace Jc
         /// <summary>
         /// 初始化Logger
         /// </summary>
-        public static void InitLogger(ILog logger,ILog errorLogger = null)
+        public static void InitLogger(ILog logger, ILog errorLogger = null)
         {
             Logger = logger;
             ErrorLogger = errorLogger;
@@ -89,7 +87,7 @@ namespace Jc
         /// <summary>
         /// 初始化Logger
         /// </summary>
-        public static void InitLogger(string logConfigPath,string repositoryName, string loggerName, string errorLoggerName = null)
+        public static void InitLogger(string logConfigPath, string repositoryName, string loggerName, string errorLoggerName = null)
         {
             if (logger == null)
             {
@@ -107,7 +105,7 @@ namespace Jc
         /// 获取LogRepository
         /// </summary>
         /// <returns></returns>
-        private static ILoggerRepository GetLogRepository(string logConfigPath,string repositoryName)
+        private static ILoggerRepository GetLogRepository(string logConfigPath, string repositoryName)
         {
             ILoggerRepository repository = LogManager.GetAllRepositories().FirstOrDefault(a => a.Name == repositoryName);
             if (repository == null)
@@ -138,9 +136,8 @@ namespace Jc
                 {
                     Logger.Info(msg);
                 }
-                catch(Exception ex)
+                catch (Exception ex)
                 {
-
                 }
             }
         }
@@ -157,9 +154,8 @@ namespace Jc
                 {
                     Logger.Warn(msg);
                 }
-                catch(Exception ex)
+                catch (Exception ex)
                 {
-
                 }
             }
         }
@@ -211,7 +207,7 @@ namespace Jc
         /// </summary>
         /// <param name="msg"></param>
         /// <param name="ex">异常信息</param>
-        public static void Error(string msg,Exception ex)
+        public static void Error(string msg, Exception ex)
         {
             try
             {

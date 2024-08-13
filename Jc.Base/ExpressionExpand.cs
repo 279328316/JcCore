@@ -1,8 +1,7 @@
 ﻿using System;
-using System.Linq;
 using System.Collections.Generic;
+using System.Linq;
 using System.Linq.Expressions;
-using System.Text;
 using System.Reflection;
 
 namespace Jc
@@ -13,7 +12,7 @@ namespace Jc
     public static class ExpressionExpand
     {
         /// <summary>
-        /// Expression And 
+        /// Expression And
         /// NewExpression 合并
         /// </summary>
         /// <param name="expr"></param>
@@ -97,7 +96,7 @@ namespace Jc
         }
 
         /// <summary>
-        /// Expression Remove 
+        /// Expression Remove
         /// NewExpression 合并
         /// </summary>
         /// <param name="expr"></param>

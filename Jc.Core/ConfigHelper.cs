@@ -1,9 +1,6 @@
 ﻿using Microsoft.Extensions.Configuration;
 using System;
-using System.Collections.Generic;
-using System.Configuration;
 using System.IO;
-using System.Text;
 using ConfigurationManager = System.Configuration.ConfigurationManager;
 
 namespace Jc
@@ -55,7 +52,6 @@ namespace Jc
             return value;
         }
 
-
         /// <summary>
         /// 获取配置AppSetting
         /// </summary>
@@ -103,7 +99,7 @@ namespace Jc
         /// <param name="key">key</param>
         /// <param name="configFileName">配置文件名称</param>
         /// <returns></returns>
-        public static string GetSectionSetting(string section,string key, string configFileName = null)
+        public static string GetSectionSetting(string section, string key, string configFileName = null)
         {
             string value = null;
             string filePath;

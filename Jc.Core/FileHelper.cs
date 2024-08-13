@@ -1,10 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Runtime.InteropServices;
-using System.Text;
-using System.Threading;
 
 namespace Jc
 {
@@ -58,7 +54,6 @@ namespace Jc
             {
                 return string.Format("{0} bytes", fileSize);
             }
-
         }
 
         /// <summary>
@@ -229,7 +224,7 @@ namespace Jc
         //调用windows API获取磁盘空闲空间
         //导入库
         [DllImport("kernel32.dll", CharSet = CharSet.Auto)]
-        static extern bool GetDiskFreeSpace([MarshalAs(UnmanagedType.LPTStr)] string rootPathName,
+        private static extern bool GetDiskFreeSpace([MarshalAs(UnmanagedType.LPTStr)] string rootPathName,
         ref int sectorsPerCluster, ref int bytesPerSector, ref int numberOfFreeClusters, ref int totalNumbeOfClusters);
 
         /// <summary>
