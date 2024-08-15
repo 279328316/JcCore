@@ -1331,6 +1331,10 @@ namespace Jc
                         {
                             string valueStr;
                             object value = piList[i].GetValue(requestParams);
+                            if (value == null)
+                            {   // 忽略空值
+                                continue;
+                            }
                             if (value is ValueType || value is string)
                             {
                                 valueStr = FormatParameterValue(value);
