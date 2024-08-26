@@ -190,7 +190,7 @@ namespace Jc.Database.Query
                     }
                     else
                     {   // 如果非可空类型,数据库中为空 throw new Exception("value is null");
-                        il.Emit(OpCodes.Ldstr, "db value is null"); // 加载字符串 "value is null" 到栈顶
+                        il.Emit(OpCodes.Ldstr, "field value is null"); // 加载字符串 "value is null" 到栈顶
                         il.Emit(OpCodes.Newobj, typeof(Exception).GetConstructor(new[] { typeof(string) })); // 创建 Exception 实例
                         il.Emit(OpCodes.Throw); // 抛出异常
                         il.Emit(OpCodes.Nop);

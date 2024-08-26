@@ -41,7 +41,7 @@ namespace Jc.Database.Query
             T dto = (T)((EntityConvertorDelegate)dtoMapping.EntityConvertor)(dr, convertResult);
             if (convertResult.IsException)
             {
-                throw new Exception($"load column '{convertResult.ColumnName}' error :{convertResult.Message}");
+                throw new Exception($"load column '{convertResult.ColumnName}' error , {convertResult.Message}");
             }
             return dto;
         }
