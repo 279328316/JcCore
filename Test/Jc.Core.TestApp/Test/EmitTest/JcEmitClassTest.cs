@@ -5,11 +5,12 @@ using System.Data;
 using System.Linq;
 using System.Reflection;
 using System.Reflection.Emit;
+using System.Reflection.PortableExecutable;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Jc.Core.FrameworkTest
+namespace Jc.Core.TestApp.Test
 {
     /// <summary>
     /// IEntityConvertor
@@ -32,7 +33,7 @@ namespace Jc.Core.FrameworkTest
     /// 因为本例中生成的为类中的方法.第0个参数为this
     /// 而函数中,不包含this,第0个对象为dr,第1个对象为EntityConvertResult
     /// </summary>
-    public class JcDtoEmitTest
+    public class JcEmitClassTest
     {
         public static void Test()
         {
@@ -41,51 +42,20 @@ namespace Jc.Core.FrameworkTest
 
         public static void SaveTest<T>()
         {
-            string asmName = "Kitty_Fw_IEntityConvertor";
-            AssemblyBuilder assemblyBuilder = AppDomain.CurrentDomain.DefineDynamicAssembly(new AssemblyName(asmName), AssemblyBuilderAccess.RunAndSave);
-            var moduleBuilder = assemblyBuilder.DefineDynamicModule("KittyModule", $"{asmName}.exe");
-            var typeBuilder = moduleBuilder.DefineType("HelloKittyClass", TypeAttributes.Class | TypeAttributes.Public);
-            typeBuilder.AddInterfaceImplementation(typeof(IEntityConvertor<T>));
-            MethodBuilder method = typeBuilder.DefineMethod("ConvertDto",
-                               MethodAttributes.Public | MethodAttributes.HideBySig |
-                               MethodAttributes.NewSlot | MethodAttributes.Virtual |
-                               MethodAttributes.Final, typeof(T),
-                              new Type[] { typeof(DataRow), typeof(EntityConvertResult) });
-            ILGenerator il = method.GetILGenerator();
-            ILGenerateSetValueMethodContent<T>(il);
-            typeBuilder.CreateType();   // 输出之前必须调用一下
-            assemblyBuilder.Save($"{asmName}.exe");
-        }
-
-        /// <summary>
-        /// IL生成SetValueMethod内容
-        /// 独立出来为共用代码
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="il"></param>
-        public static IEntityConvertor<T> GetEntityConvertor<T>()
-        {
-            var asmName = new AssemblyName("Test");
-            //var assemblyBuilder = AssemblyBuilder.DefineDynamicAssembly(asmName, AssemblyBuilderAccess.RunAndSave);
-            var assemblyBuilder = AppDomain.CurrentDomain.DefineDynamicAssembly(asmName, AssemblyBuilderAccess.RunAndSave);
-            var moduleBuilder = assemblyBuilder.DefineDynamicModule("KittyModule", "Kitty.exe");
-            var typeBuilder = moduleBuilder.DefineType("HelloKittyClass", TypeAttributes.Class | TypeAttributes.Public);
-            typeBuilder.AddInterfaceImplementation(typeof(IEntityConvertor<T>));
-            MethodBuilder method = typeBuilder.DefineMethod("ConvertDto",
-                               MethodAttributes.Public | MethodAttributes.HideBySig |
-                               MethodAttributes.NewSlot | MethodAttributes.Virtual |
-                               MethodAttributes.Final, typeof(T),
-                              new Type[] { typeof(DataRow), typeof(EntityConvertResult) });
-
-            ILGenerator il = method.GetILGenerator();
-
-            ILGenerateSetValueMethodContent<T>(il);
-
-            TypeInfo typeInfo = typeBuilder.CreateTypeInfo();
-            assemblyBuilder.Save("Kitty.exe");
-
-            object obj = assemblyBuilder.CreateInstance(typeInfo.Name);
-            return obj as IEntityConvertor<T>;
+            //string asmName = "Kitty_IEntityConvertor";
+            //PersistedAssemblyBuilder ab = new PersistedAssemblyBuilder(new AssemblyName(asmName), typeof(object).Assembly);
+            //ModuleBuilder mob = ab.DefineDynamicModule("KittyModule");
+            //TypeBuilder tb = mob.DefineType("HelloKittyClass", TypeAttributes.Public | TypeAttributes.Class);
+            //tb.AddInterfaceImplementation(typeof(IEntityConvertor<T>));
+            //MethodBuilder methodBuilder = tb.DefineMethod("ConvertDto",
+            //                   MethodAttributes.Public | MethodAttributes.HideBySig |
+            //                   MethodAttributes.NewSlot | MethodAttributes.Virtual |
+            //                   MethodAttributes.Final, typeof(T),
+            //                  new Type[] { typeof(DataRow), typeof(EntityConvertResult) });
+            //ILGenerator il = methodBuilder.GetILGenerator();
+            //ILGenerateSetValueMethodContent<T>(il);
+            //tb.CreateType();   // 输出之前必须调用一下
+            //ab.Save($"{asmName}.exe");
         }
 
         /// <summary>

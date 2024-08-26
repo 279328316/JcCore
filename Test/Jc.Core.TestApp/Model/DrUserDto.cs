@@ -1,17 +1,21 @@
 ﻿using System;
 using System.Data;
 using Jc;
-using Jc.Core.FrameworkTest.Dto;
 
-namespace Jc.Core.FrameworkTest
+namespace Jc.Core.TestApp
 {
     /// <summary>
     /// User Dto
     /// </summary>
     [Table(Name = "t_User", DisplayText = "",AutoCreate = true)]
-    public class DrUserDto : IdDtoBase
+    public class DrUserDto
     {
         #region Properties
+        /// <summary>
+        /// Id
+        /// </summary>
+        [Field(DisplayText = "Id", IsPk = true, Required = true, FieldType = "int")]
+        public int? Id { get; set; }
 
         /// <summary>
         /// 用户名
@@ -77,7 +81,7 @@ namespace Jc.Core.FrameworkTest
         /// 状态 0停用 1启用
         /// </summary>
         [Field(DisplayText = "状态 0停用 1启用", FieldType = "int")]
-        public int UserStatus { get; set; }
+        public UserStatus UserStatus { get; set; }
 
         /// <summary>
         /// 添加人
@@ -113,8 +117,8 @@ namespace Jc.Core.FrameworkTest
             {
                 dt1 = null;
             }
-            else
-            {
+            else 
+            {                 
                 dt1 = DateTime.Now;
             }
             int? i = 0;
@@ -249,7 +253,7 @@ namespace Jc.Core.FrameworkTest
                     dataColumn = columns["Sex"];
                     if (!dataRow.IsNull(dataColumn))
                     {
-                        Sex = (Sex)(int)dataRow[dataColumn];
+                        Sex = (Sex)dataRow[dataColumn];
                     }
                     else
                     {
@@ -265,7 +269,9 @@ namespace Jc.Core.FrameworkTest
                     }
                     else
                     {
-                        Birthday = null;
+                        Birthday = (DateTime?)dataRow[dataColumn];
+                        DateTime ? a = null;
+                        Birthday = a;
                     }
                 }
                 if (columns.Contains("IsDelete"))
@@ -285,7 +291,110 @@ namespace Jc.Core.FrameworkTest
                     dataColumn = columns["UserStatus"];
                     if (!dataRow.IsNull(dataColumn))
                     {
-                        UserStatus = (int)dataRow[dataColumn];
+                        UserStatus = (UserStatus)dataRow[dataColumn];
+                    }
+                    else
+                    {
+                        throw new Exception("field value is null");
+                    }
+                }
+                if (columns.Contains("AddUser"))
+                {
+                    dataColumn = columns["AddUser"];
+                    if (!dataRow.IsNull(dataColumn))
+                    {
+                        AddUser = (Guid?)dataRow[dataColumn];
+                    }
+                    else
+                    {
+                        Guid? a = null;
+                        AddUser = a;
+                    }
+                }
+                if (columns.Contains("AddDate"))
+                {
+                    dataColumn = columns["AddDate"];
+                    if (!dataRow.IsNull(dataColumn))
+                    {
+                        AddDate = (DateTime?)dataRow[dataColumn];
+                    }
+                    else
+                    {
+                        DateTime? a = null;
+                        AddDate = a;
+                    }
+                }
+                if (columns.Contains("LastUpdateUser"))
+                {
+                    dataColumn = columns["LastUpdateUser"];
+                    if (!dataRow.IsNull(dataColumn))
+                    {
+                        LastUpdateUser = (Guid?)dataRow[dataColumn];
+                    }
+                    else
+                    {
+                        LastUpdateUser = null;
+                    }
+                }
+                if (columns.Contains("LastUpdateDate"))
+                {
+                    dataColumn = columns["LastUpdateDate"];
+                    if (!dataRow.IsNull(dataColumn))
+                    {
+                        LastUpdateDate = (DateTime?)dataRow[dataColumn];
+                    }
+                    else
+                    {
+                        LastUpdateDate = null;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                string message = string.Format("Column {0} load error , {1}", dataColumn.ColumnName, ex.Message);
+                Exception ex2 = new Exception(message);
+                throw ex2;
+            }
+        }
+
+
+        public DrUserDto(DataRow dataRow,int index)
+        {
+            DrUserDto dto = new DrUserDto();
+            DataColumnCollection columns = dataRow.Table.Columns;
+            DataColumn dataColumn = null;
+            try
+            {
+                if (columns.Contains("Sex"))
+                {
+                    dataColumn = columns["Sex"];
+                    if (!dataRow.IsNull(dataColumn))
+                    {
+                        Sex = (Sex?)dataRow[dataColumn];
+                    }
+                    else
+                    {
+                        Sex = null;
+                    }
+                }
+                if (columns.Contains("IsDelete"))
+                {
+                    dataColumn = columns["IsDelete"];
+                    if (!dataRow.IsNull(dataColumn))
+                    {
+                        IsDelete = (bool)dataRow[dataColumn];
+                    }
+                    else
+                    {
+                        throw new Exception("field value is null");
+                    }
+                }
+                if (columns.Contains("UserStatus"))
+                {
+                    dataColumn = columns["UserStatus"];
+                    if (!dataRow.IsNull(dataColumn))
+                    {
+                        UserStatus = (UserStatus)dataRow[dataColumn];
                     }
                     else
                     {

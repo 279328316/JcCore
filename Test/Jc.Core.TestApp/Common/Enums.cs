@@ -19,4 +19,20 @@ namespace Jc.Core.TestApp
         [DisplayName("男")]
         Male = 1,
     }
+
+    [DisplayName("性别")]
+    public enum UserStatus
+    {
+        /// <summary>
+        /// 停用
+        /// </summary>
+        [DisplayName("停用")]
+        Disabled = 0,
+
+        /// <summary>
+        /// 启用
+        /// </summary>
+        [DisplayName("启用")]
+        Enabled = 1,
+    }
 }

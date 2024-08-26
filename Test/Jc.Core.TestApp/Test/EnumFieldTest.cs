@@ -25,7 +25,7 @@ namespace Jc.Core.TestApp.Test
                 Sex = (Sex)Enum.Parse(typeof(Sex), (i % 2).ToString()),
                 Birthday = DateTime.Now.AddYears(-1).AddHours(-1 * i),
                 IsDelete = i % 2 == 0 ? true : false,
-                UserStatus = i % 2,
+                UserStatus = (UserStatus)(i % 2),
                 AddUser = Guid.NewGuid(),
                 AddDate = DateTime.Now,
                 LastUpdateUser = Guid.NewGuid(),

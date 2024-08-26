@@ -1,34 +1,51 @@
-﻿using System;
+﻿using Jc.Database.Query;
+using System;
 using System.Collections.Generic;
-using System.Text;
 using System.Data;
+using System.IO;
+using System.Linq;
 using System.Reflection;
 using System.Reflection.Emit;
-using System.Linq.Expressions;
-using System.ComponentModel;
+using System.Runtime.InteropServices;
+using System.Text;
+using System.Threading.Tasks;
 
-namespace Jc.Database.Query
+namespace Jc.Core.TestApp.Test
 {
     /// <summary>
-    /// EntityConvertor delegate
+    /// Jc Dto Emit 测试
+    /// 本例中的代码可以直接应用于Orm EntityConverter中
     /// </summary>
-    /// <typeparam name="T"></typeparam>
-    /// <param name="dr">DataRow</param>
-    /// <param name="convertResult">转换结果对象 
-    /// 因Emit中使用String.Format Concat方法异常,无法组合异常消息
-    /// 故引入对象接收异常结果
-    /// 暂未发现其它更好方法</param>
-    /// <returns></returns>
-    public delegate object EntityConvertorDelegate(DataRow dr, EntityConvertResult convertResult);
-
-    public class EntityConvertor
+    public class JcEmitMethodTest
     {
+        public static void Test()
+        {
+            SaveTest<UserDto>();
+        }
+
+        public static void SaveTest<T>()
+        {
+            string asmName = "Kitty_DynamicMethod";
+            PersistedAssemblyBuilder ab = new PersistedAssemblyBuilder(new AssemblyName(asmName), typeof(object).Assembly);
+            ModuleBuilder mob = ab.DefineDynamicModule("KittyModule");
+            TypeBuilder tb = mob.DefineType("HelloKittyClass", TypeAttributes.Public | TypeAttributes.Class);
+            MethodBuilder methodBuilder = tb.DefineMethod("ConvertDto",
+                                   MethodAttributes.Public | MethodAttributes.HideBySig | MethodAttributes.Static
+                                   , typeof(T),
+                                  new Type[] { typeof(DataRow), typeof(EntityConvertResult) });
+
+            ILGenerator generator = methodBuilder.GetILGenerator();
+            ILGenerateSetValueMethodContent<T>(generator);
+            tb.CreateType();
+            ab.Save($"{asmName}.exe");
+        }
+
         /// <summary>
         /// 构造EntityConvertor Handler
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <returns></returns>
-        public static EntityConvertorDelegate CreateEntityConvertor<T>()
+        public static EntityConvertorDelegate GetEntityConvertor<T>()
         {
             DynamicMethod dynamicMethod = BuildSetValueMethod<T>();
             EntityConvertorDelegate handler = (EntityConvertorDelegate)dynamicMethod.CreateDelegate(typeof(EntityConvertorDelegate));
@@ -45,7 +62,7 @@ namespace Jc.Database.Query
             DynamicMethod method = new DynamicMethod("Convert" + typeof(T).Name,
                     MethodAttributes.Public | MethodAttributes.Static,
                     CallingConventions.Standard, typeof(T),
-                    new Type[] { typeof(DataRow),typeof(EntityConvertResult) }, typeof(T).Module, true);
+                    new Type[] { typeof(DataRow), typeof(EntityConvertResult) }, typeof(T).Module, true);
             ILGenerator generator = method.GetILGenerator();
             ILGenerateSetValueMethodContent<T>(generator);
             return method;

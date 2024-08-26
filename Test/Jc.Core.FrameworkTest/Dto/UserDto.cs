@@ -1,5 +1,6 @@
 ﻿using System;
 using Jc;
+using Jc.Core.FrameworkTest.Dto;
 
 namespace Jc.Core.FrameworkTest
 {
@@ -20,14 +21,9 @@ namespace Jc.Core.FrameworkTest
     /// User Dto
     /// </summary>
     [Table(Name = "t_User", DisplayText = "",AutoCreate = true)]
-    public class UserDto
+    public class UserDto : IdDtoBase
     {
         #region Properties
-        /// <summary>
-        /// Id
-        /// </summary>
-        [Field(DisplayText = "Id", IsPk = true, Required = true, FieldType = "int")]
-        public int? Id { get; set; }
 
         /// <summary>
         /// 用户名
@@ -93,7 +89,7 @@ namespace Jc.Core.FrameworkTest
         /// 状态 0停用 1启用
         /// </summary>
         [Field(DisplayText = "状态 0停用 1启用", FieldType = "int")]
-        public int? UserStatus { get; set; }
+        public int UserStatus { get; set; }
 
         /// <summary>
         /// 添加人
@@ -119,9 +115,6 @@ namespace Jc.Core.FrameworkTest
         [Field(DisplayText = "修改时间", FieldType = "datetime")]
         public DateTime? LastUpdateDate { get; set; }
         #endregion
-
-
-
     }
 
 

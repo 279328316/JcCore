@@ -44,6 +44,23 @@ namespace Jc.Database.Query
         public bool IsIgnore { get => fieldAttribute.IsIgnore; }
 
         /// <summary>
+        /// 是否可为空
+        /// </summary>
+        public bool IsNullable
+        {
+            get
+            {
+                bool isNullable = true;
+                if (pi.PropertyType.IsValueType)
+                {
+                    Type underlyingType = Nullable.GetUnderlyingType(pi.PropertyType);
+                    isNullable = underlyingType != null;
+                }
+                return isNullable;
+            }
+        }
+
+        /// <summary>
         /// 属性对象
         /// </summary>
         public PropertyInfo Pi { get => pi; }

@@ -558,11 +558,14 @@ namespace Jc.Database
         /// 执行查询记录,返回DataTable
         /// </summary>
         /// <returns></returns>
-        public DataTable GetDataTable<T>(string filterSql)
+        public DataTable GetDataTable<T>(string filterSql = null)
         {
             DataTable dt = null;
             QueryFilter filter = new QueryFilter();
-            filter.AddCustomCmd(filterSql);
+            if (!string.IsNullOrEmpty(filterSql))
+            {
+                filter.AddCustomCmd(filterSql);
+            }
             using (DbCommand dbCommand = this.DbProvider.GetQueryAllFieldDbCommand<T>(filter))
             {
                 try

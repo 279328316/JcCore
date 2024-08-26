@@ -8,7 +8,7 @@ namespace Jc.Core.TestApp.Test
 {
     public class ListAddTest
     {
-        public void Test()
+        public static void Test()
         {
             int dataAmount = 10000;
 
@@ -19,7 +19,7 @@ namespace Jc.Core.TestApp.Test
             UpdateGuidTest();
             BulkCopyGuidTest(dataAmount);
         }
-        public void AddTest(int dataAmount)
+        public static void AddTest(int dataAmount)
         {
             Console.WriteLine("批量插入测试采用拼接批量SQL方式实现");
             List<UserDto> users = new List<UserDto>();
@@ -34,6 +34,7 @@ namespace Jc.Core.TestApp.Test
 
             Stopwatch sw = new Stopwatch();
             sw.Start();
+            int nullMask = 3;
             for (int i = 0; i < dataAmount; i++)
             {
                 users.Add(new UserDto()
@@ -41,18 +42,18 @@ namespace Jc.Core.TestApp.Test
                     UserName = $"UserName{i}",
                     UserPwd = $"UserPwd{i}",
                     NickName = $"NickName{i}",
-                    RealName = $"RealName{i}",
+                    RealName = i % nullMask == 0 ? null : $"RealName{i}",
                     Email = $"Email{i}@qq.com",
                     Avatar = $"Avatar{i}",
                     PhoneNo = $"133810{i}".PadRight(11,'0'),
-                    Sex = (Sex)Enum.Parse(typeof(Sex),(i%2).ToString()),
+                    Sex = i % nullMask == 0 ? null : (i % 3 == 1 ? Sex.Male : Sex.Female),
                     Birthday = DateTime.Now.AddYears(-1).AddHours(-1*i),
-                    IsDelete = i % 2 == 0 ? true : false,
-                    UserStatus = i % 2,
-                    AddUser = Guid.NewGuid(),
-                    AddDate = DateTime.Now,
-                    LastUpdateUser = Guid.NewGuid(),
-                    LastUpdateDate = DateTime.Now
+                    IsDelete = i % nullMask == 0 ? true : false,
+                    UserStatus = (UserStatus)(i % 2),
+                    AddUser = i % nullMask == 0 ? null : Guid.NewGuid(),
+                    AddDate = i % nullMask == 0 ? null : DateTime.Now,
+                    LastUpdateUser = i % nullMask == 0 ? null : Guid.NewGuid(),
+                    LastUpdateDate = i % nullMask == 0 ? null : DateTime.Now
                 });
             }
             sw.Stop();
@@ -60,12 +61,12 @@ namespace Jc.Core.TestApp.Test
             sw.Reset();
             Console.WriteLine("执行数据插入...");
             sw.Start();
-            Dbc.Db.AddList(users,a=>new { a.Id,a.UserName,a.Email,a.AddDate},true);
+            Dbc.Db.AddList(users);
             sw.Stop();
             Console.WriteLine($"Int插入{users.Count}条记录，共耗时{sw.ElapsedMilliseconds } Ms");
         }
-        
-        public void UpdateTest()
+
+        public static void UpdateTest()
         {
             Console.WriteLine("批量更新测试.使用拼接批量SQL方式实现");
             Stopwatch sw = new Stopwatch();
@@ -76,33 +77,34 @@ namespace Jc.Core.TestApp.Test
             sw.Start();
             Console.WriteLine("执行更新数据构造...");
             int dataAmount = users.Count;
+            int nullMask = 5;
             for (int i = 0; i < users.Count; i++)
             {
                 users[i].UserName = $"UpUserName{i}";
                 users[i].UserPwd = $"UserPwd{i}";
-                users[i].NickName = $"UpNickName{i}";
+                users[i].NickName = i % nullMask == 0 ? null : $"UpNickName{i}";
                 users[i].RealName = $"UpRealName{i}";
                 users[i].Email = $"UpEmail{i}@qq.com";
                 users[i].Avatar = $"Avatar{i}";
                 users[i].PhoneNo = $"133810{i}".PadRight(11, '0');                
-                users[i].Sex = (Sex)Enum.Parse(typeof(Sex), (i % 2).ToString());
-                users[i].Birthday = DateTime.Now.AddYears(-1).AddHours(-1 * i);
-                users[i].IsDelete = i % 2 == 0 ? true : false;
-                users[i].UserStatus = i % 2;
-                users[i].LastUpdateUser = Guid.NewGuid();
-                users[i].LastUpdateDate = DateTime.Now;
+                users[i].Sex = i % nullMask == 0 ? null : (i % 3 == 1 ? Sex.Male : Sex.Female);
+                users[i].Birthday = i % nullMask == 0 ? null : DateTime.Now.AddYears(-1).AddHours(-1 * i);
+                users[i].IsDelete = i % nullMask == 0 ? true : false;
+                users[i].UserStatus = (UserStatus)(i % 2);
+                users[i].LastUpdateUser = i % nullMask == 0 ? null : Guid.NewGuid();
+                users[i].LastUpdateDate = i % nullMask == 0 ? null : DateTime.Now;
             }
             sw.Stop();
             Console.WriteLine($"构造{users.Count}条记录，共耗时{sw.ElapsedMilliseconds}Ms");
             sw.Reset();
             Console.WriteLine("执行数据更新...");
             sw.Start();
-            Dbc.Db.UpdateList(users,a=>new {a.Id,a.UserName,a.Email,a.LastUpdateDate,a.NickName});
+            Dbc.Db.UpdateList(users);
             sw.Stop();
             Console.WriteLine($"Int更新{users.Count}条记录，共耗时{sw.ElapsedMilliseconds } Ms");
         }
 
-        public void BulkCopyTest(int dataAmount)
+        public static void BulkCopyTest(int dataAmount)
         {
             Console.WriteLine("批量插入测试采用BulkCopy方式实现");
 
@@ -118,6 +120,7 @@ namespace Jc.Core.TestApp.Test
             Stopwatch sw = new Stopwatch();
             sw.Start();
 
+            int nullMask = 3;
             for (int i = 0; i < dataAmount; i++)
             {
                 users.Add(new UserDto()
@@ -126,17 +129,17 @@ namespace Jc.Core.TestApp.Test
                     UserPwd = $"UserPwd{i}",
                     NickName = $"NickName{i}",
                     RealName = $"RealName{i}",
-                    Email = $"Email{i}@qq.com",
+                    Email = i % nullMask == 0 ? null : $"Email{i}@qq.com",
                     Avatar = $"Avatar{i}",
                     PhoneNo = $"133810{i}".PadRight(11, '0'),
-                    Sex = (Sex)Enum.Parse(typeof(Sex), (i % 2).ToString()),
+                    Sex = i % nullMask == 0 ? null : (i % 3 == 1 ? Sex.Male : Sex.Female),
                     Birthday = DateTime.Now.AddYears(-1).AddHours(-1 * i),
-                    IsDelete = i % 2 == 0 ? true : false,
-                    UserStatus = i % 2,
-                    AddUser = Guid.NewGuid(),
-                    AddDate = DateTime.Now,
-                    LastUpdateUser = Guid.NewGuid(),
-                    LastUpdateDate = DateTime.Now
+                    IsDelete = i % nullMask == 0 ? true : false,
+                    UserStatus = (UserStatus)(i % 2),
+                    AddUser = i % nullMask == 0 ? null : Guid.NewGuid(),
+                    AddDate = i % nullMask == 0 ? null : DateTime.Now,
+                    LastUpdateUser = i % nullMask == 0 ? null : Guid.NewGuid(),
+                    LastUpdateDate = i % nullMask == 0 ? null : DateTime.Now
                 });
             }
             sw.Stop();
@@ -151,7 +154,7 @@ namespace Jc.Core.TestApp.Test
             Console.WriteLine($"Int BulkCopy 插入{users.Count}条记录，共耗时{sw.ElapsedMilliseconds } Ms");
         }
 
-        public void AddGuidTest(int dataAmount)
+        public static void AddGuidTest(int dataAmount)
         {
             Console.WriteLine("Guid 主键测试");
             Console.WriteLine("批量插入测试采用拼接批量SQL方式实现");
@@ -167,26 +170,28 @@ namespace Jc.Core.TestApp.Test
 
             Stopwatch sw = new Stopwatch();
             sw.Start();
+
+            int nullMask = 3;
             for (int i = 0; i < dataAmount; i++)
             {
                 users.Add(new GUserDto()
                 {
                     UserName = $"UserName{i}",
                     UserPwd = $"UserPwd{i}",
-                    NickName = $"NickName{i}",
+                    NickName = i % nullMask == 0 ? null : $"NickName{i}",
                     RealName = $"RealName{i}",
                     Email = $"Email{i}@qq.com",
                     Avatar = $"Avatar{i}",
                     PhoneNo = $"133810{i}".PadRight(11, '0'),
-                    Sex = (Sex)(i % 2),
+                    Sex = i % nullMask == 0 ? null : (i % 3 == 1 ? Sex.Male : Sex.Female),
                     Birthday = DateTime.Now.AddYears(-1).AddHours(-1 * i),
                     WeChatOpenId = $"WeChatOpenId{i}",
-                    IsDelete = i % 2 == 0 ? true : false,
-                    UserStatus = i % 2,
-                    AddUser = Guid.NewGuid(),
-                    AddDate = DateTime.Now,
-                    LastUpdateUser = Guid.NewGuid(),
-                    LastUpdateDate = DateTime.Now
+                    IsDelete = i % nullMask == 0 ? true : false,
+                    UserStatus = (UserStatus)(i % 2),
+                    AddUser = i % nullMask == 0 ? null : Guid.NewGuid(),
+                    AddDate = i % nullMask == 0 ? null : DateTime.Now,
+                    LastUpdateUser = i % nullMask == 0 ? null : Guid.NewGuid(),
+                    LastUpdateDate = i % nullMask == 0 ? null : DateTime.Now
                 });
             }
             sw.Stop();
@@ -194,12 +199,12 @@ namespace Jc.Core.TestApp.Test
             sw.Reset();
             Console.WriteLine("执行数据插入...");
             sw.Start();
-            Dbc.Db.AddList(users, a => new { a.Id, a.UserName, a.Email, a.AddDate }, true);
+            Dbc.Db.AddList(users);
             sw.Stop();
             Console.WriteLine($"Guid插入{users.Count}条记录，共耗时{sw.ElapsedMilliseconds } Ms");
         }
 
-        public void UpdateGuidTest()
+        public static void UpdateGuidTest()
         {
             Console.WriteLine("Guid 主键测试");
             Console.WriteLine("批量更新测试.使用拼接批量SQL方式实现");
@@ -210,34 +215,35 @@ namespace Jc.Core.TestApp.Test
             sw.Reset();
             sw.Start();
             int dataAmount = users.Count;
+            int nullMask = 5;
             for (int i = 0; i < users.Count; i++)
             {
                 users[i].UserName = $"UpUserName{i}";
                 users[i].UserPwd = $"UserPwd{i}";
-                users[i].NickName = $"UpNickName{i}";
+                users[i].NickName = i % nullMask == 0 ? null : $"UpNickName{i}";
                 users[i].RealName = $"UpRealName{i}";
                 users[i].Email = $"UpEmail{i}@qq.com";
                 users[i].Avatar = $"Avatar{i}";
                 users[i].PhoneNo = $"133810{i}".PadRight(11, '0');
-                users[i].Sex = (Sex)(i % 2);
+                users[i].Sex = i % nullMask == 0 ? null : (i % 3 == 1 ? Sex.Male : Sex.Female);
                 users[i].Birthday = DateTime.Now.AddYears(-1).AddHours(-1 * i);
                 users[i].WeChatOpenId = $"WeChatOpenId{i}";
-                users[i].IsDelete = i % 2 == 0 ? true : false;
-                users[i].UserStatus = i % 2;
-                users[i].LastUpdateUser = Guid.NewGuid();
-                users[i].LastUpdateDate = DateTime.Now;
+                users[i].IsDelete = i % nullMask == 0 ? true : false;
+                users[i].UserStatus = (UserStatus)(i % 2);
+                users[i].LastUpdateUser = i % nullMask == 0 ? null : Guid.NewGuid();
+                users[i].LastUpdateDate = i % nullMask == 0 ? null : DateTime.Now;
             }
             sw.Stop();
             Console.WriteLine($"构造{users.Count}条记录，共耗时{sw.ElapsedMilliseconds}Ms");
             sw.Reset();
             Console.WriteLine("执行数据更新...");
             sw.Start();
-            Dbc.Db.UpdateList(users, a => new { a.UserName, a.Email, a.LastUpdateDate, a.NickName });
+            Dbc.Db.UpdateList(users);
             sw.Stop();
             Console.WriteLine($"Guid更新{users.Count}条记录，共耗时{sw.ElapsedMilliseconds } Ms");
         }
 
-        public void BulkCopyGuidTest(int dataAmount)
+        public static void BulkCopyGuidTest(int dataAmount)
         {
             Console.WriteLine("Guid 主键测试");
             Console.WriteLine("批量插入测试采用BulkCopy方式实现");
@@ -253,26 +259,27 @@ namespace Jc.Core.TestApp.Test
 
             Stopwatch sw = new Stopwatch();
             sw.Start();
+            int nullMask = 6;
             for (int i = 0; i < dataAmount; i++)
             {
                 users.Add(new GUserDto()
                 {
                     UserName = $"UserName{i}",
                     UserPwd = $"UserPwd{i}",
-                    NickName = $"NickName{i}",
+                    NickName = i % nullMask == 0 ? null : $"NickName{i}",
                     RealName = $"RealName{i}",
                     Email = $"Email{i}@qq.com",
                     Avatar = $"Avatar{i}",
                     PhoneNo = $"133810{i}".PadRight(11, '0'),
-                    Sex = (Sex)(i % 2),
+                    Sex = i % nullMask == 0 ? null : (i % 3 == 1 ? Sex.Male : Sex.Female),
                     Birthday = DateTime.Now.AddYears(-1).AddHours(-1 * i),
                     WeChatOpenId = $"WeChatOpenId{i}",
-                    IsDelete = i % 2 == 0 ? true : false,
-                    UserStatus = i % 2,
-                    AddUser = Guid.NewGuid(),
-                    AddDate = DateTime.Now,
-                    LastUpdateUser = Guid.NewGuid(),
-                    LastUpdateDate = DateTime.Now
+                    IsDelete = i % nullMask == 0 ? true : false,
+                    UserStatus = (UserStatus)(i % 2),
+                    AddUser = i % nullMask == 0 ? null : Guid.NewGuid(),
+                    AddDate = i % nullMask == 0 ? null : DateTime.Now,
+                    LastUpdateUser = i % nullMask == 0 ? null : Guid.NewGuid(),
+                    LastUpdateDate = i % nullMask == 0 ? null : DateTime.Now
                 });
             }
             //{   //Add 事务 异常抛出 Test  重复Id测试

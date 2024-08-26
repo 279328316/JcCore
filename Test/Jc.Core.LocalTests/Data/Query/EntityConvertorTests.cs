@@ -16,13 +16,18 @@ namespace Jc.Core.Data.Query.Tests
         {
             EntityConvertorDelegate convertor = EntityConvertor.CreateEntityConvertor<UserDto>();
             List<UserDto> users = new List<UserDto>();
-            DataTable dt = Dbc.Db.GetDataTable("Select * from t_User");
+            DataTable dt = Dbc.Db.GetDataTable<UserDto>();
             if (dt?.Rows.Count > 0)
             {
                 for (int i = 0; i < dt.Rows.Count; i++)
                 {
-                    //UserDto user = convertor.ConvertDto(dt.Rows[i]);
-                    UserDto user = new UserDto(dt.Rows[i]);
+                    EntityConvertResult convertResult = new EntityConvertResult();
+                    UserDto user = (UserDto)convertor.Invoke(dt.Rows[i], convertResult);
+                    //UserDto user = new UserDto(dt.Rows[i]);
+                    if (convertResult.IsException)
+                    {
+                        throw new Exception(convertResult.Message);
+                    }
                     users.Add(user);
                 }
             }

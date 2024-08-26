@@ -1,34 +1,55 @@
-﻿using System;
+﻿using Jc.Database.Query;
+using System;
 using System.Collections.Generic;
-using System.Text;
 using System.Data;
+using System.Linq;
 using System.Reflection;
 using System.Reflection.Emit;
-using System.Linq.Expressions;
-using System.ComponentModel;
+using System.Runtime.InteropServices;
+using System.Text;
+using System.Threading.Tasks;
 
-namespace Jc.Database.Query
+namespace Jc.Core.FrameworkTest
 {
     /// <summary>
-    /// EntityConvertor delegate
+    /// Jc Dto Emit 测试
+    /// 本例中的代码可以直接应用于Orm EntityConverter中
     /// </summary>
-    /// <typeparam name="T"></typeparam>
-    /// <param name="dr">DataRow</param>
-    /// <param name="convertResult">转换结果对象 
-    /// 因Emit中使用String.Format Concat方法异常,无法组合异常消息
-    /// 故引入对象接收异常结果
-    /// 暂未发现其它更好方法</param>
-    /// <returns></returns>
-    public delegate object EntityConvertorDelegate(DataRow dr, EntityConvertResult convertResult);
-
-    public class EntityConvertor
+    public class JcEmitMethodTest
     {
+        public static void Test()
+        {
+            SaveTest<UserDto>();
+        }
+
+        public static void SaveTest<T>()
+        {
+            string asmName = "Kitty_Fw_DynamicMethod";
+            AssemblyName assemblyName = new AssemblyName(asmName);
+            //AssemblyBuilder assemblyBuilder = AssemblyBuilder.DefineDynamicAssembly(asmName, AssemblyBuilderAccess.RunAndSave);
+            AssemblyBuilder assemblyBuilder = AppDomain.CurrentDomain.DefineDynamicAssembly(assemblyName, AssemblyBuilderAccess.RunAndSave);
+            var moduleBuilder = assemblyBuilder.DefineDynamicModule("KittyModule", $"{asmName}.exe");
+            var typeBuilder = moduleBuilder.DefineType("HelloKittyClass", TypeAttributes.Class | TypeAttributes.Public);
+            MethodBuilder method = typeBuilder.DefineMethod("ConvertDto",
+                               MethodAttributes.Public | MethodAttributes.HideBySig | MethodAttributes.Static
+                               , typeof(T),
+                              new Type[] { typeof(DataRow), typeof(EntityConvertResult) });
+
+            ILGenerator generator = method.GetILGenerator();
+            ILGenerateSetValueMethodContent<T>(generator);
+
+            // 静态方法须 SetEntryPoint
+            Type classType = typeBuilder.CreateType();
+            assemblyBuilder.SetEntryPoint(classType.GetMethod("ConvertDto"));
+            assemblyBuilder.Save($"{asmName}.exe");
+        }
+
         /// <summary>
         /// 构造EntityConvertor Handler
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <returns></returns>
-        public static EntityConvertorDelegate CreateEntityConvertor<T>()
+        public static EntityConvertorDelegate GetEntityConvertor<T>()
         {
             DynamicMethod dynamicMethod = BuildSetValueMethod<T>();
             EntityConvertorDelegate handler = (EntityConvertorDelegate)dynamicMethod.CreateDelegate(typeof(EntityConvertorDelegate));
@@ -45,7 +66,7 @@ namespace Jc.Database.Query
             DynamicMethod method = new DynamicMethod("Convert" + typeof(T).Name,
                     MethodAttributes.Public | MethodAttributes.Static,
                     CallingConventions.Standard, typeof(T),
-                    new Type[] { typeof(DataRow),typeof(EntityConvertResult) }, typeof(T).Module, true);
+                    new Type[] { typeof(DataRow), typeof(EntityConvertResult) }, typeof(T).Module, true);
             ILGenerator generator = method.GetILGenerator();
             ILGenerateSetValueMethodContent<T>(generator);
             return method;
@@ -125,16 +146,13 @@ namespace Jc.Database.Query
                 il.Emit(OpCodes.Nop);
 
                 //不为空时,直接赋值
-                // result.Id = (int?)dr[dataColumn]; 之前调试时出现过后面属性值为null情况,不确定是否与使用方式有关
-                // 先使用 result.Id = (int?)dr["Id"];
+                // result.Id = (int?)dr[dataColumn];
                 if (type.IsValueType)
-                {   //直接拆箱 可空类型,也可以直接拆箱
+                {   //直接拆箱 可空类型,也可以直接拆箱                    
                     il.Emit(OpCodes.Ldloc, result);  //result
                     il.Emit(OpCodes.Ldarg_0);    //dr
                     il.Emit(OpCodes.Ldstr, fieldName);   //Id
                     il.Emit(OpCodes.Call, typeof(DataRow).GetMethod("get_Item", new Type[] { typeof(string) }));
-                    //il.Emit(OpCodes.Ldloc, curColumn);   //Id
-                    //il.Emit(OpCodes.Call, typeof(DataRow).GetMethod("get_Item", new Type[] { typeof(DataColumn) }));
 
                     if (piMap.IsEnum)
                     {   // 如果为可空枚举,需要先拆箱为原类型
@@ -159,10 +177,8 @@ namespace Jc.Database.Query
                 {   //引用类型 直接转换 result.UserName = (string)dataRow[dataColumn];
                     il.Emit(OpCodes.Ldloc, result);  //result
                     il.Emit(OpCodes.Ldarg_0);    //dr
-                    il.Emit(OpCodes.Ldstr, fieldName);   //Id
-                    il.Emit(OpCodes.Call, typeof(DataRow).GetMethod("get_Item", new Type[] { typeof(string) }));
-                    //il.Emit(OpCodes.Ldloc, curColumn);   //dataColumn
-                    //il.Emit(OpCodes.Call, typeof(DataRow).GetMethod("get_Item", new Type[] { typeof(DataColumn) }));
+                    il.Emit(OpCodes.Ldloc, curColumn);   //dataColumn
+                    il.Emit(OpCodes.Call, typeof(DataRow).GetMethod("get_Item", new Type[] { typeof(DataColumn) }));
                     il.Emit(OpCodes.Castclass, type);
                     il.Emit(OpCodes.Call, piMap.Pi.GetSetMethod());
                 }

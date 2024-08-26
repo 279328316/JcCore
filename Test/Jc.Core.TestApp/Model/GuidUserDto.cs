@@ -62,7 +62,7 @@ namespace Jc.Core.TestApp
         /// 性别 0女 1男
         /// </summary>
         [Field(DisplayText = "性别 0女 1男", FieldType = "int")]
-        public Sex Sex { get; set; }
+        public Sex? Sex { get; set; }
 
         /// <summary>
         /// 出生日期
@@ -80,13 +80,13 @@ namespace Jc.Core.TestApp
         /// 是否删除
         /// </summary>
         [Field(DisplayText = "是否删除", FieldType = "bit")]
-        public bool? IsDelete { get; set; }
+        public bool IsDelete { get; set; }
 
         /// <summary>
         /// 状态 0停用 1启用
         /// </summary>
         [Field(DisplayText = "状态 0停用 1启用", FieldType = "int")]
-        public int? UserStatus { get; set; }
+        public UserStatus UserStatus { get; set; }
 
         /// <summary>
         /// 添加人

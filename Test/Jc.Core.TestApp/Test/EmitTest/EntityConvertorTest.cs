@@ -1,5 +1,4 @@
-﻿
-using Jc.Database.Query;
+﻿using Jc.Database.Query;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -7,14 +6,17 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Jc.Core.FrameworkTest
+namespace Jc.Core.TestApp.Test
 {
     public class EntityConvertorTest
     {
         public static void Test()
         {
+            JcEmitMethodTest.Test();
+            JcDbEmitMethodTest.Test();
+
             Test_ByDynamicMethod();
-            //Test_ByJcEntityConvertor();
+            Test_ByJcEntityConvertor();
 
             Console.WriteLine($"EntityConvertorTest 测试完成,请按任意键继续");
             Console.ReadKey();
@@ -41,12 +43,6 @@ namespace Jc.Core.FrameworkTest
                         EntityConvertResult convertResult = new EntityConvertResult();
                         DataRow dr = dt.Rows[i];
                         DrUserDto user = (DrUserDto)entityConvertor.Invoke(dr, convertResult);
-                        if (convertResult.IsException)
-                        {
-                            string columnName = convertResult.ColumnName;
-                            string errorMsg = convertResult.Message;
-                            throw new Exception($"加载列{columnName}失败:{errorMsg}");
-                        }
                         users.Add(user);
 
                         DrUserDto drUser = new DrUserDto(dr);
@@ -110,17 +106,9 @@ namespace Jc.Core.FrameworkTest
                         EntityConvertResult convertResult = new EntityConvertResult();
                         DataRow dr = dt.Rows[i];
                         DrUserDto user = (DrUserDto)entityConvertor.Invoke(dr, convertResult);
-                        if (convertResult.IsException)
-                        {
-                            string columnName = convertResult.ColumnName;
-                            string errorMsg = convertResult.Message;
-                            throw new Exception($"加载列{columnName}失败:{errorMsg}");
-                        }
-                        
                         users.Add(user);
 
                         DrUserDto drUser = new DrUserDto(dr);
-
 
                         string unEqualPis = "";
                         List<FieldMapping> piMapList = EntityMappingHelper.GetPiMapList<DrUserDto>();
@@ -138,7 +126,7 @@ namespace Jc.Core.FrameworkTest
                                 unEqualPis += $"{piMap.PiName};";
                             }
                         }
-                        if (!string.IsNullOrEmpty(unEqualPis))
+                        if(!string.IsNullOrEmpty(unEqualPis))
                         {
                             throw new Exception($"属性值不匹配:{unEqualPis}");
                         }

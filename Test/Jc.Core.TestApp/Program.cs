@@ -21,8 +21,7 @@ namespace Jc.Core.TestApp
 
             try
             {
-                PgSqlQueryTest test = new PgSqlQueryTest();
-                test.Test();
+                ListAddTest.Test();
             }
             catch(Exception ex)
             {

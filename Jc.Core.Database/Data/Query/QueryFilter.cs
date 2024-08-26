@@ -369,6 +369,10 @@ namespace Jc.Database.Query
         /// <param name="cmd"></param>
         public virtual void AddCustomCmd(string cmd)
         {
+            if (string.IsNullOrEmpty(cmd))
+            {
+                return;
+            }
             string paramStr = cmd;
             this.ItemList.Add(paramStr);
             this.filterSQLString += paramStr;
