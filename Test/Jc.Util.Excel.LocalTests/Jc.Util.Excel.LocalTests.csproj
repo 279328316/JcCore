@@ -18,7 +18,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Jc.Util.Excel\Jc.Util.Excel.csproj" />
+    <ProjectReference Include="..\..\Jc.Util.Excel\Jc.Util.Excel.csproj" />
   </ItemGroup>
 
   <ItemGroup>
