@@ -12,6 +12,7 @@ using Jc.Database.Data;
 using Jc.Database.Query;
 using System.Threading.Tasks;
 using System.Collections.Concurrent;
+using NGuid;
 
 namespace Jc.Database
 {
@@ -179,7 +180,7 @@ namespace Jc.Database
             {   //Guid Id
                 if (pkValue == null || (Guid)pkValue == Guid.Empty)
                 {   //生成Guid
-                    pkField.Pi.SetValue(dto, Guid.NewGuid());
+                    pkField.Pi.SetValue(dto, GuidHelpers.CreateVersion7());
                 }
                 if (!piMapList.Contains(pkField))
                 {
@@ -293,7 +294,7 @@ namespace Jc.Database
                         {   //Guid Id
                             if (pkValue == null || (Guid)pkValue == Guid.Empty)
                             {   //生成Guid
-                                pkField.Pi.SetValue(list[i], Guid.NewGuid());
+                                pkField.Pi.SetValue(list[i], GuidHelpers.CreateVersion7());
                             }
                         }
                         #endregion
@@ -340,7 +341,7 @@ namespace Jc.Database
                     {   //Guid Id
                         if (pkValue == null || (Guid)pkValue == Guid.Empty)
                         {   //生成Guid
-                            pkField.Pi.SetValue(list[i], Guid.NewGuid());
+                            pkField.Pi.SetValue(list[i], GuidHelpers.CreateVersion7());
                         }
                     }
                     #endregion
@@ -867,7 +868,7 @@ namespace Jc.Database
                         {   //是否需要生成Guid
                             if (value == null || (Guid)value == Guid.Empty)
                             {
-                                value = Guid.NewGuid();
+                                value = GuidHelpers.CreateVersion7();
                                 piMap.Pi.SetValue(dto, value);
                             }
                         }
