@@ -3,8 +3,7 @@
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <Description>Excel操作Helper
-简单Excel导入导出操作</Description>
+    <Description>Excel操作Helper 简单Excel导入导出操作</Description>
     <Version>1.2.1.7</Version>
     <GenerateDocumentationFile>True</GenerateDocumentationFile>
     <Authors>Jc.Core</Authors>
