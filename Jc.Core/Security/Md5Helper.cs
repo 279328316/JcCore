@@ -52,9 +52,11 @@ namespace Jc.Security
             {
                 return "";
             }
-            FileStream stream = File.OpenRead(path);
-            byte[] data2 = md5.ComputeHash(stream);
-            return ConvertByteToString(data2);
+            using (FileStream stream = File.OpenRead(path))
+            {
+                byte[] data2 = md5.ComputeHash(stream);
+                return ConvertByteToString(data2);
+            }
         }
 
         private static string ConvertByteToString(byte[] data)

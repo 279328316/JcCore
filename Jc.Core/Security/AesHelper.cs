@@ -10,79 +10,302 @@ namespace Jc.Security
     /// </summary>
     public class AesHelper
     {
-        //默认密钥向量
-        private static byte[] Keys = { 0x12, 0x34, 0x56, 0x78, 0x90, 0xAB, 0xCD, 0xEF };
+        /// <summary>
+        /// Create Aes
+        /// </summary>
+        /// <param name="key"> 密码,长度为16倍数的字符串 如果启用HashKey,则不需要强制为16位的倍数 本方法中使用32位</param>
+        /// <param name="iv">偏移量,长度为16的字符串,如果启用HashKey,则不需要强制为16位,如果为空,默认使用key</param>
+        /// <param name="useHashKey">启用HashKey,对Key和Iv进行Hash256计算,取其前指定位数的字符串作为hashKey</param>
+        /// <returns></returns>
+        public static Aes CreateAes(string key, string iv = null, bool useHashKey = true)
+        {
+            Aes aes = Aes.Create();
+            aes.Mode = CipherMode.CBC;
+            aes.Padding = PaddingMode.PKCS7;
+            aes.KeySize = 128;
+            aes.BlockSize = 128;
+
+            string hashKey = GetSHA256Hash(key, 32);
+            string hashiv;
+            if (!string.IsNullOrEmpty(iv))
+            {
+                hashiv = GetSHA256Hash(iv, 16);
+            }
+            else
+            {
+                hashiv = GetSHA256Hash(key, 16);
+            }
+            aes.Key = Encoding.UTF8.GetBytes(hashKey);
+            aes.IV = Encoding.UTF8.GetBytes(hashiv);
+            return aes;
+        }
+
+        /// <summary>
+        /// 获取字符串SHA256Hash
+        /// </summary>
+        /// <param name="str"></param>
+        /// <param name="size"></param>
+        /// <returns></returns>
+        private static string GetSHA256Hash(string str, int size = 32)
+        {
+            using (SHA256 sha256 = SHA256.Create())
+            {
+                byte[] bytes = Encoding.UTF8.GetBytes(str);
+                byte[] hashedBytes = sha256.ComputeHash(bytes);
+
+                // 取前32字节作为AES算法的秘钥
+                string hash = Convert.ToBase64String(hashedBytes).Substring(0, size).PadLeft(size, '0');
+                return hash;
+            }
+        }
+
         /// <summary>
         /// 加密字符串
         /// </summary>
-        /// <param name="encryptString">待加密的字符串</param>
-        /// <param name="encryptKey">加密密钥,要求为8位</param>
-        /// <returns>加密成功返回加密后的字符串，失败返回源串</returns>
-        public static string Encrypt(string encryptString, string encryptKey)
+        /// <param name="str">待加密的字符串</param>
+        /// <param name="key">加密密钥,和加密密钥相同</param>
+        /// <param name="iv">加密偏移向量,和加密偏移向量相同,为空则使用Key进行处理</param>
+        /// <param name="useHashKey">启用HashKey,对Key和Iv进行Hash256计算,取其前指定位数的字符串作为hashKey</param>
+        /// <returns>加密成功返回加密后的字符串，失败返源串</returns>
+        public static string Encrypt(string str, string key, string iv = null, bool useHashKey = true)
         {
-            try
+            if (string.IsNullOrEmpty(str))
             {
-                if (encryptKey.Length > 8)
-                {
-                    encryptKey = encryptKey.Substring(0, 8);
-                }
-                else if (encryptKey.Length < 8)
-                {
-                    encryptKey = encryptKey.PadRight(8, '1');
-                }
-                byte[] rgbKey = Encoding.UTF8.GetBytes(encryptKey);
-                byte[] rgbIV = Keys;
-                byte[] inputByteArray = Encoding.UTF8.GetBytes(encryptString);
-                AesCryptoServiceProvider provider = new AesCryptoServiceProvider();
-                MemoryStream mStream = new MemoryStream();
-                CryptoStream cStream = new CryptoStream(mStream, provider.CreateEncryptor(rgbKey, rgbIV), CryptoStreamMode.Write);
-                cStream.Write(inputByteArray, 0, inputByteArray.Length);
-                cStream.FlushFinalBlock();
-                return Convert.ToBase64String(mStream.ToArray());
+                return string.Empty;
             }
-            catch
+            if (string.IsNullOrEmpty(key))
             {
-                return encryptString;
+                return str;
+            }
+            string encryptString;
+
+            Aes aes = CreateAes(key, iv, useHashKey);
+            ICryptoTransform encryptor = aes.CreateEncryptor();
+            using (MemoryStream msEncrypt = new MemoryStream())
+            {
+                using (CryptoStream csEncrypt = new CryptoStream(msEncrypt, encryptor, CryptoStreamMode.Write))
+                {
+                    using (StreamWriter swEncrypt = new StreamWriter(csEncrypt))
+                    {
+                        swEncrypt.Write(str);
+                    }
+                    encryptString = Convert.ToBase64String(msEncrypt.ToArray());
+                }
+            }
+            return encryptString;
+        }
+
+        /// <summary>
+        /// 解密字符串
+        /// </summary>
+        /// <param name="str">待解密的字符串</param>
+        /// <param name="key">解密密钥,和加密密钥相同</param>
+        /// <param name="iv">解密偏移向量,和加密偏移向量相同,为空则使用Key进行处理</param>
+        /// <param name="useHashKey">启用HashKey,对Key和Iv进行Hash256计算,取其前指定位数的字符串作为hashKey</param>
+        /// <returns>解密成功返回解密后的字符串，失败返源串</returns>
+        public static string Decrypt(string str, string key, string iv = null, bool useHashKey = true)
+        {
+            if (string.IsNullOrEmpty(str))
+            {
+                return string.Empty;
+            }
+            if (string.IsNullOrEmpty(key))
+            {
+                return str;
+            }
+            string decryptString;
+            Aes aes = CreateAes(key, iv, useHashKey);
+            ICryptoTransform decryptor = aes.CreateDecryptor();
+            using (MemoryStream msDecrypt = new MemoryStream(Convert.FromBase64String(str)))
+            {
+                using (CryptoStream csDecrypt = new CryptoStream(msDecrypt, decryptor, CryptoStreamMode.Read))
+                {
+                    using (StreamReader srDecrypt = new StreamReader(csDecrypt))
+                    {
+                        decryptString = srDecrypt.ReadToEnd();
+                    }
+                }
+            }
+            return decryptString;
+        }
+
+        private const ulong FileType_Tag = 0xAC010203040506CA;
+        private const int Buffer_Size = 128 * 1024;
+
+        /// <summary>
+        /// 加密文件随机数生成
+        /// </summary>
+        private static RandomNumberGenerator rand = RandomNumberGenerator.Create();
+
+        /// <summary>
+        /// 生成指定长度的随机Byte数组
+        /// </summary>
+        /// <param name="count">Byte数组长度</param>
+        /// <returns>随机Byte数组</returns>
+        private static byte[] GenerateRandomBytes(int count)
+        {
+            byte[] bytes = new byte[count];
+            rand.GetBytes(bytes);
+            return bytes;
+        }
+
+        /// <summary>
+        /// 加密文件
+        /// </summary>
+        /// <param name="sourceFile">待加密的文件</param>
+        /// <param name="targetFile">加密后的文件</param>
+        /// <param name="key">加密密钥,和加密密钥相同</param>
+        /// <param name="iv">加密偏移向量,和加密偏移向量相同,为空则使用Key进行处理</param>
+        /// <param name="useHashKey">启用HashKey,对Key和Iv进行Hash256计算,取其前指定位数的字符串作为hashKey</param>
+        /// <returns>加密成功返回加密后的字符串，失败返源串</returns>
+        public static void EncryptFile(string sourceFile, string targetFile, string key, string iv = null, bool useHashKey = true)
+        {
+            if (string.IsNullOrEmpty(sourceFile))
+            {
+                throw new Exception("待加密文件不能为空");
+            }
+            if (string.IsNullOrEmpty(targetFile))
+            {
+                throw new Exception("目标文件路径不能为空");
+            }
+            if (!File.Exists(sourceFile))
+            {
+                throw new Exception("待加密文件不存在");
+            }
+            if (File.Exists(targetFile))
+            {
+                throw new Exception("目标文件已存在");
+            }
+            FileInfo fileInfo = new FileInfo(sourceFile);
+            if (fileInfo.Length <= 0)
+            {
+                throw new Exception("待加密文件大小为0");
+            }
+
+            //打开输入输出文件流
+            using (FileStream fsource = File.OpenRead(sourceFile))
+            using (FileStream fout = File.OpenWrite(targetFile))
+            {
+                // 创建加密对象
+                Aes aes = CreateAes(key, iv, useHashKey);
+                using (ICryptoTransform encryptor = aes.CreateEncryptor())
+                using (CryptoStream cout = new CryptoStream(fout, encryptor, CryptoStreamMode.Write))
+                using (BinaryWriter bw = new BinaryWriter(cout))
+                {
+                    //使用加密流写入标签
+                    bw.Write(FileType_Tag);      // 写入文件类型标记
+                    bw.Write(fsource.Length);    // 写入原始文件的长度
+
+                    int read; // 输入文件读取数量
+                    byte[] buffer = new byte[4096]; // 缓冲区大小
+                    //将源文件写入加密流和散列流
+                    while ((read = fsource.Read(buffer, 0, buffer.Length)) != 0)
+                    {
+                        cout.Write(buffer, 0, read);
+                    }
+
+                    // 计算解密文件的哈希值
+                    using (SHA256 hasher = SHA256.Create())
+                    {
+                        fsource.Seek(0, SeekOrigin.Begin); // 重置文件指针到开始位置
+                        byte[] hash = hasher.ComputeHash(fsource);
+
+                        // 将散列写入加密文件的末尾
+                        cout.Write(hash, 0, hash.Length);
+                    }
+                }
             }
         }
 
         /// <summary>
-        /// DES解密字符串
+        /// 解密文件
         /// </summary>
-        /// <param name="decryptString">待解密的字符串</param>
-        /// <param name="decryptKey">解密密钥,要求为8位,和加密密钥相同</param>
-        /// <returns>解密成功返回解密后的字符串，失败返源串</returns>
-        public static string DecryptDES(string decryptString, string decryptKey)
+        /// <param name="sourceFile">待解密的文件</param>
+        /// <param name="targetFile">解密后的文件</param>
+        /// <param name="key">解密密钥,和加密密钥相同</param>
+        /// <param name="iv">解密偏移向量,和加密偏移向量相同,为空则使用Key进行处理</param>
+        /// <param name="useHashKey">启用HashKey,对Key和Iv进行Hash256计算,取其前指定位数的字符串作为hashKey</param>
+        /// <returns></returns>
+        public static void DecryptFile(string sourceFile, string targetFile, string key, string iv = null, bool useHashKey = true)
         {
-            try
+            if (string.IsNullOrEmpty(sourceFile))
             {
-                if (decryptKey.Length > 8)
-                {
-                    decryptKey = decryptKey.Substring(0, 8);
-                }
-                else if (decryptKey.Length < 8)
-                {
-                    decryptKey = decryptKey.PadRight(8, '1');
-                }
-                byte[] rgbKey = Encoding.UTF8.GetBytes(decryptKey);
-                byte[] rgbIV = Keys;
-                byte[] inputByteArray = Convert.FromBase64String(decryptString);
-                AesCryptoServiceProvider DCSP = new AesCryptoServiceProvider();
-                MemoryStream mStream = new MemoryStream();
-                CryptoStream cStream = new CryptoStream(mStream, DCSP.CreateDecryptor(rgbKey, rgbIV), CryptoStreamMode.Write);
-                cStream.Write(inputByteArray, 0, inputByteArray.Length);
-                cStream.FlushFinalBlock();
-                return Encoding.UTF8.GetString(mStream.ToArray());
+                throw new Exception("待解密文件不能为空");
             }
-            catch
+            if (string.IsNullOrEmpty(targetFile))
             {
-                return decryptString;
+                throw new Exception("目标文件路径不能为空");
+            }
+            if (!File.Exists(sourceFile))
+            {
+                throw new Exception("待解密文件不存在");
+            }
+            if (File.Exists(targetFile))
+            {
+                throw new Exception("目标文件已存在");
+            }
+            FileInfo fileInfo = new FileInfo(sourceFile);
+            if (fileInfo.Length <= 0)
+            {
+                throw new Exception("待解密文件大小为0");
+            }
+
+            //打开输入输出文件流
+            using (FileStream fsource = File.OpenRead(sourceFile))
+            using (FileStream fout = File.Create(targetFile))
+            {
+                // 创建Aes对象
+                Aes aes = CreateAes(key, iv, useHashKey);
+
+                //解密CryptoStream
+                using (ICryptoTransform decryptor = aes.CreateDecryptor())
+                using (CryptoStream cin = new CryptoStream(fsource, decryptor, CryptoStreamMode.Read))
+                using (BinaryReader br = new BinaryReader(cin))
+                {
+                    //使用解密流解密
+                    ulong tag = br.ReadUInt64();
+                    long fileSize = br.ReadInt64();
+
+                    if (FileType_Tag != tag)
+                        throw new Exception("非Aes加密文件或文件被破坏");
+
+                    long totalRead = 0; //当前获取大小
+                    byte[] buffer = new byte[4096]; //临时缓存
+                    int read;
+
+                    // 读取并解密文件数据
+                    while (totalRead < fileSize && (read = cin.Read(buffer, 0, Math.Min(buffer.Length, (int)(fileSize - totalRead)))) > 0)
+                    {
+                        fout.Write(buffer, 0, read);
+                        totalRead += read;
+                    }
+
+                    using (SHA256 hasher = SHA256.Create())
+                    using (MemoryStream memoryStream = new MemoryStream())
+                    {
+                        // 计算解密文件的哈希值
+                        fout.Seek(0, SeekOrigin.Begin); // 重置文件指针到开始位置
+                        byte[] currentHash = hasher.ComputeHash(fout);
+
+                        // 读取存储在文件末尾的哈希值（存在需要多次读取的情况）
+                        byte[] storedHash = new byte[hasher.HashSize / 8];
+                        while ((read = cin.Read(storedHash, 0, storedHash.Length)) > 0)
+                        {
+                            memoryStream.Write(storedHash, 0, read);
+                        }
+                        storedHash = memoryStream.ToArray();
+
+                        // 验证哈希值
+                        if (!CheckByteArrays(storedHash, currentHash))
+                            throw new Exception("文件哈希值验证失败，文件可能已被篡改");
+
+                        // 检查读取的数据量是否与文件大小一致
+                        if (totalRead != fileSize)
+                            throw new Exception("文件大小不匹配，文件可能不完整");
+                    }
+                }
             }
         }
-
-        private const ulong FC_TAG = 0xFC010203040506CF;
-
-        private const int BUFFER_SIZE = 128 * 1024;
 
         /// <summary>
         /// 检验两个Byte数组是否相同
@@ -102,188 +325,6 @@ namespace Jc.Security
                 return true;
             }
             return false;
-        }
-
-        /// <summary>
-        /// 创建Rijndael SymmetricAlgorithm
-        /// </summary>
-        /// <param name="password">密码</param>
-        /// <param name="salt"></param>
-        /// <returns>加密对象</returns>
-        private static SymmetricAlgorithm CreateRijndael(string password, byte[] salt)
-        {
-            PasswordDeriveBytes pdb = new PasswordDeriveBytes(password, salt, "SHA256", 1000);
-
-            SymmetricAlgorithm sma = Rijndael.Create();
-            sma.KeySize = 256;
-            sma.Key = pdb.GetBytes(32);
-            sma.Padding = PaddingMode.PKCS7;
-            return sma;
-        }
-
-        /// <summary>
-        /// 加密文件随机数生成
-        /// </summary>
-        private static RandomNumberGenerator rand = new RNGCryptoServiceProvider();
-
-        /// <summary>
-        /// 生成指定长度的随机Byte数组
-        /// </summary>
-        /// <param name="count">Byte数组长度</param>
-        /// <returns>随机Byte数组</returns>
-        private static byte[] GenerateRandomBytes(int count)
-        {
-            byte[] bytes = new byte[count];
-            rand.GetBytes(bytes);
-            return bytes;
-        }
-
-        /// <summary>
-        /// 加密文件
-        /// </summary>
-        /// <param name="inFile">待加密文件</param>
-        /// <param name="outFile">加密后输入文件</param>
-        /// <param name="password">加密密码</param>
-        public static void EncryptFile(string inFile, string outFile, string password)
-        {
-            using (FileStream fin = File.OpenRead(inFile),
-                fout = File.OpenWrite(outFile))
-            {
-                long lSize = fin.Length; // 输入文件长度
-                int size = (int)lSize;
-                byte[] bytes = new byte[BUFFER_SIZE]; // 缓存
-                int read = -1; // 输入文件读取数量
-                int value = 0;
-
-                // 获取IV和salt
-                byte[] IV = GenerateRandomBytes(16);
-                byte[] salt = GenerateRandomBytes(16);
-
-                // 创建加密对象
-                SymmetricAlgorithm sma = AesHelper.CreateRijndael(password, salt);
-                sma.IV = IV;
-
-                // 在输出文件开始部分写入IV和salt
-                fout.Write(IV, 0, IV.Length);
-                fout.Write(salt, 0, salt.Length);
-
-                // 创建散列加密
-                HashAlgorithm hasher = SHA256.Create();
-                using (CryptoStream cout = new CryptoStream(fout, sma.CreateEncryptor(), CryptoStreamMode.Write),
-                    chash = new CryptoStream(Stream.Null, hasher, CryptoStreamMode.Write))
-                {
-                    BinaryWriter bw = new BinaryWriter(cout);
-                    bw.Write(lSize);
-
-                    bw.Write(FC_TAG);
-
-                    // 读写字节块到加密流缓冲区
-                    while ((read = fin.Read(bytes, 0, bytes.Length)) != 0)
-                    {
-                        cout.Write(bytes, 0, read);
-                        chash.Write(bytes, 0, read);
-                        value += read;
-                    }
-                    // 关闭加密流
-                    chash.Flush();
-                    chash.Close();
-
-                    // 读取散列
-                    byte[] hash = hasher.Hash;
-
-                    // 输入文件写入散列
-                    cout.Write(hash, 0, hash.Length);
-
-                    // 关闭文件流
-                    cout.Flush();
-                    cout.Close();
-                }
-            }
-        }
-
-        /// <summary>
-        /// 解密文件
-        /// </summary>
-        /// <param name="inFile">待解密文件</param>
-        /// <param name="outFile">解密后输出文件</param>
-        /// <param name="password">解密密码</param>
-        public static void DecryptFile(string inFile, string outFile, string password)
-        {
-            // 创建打开文件流
-            using (FileStream fin = File.OpenRead(inFile),
-                fout = File.OpenWrite(outFile))
-            {
-                int size = (int)fin.Length;
-                byte[] bytes = new byte[BUFFER_SIZE];
-                int read = -1;
-                int value = 0;
-                int outValue = 0;
-
-                byte[] IV = new byte[16];
-                fin.Read(IV, 0, 16);
-                byte[] salt = new byte[16];
-                fin.Read(salt, 0, 16);
-
-                SymmetricAlgorithm sma = AesHelper.CreateRijndael(password, salt);
-                sma.IV = IV;
-
-                value = 32;
-                long lSize = -1;
-
-                // 创建散列对象, 校验文件
-                HashAlgorithm hasher = SHA256.Create();
-
-                using (CryptoStream cin = new CryptoStream(fin, sma.CreateDecryptor(), CryptoStreamMode.Read),
-                    chash = new CryptoStream(Stream.Null, hasher, CryptoStreamMode.Write))
-                {
-                    // 读取文件长度
-                    BinaryReader br = new BinaryReader(cin);
-                    lSize = br.ReadInt64();
-                    ulong tag = br.ReadUInt64();
-
-                    if (FC_TAG != tag)
-                        throw new System.Exception("文件被破坏");
-
-                    long numReads = lSize / BUFFER_SIZE;
-
-                    long slack = (long)lSize % BUFFER_SIZE;
-
-                    for (int i = 0; i < numReads; ++i)
-                    {
-                        read = cin.Read(bytes, 0, bytes.Length);
-                        fout.Write(bytes, 0, read);
-                        chash.Write(bytes, 0, read);
-                        value += read;
-                        outValue += read;
-                    }
-
-                    if (slack > 0)
-                    {
-                        read = cin.Read(bytes, 0, (int)slack);
-                        fout.Write(bytes, 0, read);
-                        chash.Write(bytes, 0, read);
-                        value += read;
-                        outValue += read;
-                    }
-
-                    chash.Flush();
-                    chash.Close();
-
-                    fout.Flush();
-                    fout.Close();
-
-                    byte[] curHash = hasher.Hash;
-
-                    // 获取比较和旧的散列对象
-                    byte[] oldHash = new byte[hasher.HashSize / 8];
-                    read = cin.Read(oldHash, 0, oldHash.Length);
-                    if ((oldHash.Length != read) || (!CheckByteArrays(oldHash, curHash)))
-                        throw new System.Exception("文件被破坏");
-                }
-
-                if (outValue != lSize)
-                    throw new System.Exception("文件大小不匹配");
-            }
         }
     }
 }

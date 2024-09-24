@@ -69,11 +69,15 @@ namespace Jc.Security
                 byte[] rgbIV = Keys;
                 byte[] inputByteArray = Convert.FromBase64String(decryptString);
                 DESCryptoServiceProvider DCSP = new DESCryptoServiceProvider();
-                MemoryStream mStream = new MemoryStream();
-                CryptoStream cStream = new CryptoStream(mStream, DCSP.CreateDecryptor(rgbKey, rgbIV), CryptoStreamMode.Write);
-                cStream.Write(inputByteArray, 0, inputByteArray.Length);
-                cStream.FlushFinalBlock();
-                return Encoding.UTF8.GetString(mStream.ToArray());
+                using (MemoryStream mStream = new MemoryStream())
+                {
+                    using (CryptoStream cStream = new CryptoStream(mStream, DCSP.CreateDecryptor(rgbKey, rgbIV), CryptoStreamMode.Write))
+                    {
+                        cStream.Write(inputByteArray, 0, inputByteArray.Length);
+                        cStream.FlushFinalBlock();
+                        return Encoding.UTF8.GetString(mStream.ToArray());
+                    }
+                }
             }
             catch
             {

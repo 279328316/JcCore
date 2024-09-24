@@ -1371,6 +1371,7 @@ namespace Jc
                 {
                     valueStr = parameterValue.ToString();
                 }
+                valueStr = WebUtility.UrlEncode(valueStr);
             }
             return valueStr;
         }
