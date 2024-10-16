@@ -165,7 +165,7 @@ namespace Jc
                         using (Stream stream = new FileStream(filePath, overWrite ? FileMode.Create : FileMode.CreateNew))
                         {
                             long totalLength = response.ContentLength;
-                            int createdSize = 0;
+                            long createdSize = 0;
                             int blockSize = 50 * 1024, readSize;
                             byte[] bArr = new byte[blockSize];
                             while ((readSize = responseStream.Read(bArr, 0, blockSize)) > 0)
@@ -234,7 +234,7 @@ namespace Jc
                         using (Stream stream = new FileStream(filePath, overWrite ? FileMode.Create : FileMode.CreateNew))
                         {
                             long totalLength = response.ContentLength;
-                            int createdSize = 0;
+                            long createdSize = 0;
                             int blockSize = 50 * 1024, readSize;
                             byte[] bArr = new byte[blockSize];
                             while ((readSize = responseStream.Read(bArr, 0, blockSize)) > 0)
@@ -688,7 +688,7 @@ namespace Jc
                     using (Stream stream = new FileStream(downloadPath, FileMode.CreateNew))
                     {
                         long totalLength = response.ContentLength;
-                        int createdSize = 0;
+                        long createdSize = 0;
                         int blockSize = 50 * 1024, readSize;
                         byte[] bArr = new byte[blockSize];
                         while ((readSize = responseStream.Read(bArr, 0, blockSize)) > 0)
