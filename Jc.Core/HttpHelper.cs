@@ -175,7 +175,7 @@ namespace Jc
                                 createdSize += readSize;
                                 if (progressChanged != null && totalLength != 0)
                                 {
-                                    int progress = (int)(100 * createdSize / totalLength);
+                                    int progress = (int)(100.0 * createdSize / totalLength);
                                     progressChanged(null, new ProgressChangedEventArgs(progress, progress));
                                 }
                             }
@@ -244,7 +244,7 @@ namespace Jc
                                 createdSize += readSize;
                                 if (progressChanged != null && totalLength != 0)
                                 {
-                                    int progress = (int)(100 * createdSize / totalLength);
+                                    int progress = (int)(100.0 * createdSize / totalLength);
                                     progressChanged(null, new ProgressChangedEventArgs(progress, progress));
                                 }
                             }
@@ -698,7 +698,7 @@ namespace Jc
                             createdSize += readSize;
                             if (progressChanged != null && totalLength != 0)
                             {
-                                int progress = (int)(100 * createdSize / totalLength);
+                                int progress = (int)(100.0 * createdSize / totalLength);
                                 progressChanged(null, new ProgressChangedEventArgs(progress, progress));
                             }
                         }
