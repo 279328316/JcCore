@@ -11,6 +11,7 @@ using System.Collections.Specialized;
 using Jc.Database.Data;
 using Jc.Database.Query;
 using Microsoft.Extensions.Primitives;
+using static log4net.Appender.RollingFileAppender;
 
 
 namespace Jc.Database
@@ -48,111 +49,186 @@ namespace Jc.Database
             for (int i = 0; i < collection.AllKeys.Length; i++)
             {
                 string queryItemKey = collection.AllKeys[i];
-                if (!string.IsNullOrEmpty(queryItemKey))
+                if (string.IsNullOrEmpty(queryItemKey))
                 {
-                    string queryItemVal = collection[queryItemKey];
-                    Object itemValue = null;
-                    if (!string.IsNullOrEmpty(queryItemVal)
-                        && queryItemVal.ToLower() != "null"
-                        && queryItemVal.ToLower() != "undefined")
-                    {
-                        FieldMapping piMap = piMapList.Where(p => queryItemKey.ToLower() == p.PiName.ToLower()
-                                || queryItemKey.ToLower() == ($"min{p.PiName}").ToLower()
-                                || queryItemKey.ToLower() == ($"max{p.PiName}").ToLower()
-                                || queryItemKey.ToLower() == ($"{p.PiName}s").ToLower()).FirstOrDefault();
-                        if(piMap==null)
-                        {
-                            continue;
-                        }
-                        #region 处理匹配到的属性
-                        bool rangeMin = queryItemKey.ToLower() == ($"min{piMap.PiName}").ToLower();
-                        bool rangeMax = queryItemKey.ToLower() == ($"max{piMap.PiName}").ToLower();
-                        bool isList = queryItemKey.ToLower() == ($"{piMap.PiName}s").ToLower();
-
-                        Operand operand = Operand.Equal;
-
-                        if ((operandSettings != null) && operandSettings.ContainsKey(queryItemKey))
-                        {
-                            operand = operandSettings[queryItemKey];
-                            itemValue = queryItemVal;
-                        }
-                        else if (isList)
-                        {
-                            operand = Operand.Contains;
-                            List<string> valueList;
-                            if (queryItemVal.StartsWith("[") && queryItemVal.EndsWith("]"))
-                            {
-                                valueList = JsonHelper.DeserializeObject<List<string>>(queryItemVal);
-                            }
-                            else
-                            {
-                                valueList = queryItemVal.Split(',')
-                                    .Where(a => !string.IsNullOrEmpty(a)).Select(a => a.Trim()).ToList();
-                            }
-                            if (valueList?.Count > 0)
-                            {
-                                itemValue = valueList;
-                            }
-                            else
-                            {
-                                continue;
-                            }
-                        }
-                        else if (rangeMin)
-                        {
-                            operand = Operand.GreaterThanOrEqual;
-                            if (piMap.PropertyType == typeof(DateTime) || piMap.PropertyType == typeof(DateTime?))
-                            {
-                                DateTime dt;
-                                if (DateTime.TryParse(queryItemVal, out dt))
-                                {
-                                    itemValue = dt.Date;
-                                }
-                                else
-                                {
-                                    throw new Exception("日期格式错误.");
-                                }
-                            }
-                            else
-                            {
-                                itemValue = queryItemVal;
-                            }
-                        }
-                        else if (rangeMax)
-                        {
-                            if (piMap.PropertyType == typeof(DateTime) || piMap.PropertyType == typeof(DateTime?))
-                            {
-                                operand = Operand.LessThan;
-                                DateTime dt;
-                                if (DateTime.TryParse(queryItemVal, out dt))
-                                {
-                                    itemValue = dt.Date.AddDays(1);
-                                }
-                                else
-                                {
-                                    throw new Exception("日期格式错误.");
-                                }
-                            }
-                            else
-                            {
-                                operand = Operand.LessThanOrEqual;
-                                itemValue = queryItemVal;
-                            }
-                        }
-                        else if (piMap.PropertyType == typeof(string))
-                        {
-                            operand = Operand.Like;
-                            itemValue = queryItemVal;
-                        }
-                        else
-                        {
-                            itemValue = queryItemVal;
-                        }
-                        var queryExp = ExpressionHelper.CreateLambdaExpression<T>(operand, piMap.PiName, itemValue);
-                        query.And(queryExp);
-                        #endregion
-                    }
+                    continue;
                 }
+                string queryItemVal = collection[queryItemKey];
+                if (string.IsNullOrEmpty(queryItemVal)
+                    || queryItemVal.ToLower() == "null"
+                    || queryItemVal.ToLower() == "undefined")
+                {
+                    continue;
+                }
+                queryItemKey = queryItemKey.ToLower();
+                FieldMapping piMap = piMapList.Where(p => queryItemKey == p.PiName.ToLower()
+                        || queryItemKey == ($"min{p.PiName}").ToLower()
+                        || queryItemKey == ($"max{p.PiName}").ToLower()
+                        || queryItemKey == ($"{p.PiName}range").ToLower()
+                        || queryItemKey == ($"{p.PiName}s").ToLower()).FirstOrDefault();
+                if (piMap == null)
+                {
+                    continue;
+                }
+                #region 处理匹配到的属性
+                bool isList = queryItemKey == ($"{piMap.PiName}s").ToLower();
+                bool rangeMin = queryItemKey == ($"min{piMap.PiName}").ToLower();
+                bool rangeMax = queryItemKey == ($"max{piMap.PiName}").ToLower();
+                bool range = queryItemKey == ($"{piMap.PiName}range").ToLower();
+
+                Operand operand = Operand.Equal;
+
+                if (isList)
+                {
+                    #region isList查询
+                    List<string> valueList;
+                    if (queryItemVal.StartsWith("[") && queryItemVal.EndsWith("]"))
+                    {
+                        valueList = JsonHelper.DeserializeObject<List<string>>(queryItemVal);
+                    }
+                    else
+                    {
+                        valueList = queryItemVal.Split(',')
+                            .Where(a => !string.IsNullOrEmpty(a)).Select(a => a.Trim()).ToList();
+                    }
+                    if (valueList?.Count <= 0)
+                    {
+                        continue;
+                    }
+                    operand = Operand.Contains;
+                    var queryExp = ExpressionHelper.CreateLambdaExpression<T>(operand, piMap.PiName, valueList);
+                    query.And(queryExp);
+                    #endregion
+                }
+                else if (rangeMin)
+                {
+                    #region RangeMin查询
+                    if (piMap.PropertyType == typeof(DateTime) || piMap.PropertyType == typeof(DateTime?))
+                    {
+                        DateTime dt;
+                        if (!DateTime.TryParse(queryItemVal, out dt))
+                        {
+                            throw new Exception("日期格式错误.");
+                        }
+                        if (dt.Kind == DateTimeKind.Utc)
+                        {
+                            dt = dt.ToLocalTime();
+                        }
+                        DateTime min_dt = dt.Date;
+                        operand = Operand.GreaterThanOrEqual;
+                        var queryExp = ExpressionHelper.CreateLambdaExpression<T>(operand, piMap.PiName, min_dt);
+                        query.And(queryExp);
+                    }
+                    else
+                    {
+                        operand = Operand.GreaterThanOrEqual;
+                        var queryExp = ExpressionHelper.CreateLambdaExpression<T>(operand, piMap.PiName, queryItemVal);
+                        query.And(queryExp);
+                    }
+                    #endregion
+                }
+                else if (rangeMax)
+                {
+                    #region RangeMax查询
+                    if (piMap.PropertyType == typeof(DateTime) || piMap.PropertyType == typeof(DateTime?))
+                    {
+                        DateTime dt;
+                        if (!DateTime.TryParse(queryItemVal, out dt))
+                        {
+                            throw new Exception("日期格式错误.");
+                        }
+                        if(dt.Kind == DateTimeKind.Utc)
+                        {
+                            dt = dt.ToLocalTime();
+                        }
+                        DateTime max_dt = dt.Date.AddDays(1);
+                        operand = Operand.LessThan;
+                        var queryExp = ExpressionHelper.CreateLambdaExpression<T>(operand, piMap.PiName, max_dt);
+                        query.And(queryExp);
+                    }
+                    else
+                    {
+                        operand = Operand.LessThanOrEqual;
+                        var queryExp = ExpressionHelper.CreateLambdaExpression<T>(operand, piMap.PiName, queryItemVal);
+                        query.And(queryExp);
+                    }
+                    #endregion
+                }
+                else if (range)
+                {   // AddDateRange Json => List<Datetime> 或其他格式如 countRange Json => List<string>
+                    #region Range查询
+                    if (piMap.PropertyType == typeof(DateTime) || piMap.PropertyType == typeof(DateTime?))
+                    {
+                        List<DateTime?> dateTimes = JsonHelper.DeserializeObject<List<DateTime?>>(queryItemVal);
+                        if(dateTimes?.Count>=2)
+                        {
+                            if (dateTimes[0] != null)
+                            {
+                                DateTime dt = dateTimes[0].Value;
+                                if (dt.Kind == DateTimeKind.Utc)
+                                {
+                                    dt = dt.ToLocalTime();
+                                }
+                                DateTime min_dt = dt.Date;
+                                operand = Operand.GreaterThanOrEqual;
+                                var minQueryExp = ExpressionHelper.CreateLambdaExpression<T>(operand, piMap.PiName, min_dt);
+                                query.And(minQueryExp);
+                            }
+                            if (dateTimes[1] != null)
+                            {
+                                DateTime dt = dateTimes[1].Value;
+                                if (dt.Kind == DateTimeKind.Utc)
+                                {
+                                    dt = dt.ToLocalTime();
+                                }
+                                DateTime max_dt = dt.Date.AddDays(1);
+                                operand = Operand.LessThan;
+                                var maxQueryExp = ExpressionHelper.CreateLambdaExpression<T>(operand, piMap.PiName, max_dt);
+                                query.And(maxQueryExp);
+                            }
+                        }
+                    }
+                    else
+                    {
+                        List<string> rangeList = JsonHelper.DeserializeObject<List<string>>(queryItemVal);
+                        if (rangeList?.Count >= 2)
+                        {
+                            if (rangeList[0] != null)
+                            {
+                                string minValue = rangeList[0];
+                                operand = Operand.GreaterThanOrEqual;
+                                var minQueryExp = ExpressionHelper.CreateLambdaExpression<T>(operand, piMap.PiName, minValue);
+                                query.And(minQueryExp);
+                            }
+                            if (rangeList[1] != null)
+                            {
+                                string maxValue = rangeList[1];
+                                operand = Operand.LessThanOrEqual;
+                                var maxQueryExp = ExpressionHelper.CreateLambdaExpression<T>(operand, piMap.PiName, maxValue);
+                                query.And(maxQueryExp);
+                            }
+                        }
+                    }
+                    #endregion
+                }
+                else
+                {
+                    if ((operandSettings != null) && operandSettings.ContainsKey(piMap.PiName))
+                    {
+                        operand = operandSettings[piMap.PiName];
+                    }
+                    else if (piMap.PropertyType == typeof(string))
+                    {
+                        operand = Operand.Like;
+                    }
+                    else
+                    {
+                        operand = Operand.Equal;
+                    }
+                    var queryExp = ExpressionHelper.CreateLambdaExpression<T>(operand, piMap.PiName, queryItemVal);
+                    query.And(queryExp);
+                }
+                #endregion
             }
             return query;
         }
