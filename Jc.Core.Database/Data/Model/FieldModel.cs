@@ -15,9 +15,12 @@ namespace Jc.Database.Data
         private string fieldName =null;//字段名称
         private string fieldChName =null;//字段中文名称
         private bool isPk = false;//是否主键
+        private string isPkStr = "";//是否主键Str
         private string fieldType =null;//字段类型
         private int? fieldLength =null;//字段长度
-        private bool isNullAble = false;//可否为空
+        private string fieldLengthStr = "";//字段长度Str
+        private bool isNullable = false;//可否为空
+        private string isNullableStr = "";//是否为空Str
         private string note =null;//备注
         #endregion
 
@@ -73,6 +76,28 @@ namespace Jc.Database.Data
                 isPk=value;
             }
         }
+
+        /// <summary>
+        ///可否主键Str
+        /// </summary>
+        public string IsPkStr
+        {
+            get
+            {
+                return IsPk.ToString();
+            }
+            set
+            {
+                isPkStr = value;
+                bool tempIsPk = false;
+                int intValue;
+                if (int.TryParse(isPkStr, out intValue))
+                {
+                    tempIsPk = intValue != 0; // 如果intValue不是0，则结果为true
+                }
+                this.IsPk = tempIsPk;
+            }
+        }
         /// <summary>
         ///字段类型
         /// </summary>
@@ -102,19 +127,61 @@ namespace Jc.Database.Data
             }
         }
         /// <summary>
-        ///可否为空
+        ///字段长度Str
         /// </summary>
-        public bool IsNullAble
+        public string FieldLengthStr
         {
             get
             {
-                return isNullAble;
+                return fieldLength.HasValue ? fieldLength.Value.ToString() : "0";
             }
             set
             {
-                isNullAble=value;
+                fieldLengthStr = value;
+                int tempLength = 0;
+                if (int.TryParse(fieldLengthStr, out tempLength))
+                {
+                    this.fieldLength = tempLength;
+                }
             }
         }
+        /// <summary>
+        ///可否为空
+        /// </summary>
+        public bool IsNullable
+        {
+            get
+            {
+                return isNullable;
+            }
+            set
+            {
+                isNullable=value;
+            }
+        }
+
+        /// <summary>
+        ///可否为空Str
+        /// </summary>
+        public string IsNullableStr
+        {
+            get
+            {
+                return isNullable.ToString();
+            }
+            set
+            {
+                isNullableStr = value;
+                bool tempIsNullable = false;
+                int intValue;
+                if (int.TryParse(isNullableStr, out intValue))
+                {
+                    tempIsNullable = intValue != 0; // 如果intValue不是0，则结果为true
+                }
+                this.isNullable = tempIsNullable;
+            }
+        }
+
         /// <summary>
         ///备注
         /// </summary>

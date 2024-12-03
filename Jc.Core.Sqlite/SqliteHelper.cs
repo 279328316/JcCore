@@ -96,8 +96,6 @@ namespace Jc.Core.Sqlite
                     FieldModel field = new FieldModel()
                     {
                         FieldName = dr["name"].ToString(),
-                        IsNullAble = !Convert.ToBoolean(dr["notnull"]),
-                        IsPk = !Convert.ToBoolean(dr["notnull"]),
                     };
                     string fieldTypeStr = dr["type"].ToString();
                     int typeEndIndex = fieldTypeStr.IndexOf("(");

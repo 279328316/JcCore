@@ -12,7 +12,6 @@ namespace Jc
     /// </summary>
     public static class ObjectExpand
     {
-
         #region ICloneable 成员
 
         /// <summary>
@@ -37,11 +36,11 @@ namespace Jc
             List<string> excludeList = null;
             if (excludeExpr != null)
             {   //转换为小写对比
-                excludeList = GetPiList(excludeExpr);
+                excludeList = ExpressionHelper.GetPiList(excludeExpr);
             }
             if (includeExpr != null)
             {
-                includeList = GetPiList(includeExpr);
+                includeList = ExpressionHelper.GetPiList(includeExpr);
             }
             foreach (PropertyInfo pi in sourcePiList)
             {
@@ -63,8 +62,8 @@ namespace Jc
                 {   //属性类型相同 直接赋值 int==int int?==int?
                     destPi.SetValue(dest, piValue, null);
                 }
-                else if (destPi.PropertyType.GenericTypeArguments?.Length>0
-                        && destPi.PropertyType.GenericTypeArguments[0]== pi.PropertyType)
+                else if (destPi.PropertyType.GenericTypeArguments?.Length > 0
+                        && destPi.PropertyType.GenericTypeArguments[0] == pi.PropertyType)
                 {   //int?=int
                     destPi.SetValue(dest, piValue, null);
                 }
@@ -87,7 +86,7 @@ namespace Jc
         /// <param name="excludeExpr">排除属性列表</param>
         public static T MapTo<T>(this object source, T dest, Expression<Func<T, object>> includeExpr = null, Expression<Func<T, object>> excludeExpr = null) where T : class, new()
         {
-            if(dest == null)
+            if (dest == null)
             {
                 dest = new T();
             }
@@ -101,7 +100,7 @@ namespace Jc
         /// <param name="source">来源</param>
         /// <param name="includeExpr">包含属性列表</param>
         /// <param name="excludeExpr">排除属性列表</param>
-        public static T MapTo<T>(this object source,Expression<Func<T, object>> includeExpr = null, Expression<Func<T, object>> excludeExpr = null) where T : class, new()
+        public static T MapTo<T>(this object source, Expression<Func<T, object>> includeExpr = null, Expression<Func<T, object>> excludeExpr = null) where T : class, new()
         {
             T dest = new T();
             source.CopyTo(dest, includeExpr, excludeExpr);
@@ -136,40 +135,6 @@ namespace Jc
                 }
             }
             return destList;
-        }
-
-        /// <summary>
-        /// 通过Lambed Expression获取属性名称
-        /// </summary>
-        /// <param name="expr">查询表达式</param>
-        /// <returns></returns>
-        public static List<string> GetPiList<T>(Expression<Func<T, object>> expr)
-        {
-            List<string> result = new List<string>();
-            if (expr.Body is NewExpression)
-            {   // t=>new{t.Id,t.Name}
-                NewExpression nexp = expr.Body as NewExpression;
-                if (nexp.Members != null)
-                {
-                    result = nexp.Members.Select(member => member.Name).ToList();
-                }
-            }
-            else if (expr.Body is UnaryExpression)
-            {   //t=>t.Id
-                UnaryExpression uexp = expr.Body as UnaryExpression;
-                MemberExpression mexp = uexp.Operand as MemberExpression;
-                result.Add(mexp.Member.Name);
-            }
-            else if (expr.Body is MemberExpression)
-            {   //t=>t.Id T为子类时
-                MemberExpression mexp = expr.Body as MemberExpression;
-                result.Add(mexp.Member.Name);
-            }
-            else
-            {
-                throw new System.Exception("不支持的Select lambda写法");
-            }
-            return result;
         }
 
         #endregion
