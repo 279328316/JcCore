@@ -1,5 +1,4 @@
-﻿
-using Jc.Core.TestApp.Test;
+﻿using Jc.Core.TestApp.Test;
 using Jc.Database;
 using System;
 using System.Collections.Generic;
@@ -21,9 +20,9 @@ namespace Jc.Core.TestApp
 
             try
             {
-                ListAddTest.Test();
+                ConfigHelperTest.Test();
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 LogHelper.Error($"执行失败:", ex);
             }
