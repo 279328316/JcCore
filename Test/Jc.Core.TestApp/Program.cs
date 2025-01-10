@@ -20,7 +20,7 @@ namespace Jc.Core.TestApp
 
             try
             {
-                ConfigHelperTest.Test();
+                AddTest.Test();
             }
             catch (Exception ex)
             {

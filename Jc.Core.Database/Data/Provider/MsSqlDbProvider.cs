@@ -60,7 +60,7 @@ namespace Jc.Database.Provider
         {
             DbCommand dbCommand = CreateDbCommand();
             dbCommand.CommandText = "Select SCOPE_IDENTITY()";
-            return dbCommand ; 
+            return dbCommand;
         }
 
         /// <summary>
@@ -72,6 +72,10 @@ namespace Jc.Database.Provider
         /// <returns></returns>
         public override DbCommand GetQueryRecordsPageDbCommand<T>(QueryFilter filter, string subTableArg = null)
         {
+            if (filter == null)
+            {
+                throw new Exception("Paging query must specify pagination information");
+            }
             DbCommand dbCommand = CreateDbCommand();
 
             //表名 查询字段名 主键字段名
@@ -87,11 +91,11 @@ namespace Jc.Database.Provider
             {
                 selectParams += string.IsNullOrEmpty(selectParams) ? $"t1.{piMap.FieldName}" : $",t1.{piMap.FieldName}";
             }
-            if (filter != null && filter.ItemList.Count>0)
+            if (filter.ItemList.Count > 0)
             {
                 queryStr = filter.FilterSQLString;
             }
-            if (filter != null && !string.IsNullOrEmpty(filter.OrderSQLString))
+            if (!string.IsNullOrEmpty(filter.OrderSQLString))
             {
                 orderStr = filter.OrderSQLString;
             }
@@ -110,17 +114,15 @@ namespace Jc.Database.Provider
             sqlStr = sqlStr.Replace("@LowRecNum", filter.FilterStartIndex.ToString());
             sqlStr = sqlStr.Replace("@PageSize", filter.PageSize.ToString());
             sqlStr = sqlStr.Replace("@OrderStr", orderStr);
-            if (filter != null)
+
+            for (int i = 0; i < filter.FilterParameters.Count; i++)
             {
-                for (int i = 0; i < filter.FilterParameters.Count; i++)
-                {
-                    DbParameter dbParameter = dbCommand.CreateParameter();
-                    dbParameter.Direction = ParameterDirection.Input;
-                    dbParameter.ParameterName = filter.FilterParameters[i].ParameterName;
-                    dbParameter.Value = filter.FilterParameters[i].ParameterValue;
-                    dbParameter.DbType = filter.FilterParameters[i].ParameterDbType;
-                    dbCommand.Parameters.Add(dbParameter);
-                }
+                DbParameter dbParameter = dbCommand.CreateParameter();
+                dbParameter.Direction = ParameterDirection.Input;
+                dbParameter.ParameterName = filter.FilterParameters[i].ParameterName;
+                dbParameter.Value = filter.FilterParameters[i].ParameterValue;
+                dbParameter.DbType = filter.FilterParameters[i].ParameterDbType;
+                dbCommand.Parameters.Add(dbParameter);
             }
             dbCommand.CommandText = string.Format(sqlStr, dtoDbMapping.GetTableName(subTableArg), selectParams);
             return dbCommand;
@@ -135,6 +137,10 @@ namespace Jc.Database.Provider
         /// <returns></returns>
         public DbCommand GetQueryRecordsPageDbCommandBak<T>(QueryFilter filter, string subTableArg = null)
         {
+            if (filter == null)
+            {
+                throw new Exception("Paging query must specify pagination information");
+            }
             DbCommand dbCommand = CreateDbCommand();
 
             //表名 查询字段名 主键字段名
@@ -152,7 +158,7 @@ namespace Jc.Database.Provider
             {
                 selectParams += string.IsNullOrEmpty(selectParams) ? "t2.Num,t1." + piMap.FieldName : ",t1." + piMap.FieldName;
             }
-            if (filter != null && filter.ItemList.Count>0)
+            if (filter?.ItemList.Count > 0)
             {
                 queryStr = filter.FilterSQLString;
             }
@@ -376,7 +382,7 @@ namespace Jc.Database.Provider
         /// <param name="useTransaction"></param>
         /// <param name="progress">0,1 进度</param>
         /// <returns></returns>
-        public override void BulkCopy(string tableName, DataTable dt,int batchSize, int timeout = 0, bool useTransaction = true, IProgress<float> progress = null)
+        public override void BulkCopy(string tableName, DataTable dt, int batchSize, int timeout = 0, bool useTransaction = true, IProgress<float> progress = null)
         {
             dbCreator.BulkCopy(this.ConnectString, tableName, dt, batchSize, timeout, useTransaction, progress);
         }

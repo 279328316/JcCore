@@ -21,9 +21,11 @@ namespace Jc.Database.Provider
         #region Fields & Properties
 
         private string dbName;
+
         private string connectString;
 
         private DatabaseType dbType;
+
         internal IDbCreator dbCreator;  //DbCreator
 
         /// <summary>
@@ -61,11 +63,11 @@ namespace Jc.Database.Provider
         /// <summary>
         /// 数据库类型
         /// </summary>
-        public DatabaseType DbType 
+        public DatabaseType DbType
         {
-            get 
+            get
             {
-                return dbType; 
+                return dbType;
             }
         }
 
@@ -75,7 +77,7 @@ namespace Jc.Database.Provider
         /// Ctor
         /// </summary>
         /// <param name="connectString"></param>
-        internal DbProvider(string connectString,DatabaseType databaseType)
+        internal DbProvider(string connectString, DatabaseType databaseType)
         {
             this.ConnectString = connectString;
             this.dbType = databaseType;
@@ -179,6 +181,7 @@ namespace Jc.Database.Provider
         /// <param name="progress">0,1 进度</param>
         /// <returns></returns>
         public abstract void BulkCopy(string tableName, DataTable dt, int batchSize, int timeout = 0, bool useTransaction = true, IProgress<float> progress = null);
+
         #endregion
 
         #region Methods
@@ -223,7 +226,6 @@ namespace Jc.Database.Provider
             return dbCommand;
         }
 
-
         /// <summary>
         /// 获取插入DbCmd
         /// </summary>
@@ -246,7 +248,7 @@ namespace Jc.Database.Provider
             {
                 PropertyInfo pi = piMap.Pi;
                 if (piMap.FieldAttribute.ReadOnly) continue;  //跳过只读字段
-                if(piMap == pkField && dtoDbMapping.IsAutoIncrementPk)
+                if (piMap == pkField && dtoDbMapping.IsAutoIncrementPk)
                 {   //如果是自增主键 跳过插入
                     continue;
                 }
@@ -346,14 +348,14 @@ namespace Jc.Database.Provider
                 dbParameter.Value = GetParameterValue(piMap, dto);
                 dbParameter.DbType = piMap.DbType;
                 dbCommand.Parameters.Add(dbParameter);
-                
+
                 if (!string.IsNullOrEmpty(setParams))
                 {
                     setParams += ",";
                 }
                 setParams += $"{piMap.FieldName}={dbParameter.ParameterName}";
             }
-            
+
             DbParameter whereParameter = dbCommand.CreateParameter();
             whereParameter.Direction = ParameterDirection.Input;
             whereParameter.ParameterName = $"@where{pkField.FieldName}";
@@ -385,10 +387,12 @@ namespace Jc.Database.Provider
 
             string setParams = null;
 
-            if (filter != null && filter.FilterParameters.Count > 0)
+            if (filter != null)
             {
-                sqlStr += filter.FilterSQLString;
-
+                if (filter.ItemList.Count > 0)
+                {
+                    sqlStr += filter.FilterSQLString;
+                }
                 for (int i = 0; i < filter.FilterParameters.Count; i++)
                 {
                     DbParameter dbParameter = dbCommand.CreateParameter();
@@ -475,7 +479,7 @@ namespace Jc.Database.Provider
                 whereParameter.Value = pkValue != null ? pkValue : DBNull.Value;
                 dbCommand.Parameters.Add(whereParameter);
                 whereParams = $"{pkField.FieldName}={whereParameter.ParameterName}";
-                
+
                 string updateStr = string.Format(sqlStr, dtoDbMapping.GetTableName(subTableArg), setParams, whereParams);
                 strBuilder.Append(updateStr);
             }
@@ -534,10 +538,12 @@ namespace Jc.Database.Provider
 
             EntityMapping dtoDbMapping = EntityMappingHelper.GetMapping<T>();
 
-            if (filter != null && filter.FilterParameters.Count > 0)
+            if (filter != null)
             {
-                sqlStr += filter.FilterSQLString;
-
+                if (filter.ItemList.Count > 0)
+                {
+                    sqlStr += filter.FilterSQLString;
+                }
                 for (int i = 0; i < filter.FilterParameters.Count; i++)
                 {
                     DbParameter dbParameter = dbCommand.CreateParameter();
@@ -603,16 +609,16 @@ namespace Jc.Database.Provider
             {
                 selectParams += string.IsNullOrEmpty(selectParams) ? piMap.FieldName : $",{piMap.FieldName}";
             }
-            if (filter != null && filter.ItemList.Count>0)
-            {
-                sqlStr += filter.FilterSQLString;
-            }
-            if (filter != null && !string.IsNullOrEmpty(filter.OrderSQLString))
-            {
-                sqlStr += filter.OrderSQLString;
-            }
             if (filter != null)
             {
+                if (filter.ItemList.Count > 0)
+                {
+                    sqlStr += filter.FilterSQLString;
+                }
+                if (!string.IsNullOrEmpty(filter.OrderSQLString))
+                {
+                    sqlStr += filter.OrderSQLString;
+                }
                 for (int i = 0; i < filter.FilterParameters.Count; i++)
                 {
                     DbParameter dbParameter = dbCommand.CreateParameter();
@@ -628,8 +634,7 @@ namespace Jc.Database.Provider
         }
 
         /// <summary>
-        /// 获取查询DbCommand
-        /// 获取所有字段 Select * From {0}
+        /// 获取查询DbCommand 获取所有字段 Select * From {0}
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="filter"></param>
@@ -641,16 +646,16 @@ namespace Jc.Database.Provider
             string sqlStr = "Select * From {0}";
             EntityMapping dtoDbMapping = EntityMappingHelper.GetMapping<T>();
             List<FieldMapping> piMapList = EntityMappingHelper.GetPiMapList<T>(filter);
-            if (filter != null && filter.ItemList.Count > 0)
-            {
-                sqlStr += filter.FilterSQLString;
-            }
-            if (filter != null && !string.IsNullOrEmpty(filter.OrderSQLString))
-            {
-                sqlStr += filter.OrderSQLString;
-            }
             if (filter != null)
             {
+                if (filter.ItemList.Count > 0)
+                {
+                    sqlStr += filter.FilterSQLString;
+                }
+                if (!string.IsNullOrEmpty(filter.OrderSQLString))
+                {
+                    sqlStr += filter.OrderSQLString;
+                }
                 for (int i = 0; i < filter.FilterParameters.Count; i++)
                 {
                     DbParameter dbParameter = dbCommand.CreateParameter();
@@ -716,27 +721,29 @@ namespace Jc.Database.Provider
             {
                 throw new Exception("求和字段不能为空");
             }
-            selectParams = piMap.FieldName;            
-            if (filter != null && filter.ItemList.Count > 0)
+            selectParams = piMap.FieldName;
+            if (filter != null)
             {
-                sqlStr += filter.FilterSQLString;
-            }
-            if (filter != null && filter.FilterParameters.Count>0)
-            {
-                for (int i = 0; i < filter.FilterParameters.Count; i++)
+                if (filter.ItemList.Count > 0)
                 {
-                    DbParameter dbParameter = dbCommand.CreateParameter();
-                    dbParameter.Direction = ParameterDirection.Input;
-                    dbParameter.ParameterName = filter.FilterParameters[i].ParameterName;
-                    dbParameter.Value = filter.FilterParameters[i].ParameterValue;
-                    dbParameter.DbType = filter.FilterParameters[i].ParameterDbType;
-                    dbCommand.Parameters.Add(dbParameter);
+                    sqlStr += filter.FilterSQLString;
+                }
+                if (filter.FilterParameters.Count > 0)
+                {
+                    for (int i = 0; i < filter.FilterParameters.Count; i++)
+                    {
+                        DbParameter dbParameter = dbCommand.CreateParameter();
+                        dbParameter.Direction = ParameterDirection.Input;
+                        dbParameter.ParameterName = filter.FilterParameters[i].ParameterName;
+                        dbParameter.Value = filter.FilterParameters[i].ParameterValue;
+                        dbParameter.DbType = filter.FilterParameters[i].ParameterDbType;
+                        dbCommand.Parameters.Add(dbParameter);
+                    }
                 }
             }
             dbCommand.CommandText = string.Format(sqlStr, dtoDbMapping.GetTableName(subTableArg), selectParams);
             return dbCommand;
         }
-
 
         /// <summary>
         /// 获取字段求和DbCommand 返回Total列
@@ -757,20 +764,23 @@ namespace Jc.Database.Provider
                 throw new Exception("计算字段不能为空");
             }
             selectParams = piMap.FieldName;
-            if (filter != null && filter.ItemList.Count > 0)
+            if (filter != null)
             {
-                sqlStr += filter.FilterSQLString;
-            }
-            if (filter != null && filter.FilterParameters.Count > 0)
-            {
-                for (int i = 0; i < filter.FilterParameters.Count; i++)
+                if (filter.ItemList.Count > 0)
                 {
-                    DbParameter dbParameter = dbCommand.CreateParameter();
-                    dbParameter.Direction = ParameterDirection.Input;
-                    dbParameter.ParameterName = filter.FilterParameters[i].ParameterName;
-                    dbParameter.Value = filter.FilterParameters[i].ParameterValue;
-                    dbParameter.DbType = filter.FilterParameters[i].ParameterDbType;
-                    dbCommand.Parameters.Add(dbParameter);
+                    sqlStr += filter.FilterSQLString;
+                }
+                if (filter.FilterParameters.Count > 0)
+                {
+                    for (int i = 0; i < filter.FilterParameters.Count; i++)
+                    {
+                        DbParameter dbParameter = dbCommand.CreateParameter();
+                        dbParameter.Direction = ParameterDirection.Input;
+                        dbParameter.ParameterName = filter.FilterParameters[i].ParameterName;
+                        dbParameter.Value = filter.FilterParameters[i].ParameterValue;
+                        dbParameter.DbType = filter.FilterParameters[i].ParameterDbType;
+                        dbCommand.Parameters.Add(dbParameter);
+                    }
                 }
             }
             dbCommand.CommandText = string.Format(sqlStr, dtoDbMapping.GetTableName(subTableArg), selectParams);
@@ -796,20 +806,23 @@ namespace Jc.Database.Provider
                 throw new Exception("计算字段不能为空");
             }
             selectParams = piMap.FieldName;
-            if (filter != null && filter.ItemList.Count > 0)
+            if (filter != null)
             {
-                sqlStr += filter.FilterSQLString;
-            }
-            if (filter != null && filter.FilterParameters.Count > 0)
-            {
-                for (int i = 0; i < filter.FilterParameters.Count; i++)
+                if (filter.ItemList.Count > 0)
                 {
-                    DbParameter dbParameter = dbCommand.CreateParameter();
-                    dbParameter.Direction = ParameterDirection.Input;
-                    dbParameter.ParameterName = filter.FilterParameters[i].ParameterName;
-                    dbParameter.Value = filter.FilterParameters[i].ParameterValue;
-                    dbParameter.DbType = filter.FilterParameters[i].ParameterDbType;
-                    dbCommand.Parameters.Add(dbParameter);
+                    sqlStr += filter.FilterSQLString;
+                }
+                if (filter.FilterParameters.Count > 0)
+                {
+                    for (int i = 0; i < filter.FilterParameters.Count; i++)
+                    {
+                        DbParameter dbParameter = dbCommand.CreateParameter();
+                        dbParameter.Direction = ParameterDirection.Input;
+                        dbParameter.ParameterName = filter.FilterParameters[i].ParameterName;
+                        dbParameter.Value = filter.FilterParameters[i].ParameterValue;
+                        dbParameter.DbType = filter.FilterParameters[i].ParameterDbType;
+                        dbCommand.Parameters.Add(dbParameter);
+                    }
                 }
             }
             dbCommand.CommandText = string.Format(sqlStr, dtoDbMapping.GetTableName(subTableArg), selectParams);
@@ -829,12 +842,12 @@ namespace Jc.Database.Provider
             string sqlStr = "Select Count(*) as RecCount From {0} {1}";
             string queryStr = "";
             EntityMapping dtoDbMapping = EntityMappingHelper.GetMapping<T>();
-            if (filter != null && filter.ItemList.Count > 0)
+            if (filter != null)
             {
-                queryStr = filter.FilterSQLString;
-            }
-            if (filter != null && filter.FilterParameters.Count > 0)
-            {
+                if (filter.ItemList.Count > 0)
+                {
+                    queryStr = filter.FilterSQLString;
+                }
                 for (int i = 0; i < filter.FilterParameters.Count; i++)
                 {
                     DbParameter dbParameter = dbCommand.CreateParameter();
@@ -855,11 +868,11 @@ namespace Jc.Database.Provider
         /// <param name="piMap"></param>
         /// <param name="dto"></param>
         /// <returns></returns>
-        private object GetParameterValue(FieldMapping piMap,object dto)
+        private object GetParameterValue(FieldMapping piMap, object dto)
         {
             object dbValue = DBNull.Value;
             object piValue = piMap.Pi.GetValue(dto);
-            if (piValue !=null)
+            if (piValue != null)
             {
                 if (piMap.IsEnum)
                 {   //如果为枚举类型.转换为int
@@ -873,6 +886,7 @@ namespace Jc.Database.Provider
             }
             return dbValue;
         }
+
         /// <summary>
         /// 获取ConTestDbCommand
         /// </summary>
@@ -883,7 +897,8 @@ namespace Jc.Database.Provider
             string sqlStr = "Select 1 as a;";
             dbCommand.CommandText = sqlStr;
             return dbCommand;
-        }        
+        }
+
         #endregion
     }
 }

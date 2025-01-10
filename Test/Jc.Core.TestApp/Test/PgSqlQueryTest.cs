@@ -13,13 +13,17 @@ namespace Jc.Core.TestApp.Test
         private class QueryObj
         {
             public int? Id { get; set; }
+
             public string UserName { get; set; }
+
             public List<int?> Ids { get; set; }
 
             public int MinId { get; set; }
+
             public int MaxId { get; set; }
 
             public DateTime MinDt { get; set; }
+
             public DateTime MaxDt { get; set; }
 
             public QueryObj Query { get; set; }
@@ -27,6 +31,8 @@ namespace Jc.Core.TestApp.Test
 
         public void Test()
         {
+            AddUserTest();
+            UpdateTest();
             NTest();
             CommonCompareTest();
             DateTimeCompareTest();
@@ -36,7 +42,7 @@ namespace Jc.Core.TestApp.Test
 
         public void ContainsTest()
         {
-            var queryObj = new QueryObj (){ UserName = "Abc", Ids = new List<int?> { 1, 2, 3 } };
+            var queryObj = new QueryObj() { UserName = "Abc", Ids = new List<int?> { 1, 2, 3 } };
             queryObj.Query = queryObj;
 
             List<PgUserDto> list = null;
@@ -80,7 +86,7 @@ namespace Jc.Core.TestApp.Test
 
         private void NTest()
         {
-            var queryObj = new QueryObj() { UserName = "Abc",Id = 1, Ids = new List<int?> { 1, 2, 3 },MinDt = DateTime.Now};
+            var queryObj = new QueryObj() { UserName = "Abc", Id = 1, Ids = new List<int?> { 1, 2, 3 }, MinDt = DateTime.Now };
             queryObj.Query = queryObj;
 
             List<PgUserDto> list = null;
@@ -212,6 +218,62 @@ namespace Jc.Core.TestApp.Test
             list = Dbc.PgTestDb.GetList<PgUserDto>(a => a.UserName.ToLower() == a.FirstName);
             list = Dbc.PgTestDb.GetList<PgUserDto>(a => a.UserName == a.FirstName.ToLower());
             list = Dbc.PgTestDb.GetList<PgUserDto>(a => a.UserName.ToLower() == a.FirstName.ToLower());
+        }
+
+        public static void AddUserTest()
+        {
+            Console.WriteLine("插入测试");
+
+            if (!Dbc.PgTestDb.CheckTableExists<PgUserDto>())
+            {
+                Dbc.PgTestDb.CreateTable<PgUserDto>();
+            }
+
+            //int clearRows = Dbc.PgTestDb.Delete<PgUserDto>(a => a.Id != 0);
+            //Console.WriteLine($"清理数据:{clearRows}");
+
+            Stopwatch sw = new Stopwatch();
+            sw.Start();
+            int i = Random.Shared.Next(1, 100);
+            PgUserDto user = new PgUserDto()
+            {
+                UserName = $"UserName{i}",
+                UserPwd = $"UserPwd{i}",
+                LastUpdateDate = null
+            };
+            sw.Stop();
+            Console.WriteLine("执行数据插入...");
+            sw.Start();
+            Dbc.PgTestDb.Add(user);
+            sw.Stop();
+            Console.WriteLine($"Int插入1条记录，共耗时{sw.ElapsedMilliseconds} Ms");
+        }
+
+        public static void UpdateTest()
+        {
+            Console.WriteLine("更新测试.使用拼接批量SQL方式实现");
+            Stopwatch sw = new Stopwatch();
+            sw.Start();
+            List<PgUserDto> users = Dbc.PgTestDb.GetSortList<PgUserDto>(null, a => a.Id);
+            Console.WriteLine($"查询{users.Count}条记录，共耗时{sw.ElapsedMilliseconds}Ms");
+            sw.Reset();
+            sw.Start();
+            Console.WriteLine("执行更新数据构造...");
+            int dataAmount = users.Count;
+            for (int i = 0; i < users.Count; i++)
+            {
+                users[i].UserName = $"UpUserName{i}";
+                users[i].UserPwd = $"UserPwd{i}";
+                users[i].LastUpdateDate = DateTime.Now;
+            }
+            sw.Stop();
+            Console.WriteLine($"构造{users.Count}条记录，共耗时{sw.ElapsedMilliseconds}Ms");
+            sw.Reset();
+            Console.WriteLine("执行数据更新...");
+            sw.Start();
+            Dbc.PgTestDb.UpdateList(users, a => new { a.Id, a.UserName, a.LastUpdateDate });
+            sw.Stop();
+            Console.WriteLine($"Int更新{users.Count}条记录，共耗时{sw.ElapsedMilliseconds} Ms");
         }
     }
 }

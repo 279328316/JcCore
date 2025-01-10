@@ -13,7 +13,7 @@ namespace Jc.Core.TestApp
         /// <summary>
         /// Id
         /// </summary>
-        [Field(Name ="id", IsPk = true, Required = true, FieldType = "int")]
+        [Field(Name = "id", IsPk = true, Required = true, FieldType = "int")]
         public int Id { get; set; }
 
         /// <summary>
@@ -56,7 +56,8 @@ namespace Jc.Core.TestApp
         /// 修改时间
         /// </summary>
         [Field(Name = "last_modified_date_time", DisplayText = "修改时间", FieldType = "datetime")]
-        public DateTime LastUpdateDate { get; set; }
+        public DateTime? LastUpdateDate { get; set; }
+
         #endregion
     }
 }

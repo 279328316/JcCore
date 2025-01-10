@@ -8,7 +8,6 @@ using Jc.Database.Query;
 using System.Reflection;
 using System.Data;
 
-
 namespace Jc.Database.Provider
 {
     /// <summary>
@@ -77,6 +76,10 @@ namespace Jc.Database.Provider
         /// <returns></returns>
         public override DbCommand GetQueryRecordsPageDbCommand<T>(QueryFilter filter, string subTableArg = null)
         {
+            if (filter == null)
+            {
+                throw new Exception("Paging query must specify pagination information");
+            }
             DbCommand dbCommand = CreateDbCommand();
             //表名 查询字段名 主键字段名
             string sqlStr = "Select {1} From {0} @QueryStr @OrderStr limit @PageSize offset @LowRecNum";
@@ -90,11 +93,11 @@ namespace Jc.Database.Provider
             {
                 selectParams += string.IsNullOrEmpty(selectParams) ? piMap.FieldName : "," + piMap.FieldName;
             }
-            if (filter != null && filter.ItemList.Count>0)
+            if (filter.ItemList.Count > 0)
             {
                 queryStr = filter.FilterSQLString;
             }
-            if (filter != null && !string.IsNullOrEmpty(filter.OrderSQLString))
+            if (!string.IsNullOrEmpty(filter.OrderSQLString))
             {
                 orderStr = filter.OrderSQLString;
             }
@@ -102,21 +105,17 @@ namespace Jc.Database.Provider
             sqlStr = sqlStr.Replace("@LowRecNum", filter.FilterStartIndex.ToString());
             sqlStr = sqlStr.Replace("@PageSize", filter.PageSize.ToString());
             sqlStr = sqlStr.Replace("@OrderStr", orderStr);
-            if (filter != null)
+            for (int i = 0; i < filter.FilterParameters.Count; i++)
             {
-                for (int i = 0; i < filter.FilterParameters.Count; i++)
-                {
-                    DbParameter dbParameter = dbCommand.CreateParameter();
-                    dbParameter.ParameterName = filter.FilterParameters[i].ParameterName;
-                    dbParameter.Value = filter.FilterParameters[i].ParameterValue;
-                    dbParameter.DbType = filter.FilterParameters[i].ParameterDbType;
-                    dbCommand.Parameters.Add(dbParameter);
-                }
+                DbParameter dbParameter = dbCommand.CreateParameter();
+                dbParameter.ParameterName = filter.FilterParameters[i].ParameterName;
+                dbParameter.Value = filter.FilterParameters[i].ParameterValue;
+                dbParameter.DbType = filter.FilterParameters[i].ParameterDbType;
+                dbCommand.Parameters.Add(dbParameter);
             }
             dbCommand.CommandText = string.Format(sqlStr, dtoDbMapping.GetTableName(subTableArg), selectParams, dtoDbMapping.GetPkField().FieldName);
             return dbCommand;
         }
-
 
         /// <summary>
         /// 获取建表DbCommand
@@ -165,10 +164,10 @@ namespace Jc.Database.Provider
         public override DbCommand GetCheckTableExistsDbCommand<T>(string subTableArg = null)
         {
             EntityMapping dtoDbMapping = EntityMappingHelper.GetMapping<T>();
-            string tableName = dtoDbMapping.GetTableName(subTableArg);            
+            string tableName = dtoDbMapping.GetTableName(subTableArg);
             return GetCheckTableExistsDbCommand(tableName);
         }
-        
+
         /// <summary>
         /// 获取检查表是否存在DbCommand
         /// </summary>
@@ -234,7 +233,7 @@ namespace Jc.Database.Provider
         /// <param name="piMap">字段属性Map</param>
         /// <param name="isLastField">是否为最后一个字段</param>
         /// <returns></returns>
-        private string CreateField(FieldMapping piMap,bool isLastField = false)
+        private string CreateField(FieldMapping piMap, bool isLastField = false)
         {
             string fieldStr = "";
             if (piMap.IsIgnore != true)
@@ -262,7 +261,7 @@ namespace Jc.Database.Provider
                 {
                     strBuilder.Append(" primary key ");
 
-                    if (fieldType == "int" || fieldType == "integer" || fieldType== "long" || fieldType == "bigint")
+                    if (fieldType == "int" || fieldType == "integer" || fieldType == "long" || fieldType == "bigint")
                     {
                         strBuilder.Append(" autoincrement ");
                     }
@@ -514,5 +513,5 @@ namespace Jc.Database.Provider
         {
             throw new NotImplementedException();
         }
-    }    
+    }
 }
