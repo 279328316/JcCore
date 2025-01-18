@@ -31,9 +31,7 @@ namespace Jc
     }
 
     /// <summary>
-    /// 有关HTTP请求的辅助类
-    /// 如果需要解析中文GBK请在程序启动时注册Encoding
-    /// 调用静态方法RegisterEncodingProvider
+    /// 有关HTTP请求的辅助类 如果需要解析中文GBK请在程序启动时注册Encoding 调用静态方法RegisterEncodingProvider
     /// </summary>
     public class HttpHelper
     {
@@ -79,8 +77,7 @@ namespace Jc
         #region Ctor
 
         /// <summary>
-        /// 静态Ctor
-        /// 注册字符
+        /// 静态Ctor 注册字符
         /// </summary>
         static HttpHelper()
         {
@@ -92,9 +89,7 @@ namespace Jc
         #region SetMethods
 
         /// <summary>
-        /// 构造方法
-        /// 如果需要解析中文GBK请在程序启动时注册Encoding
-        /// 调用静态方法RegisterEncodingProvider
+        /// 构造方法 如果需要解析中文GBK请在程序启动时注册Encoding 调用静态方法RegisterEncodingProvider
         /// </summary>
         public HttpHelper()
         {
@@ -289,9 +284,7 @@ namespace Jc
         #region Get请求
 
         /// <summary>
-        /// 执行Get请求
-        /// 可接受IDictionary&lt;string,object&gt;,IEnumerable&lt;keyvaluePair&lt;string,object&gt;&gt;,
-        /// IEnumerable&lt;object&gt;,string(a=a1&amp;b=b1),object等类型参数
+        /// 执行Get请求 可接受IDictionary&lt;string,object&gt;,IEnumerable&lt;keyvaluePair&lt;string,object&gt;&gt;, IEnumerable&lt;object&gt;,string(a=a1&amp;b=b1),object等类型参数
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="url">请求URL</param>
@@ -304,9 +297,7 @@ namespace Jc
         }
 
         /// <summary>
-        /// 执行Get请求
-        /// 可接受IDictionary&lt;string,object&gt;,IEnumerable&lt;keyvaluePair&lt;string,object&gt;&gt;,
-        /// IEnumerable&lt;object&gt;,string(a=a1&amp;b=b1),object等类型参数
+        /// 执行Get请求 可接受IDictionary&lt;string,object&gt;,IEnumerable&lt;keyvaluePair&lt;string,object&gt;&gt;, IEnumerable&lt;object&gt;,string(a=a1&amp;b=b1),object等类型参数
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="url">请求URL</param>
@@ -333,9 +324,7 @@ namespace Jc
         }
 
         /// <summary>
-        /// 执行Get请求
-        /// 可接受IDictionary&lt;string,object&gt;,IEnumerable&lt;keyvaluePair&lt;string,object&gt;&gt;,
-        /// IEnumerable&lt;object&gt;,string(a=a1&amp;b=b1),object等类型参数
+        /// 执行Get请求 可接受IDictionary&lt;string,object&gt;,IEnumerable&lt;keyvaluePair&lt;string,object&gt;&gt;, IEnumerable&lt;object&gt;,string(a=a1&amp;b=b1),object等类型参数
         /// </summary>
         /// <param name="url">请求URL</param>
         /// <param name="requestParams">请求参数</param>
@@ -363,9 +352,7 @@ namespace Jc
         #region Post请求
 
         /// <summary>
-        /// 执行Post请求
-        /// 可接受IDictionary&lt;string,object&gt;,IEnumerable&lt;keyvaluePair&lt;string,object&gt;&gt;,
-        /// IEnumerable&lt;object&gt;,string(a=a1&amp;b=b1),object等类型参数
+        /// 执行Post请求 可接受IDictionary&lt;string,object&gt;,IEnumerable&lt;keyvaluePair&lt;string,object&gt;&gt;, IEnumerable&lt;object&gt;,string(a=a1&amp;b=b1),object等类型参数
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="url">请求的url</param>
@@ -379,9 +366,7 @@ namespace Jc
         }
 
         /// <summary>
-        /// 执行Post请求
-        /// 可接受IDictionary&lt;string,object&gt;,IEnumerable&lt;keyvaluePair&lt;string,object&gt;&gt;,
-        /// IEnumerable&lt;object&gt;,string(a=a1&amp;b=b1),object等类型参数
+        /// 执行Post请求 可接受IDictionary&lt;string,object&gt;,IEnumerable&lt;keyvaluePair&lt;string,object&gt;&gt;, IEnumerable&lt;object&gt;,string(a=a1&amp;b=b1),object等类型参数
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="url">请求url</param>
@@ -409,9 +394,7 @@ namespace Jc
         }
 
         /// <summary>
-        /// 执行Post请求
-        /// 可接受IDictionary&lt;string,object&gt;,IEnumerable&lt;keyvaluePair&lt;string,object&gt;&gt;,
-        /// IEnumerable&lt;object&gt;,string(a=a1&amp;b=b1),object等类型参数
+        /// 执行Post请求 可接受IDictionary&lt;string,object&gt;,IEnumerable&lt;keyvaluePair&lt;string,object&gt;&gt;, IEnumerable&lt;object&gt;,string(a=a1&amp;b=b1),object等类型参数
         /// </summary>
         /// <param name="url">请求url</param>
         /// <param name="requestParams">请求参数</param>
@@ -440,9 +423,7 @@ namespace Jc
         #region UploadFile请求
 
         /// <summary>
-        /// 执行UploadFile请求
-        /// 可接受IDictionary&lt;string,object&gt;,IEnumerable&lt;keyvaluePair&lt;string,object&gt;&gt;,
-        /// IEnumerable&lt;object&gt;,string(a=a1&amp;b=b1),object等类型参数
+        /// 执行UploadFile请求 可接受IDictionary&lt;string,object&gt;,IEnumerable&lt;keyvaluePair&lt;string,object&gt;&gt;, IEnumerable&lt;object&gt;,string(a=a1&amp;b=b1),object等类型参数
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="url">请求url</param>
@@ -456,9 +437,7 @@ namespace Jc
         }
 
         /// <summary>
-        /// 执行UploadFile请求
-        /// 可接受IDictionary&lt;string,object&gt;,IEnumerable&lt;keyvaluePair&lt;string,object&gt;&gt;,
-        /// IEnumerable&lt;object&gt;,string(a=a1&amp;b=b1),object等类型参数
+        /// 执行UploadFile请求 可接受IDictionary&lt;string,object&gt;,IEnumerable&lt;keyvaluePair&lt;string,object&gt;&gt;, IEnumerable&lt;object&gt;,string(a=a1&amp;b=b1),object等类型参数
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="url">请求url</param>
@@ -484,9 +463,7 @@ namespace Jc
         }
 
         /// <summary>
-        /// 执行UploadFile请求
-        /// 可接受IDictionary&lt;string,object&gt;,IEnumerable&lt;keyvaluePair&lt;string,object&gt;&gt;,
-        /// IEnumerable&lt;object&gt;,string(a=a1&amp;b=b1),object等类型参数
+        /// 执行UploadFile请求 可接受IDictionary&lt;string,object&gt;,IEnumerable&lt;keyvaluePair&lt;string,object&gt;&gt;, IEnumerable&lt;object&gt;,string(a=a1&amp;b=b1),object等类型参数
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="url">请求url</param>
@@ -504,9 +481,7 @@ namespace Jc
         }
 
         /// <summary>
-        /// 执行UploadFile请求
-        /// 可接受IDictionary&lt;string,object&gt;,IEnumerable&lt;keyvaluePair&lt;string,object&gt;&gt;,
-        /// IEnumerable&lt;object&gt;,string(a=a1&amp;b=b1),object等类型参数
+        /// 执行UploadFile请求 可接受IDictionary&lt;string,object&gt;,IEnumerable&lt;keyvaluePair&lt;string,object&gt;&gt;, IEnumerable&lt;object&gt;,string(a=a1&amp;b=b1),object等类型参数
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="url">请求url</param>
@@ -524,9 +499,7 @@ namespace Jc
         }
 
         /// <summary>
-        /// 执行UploadFile请求 以stream方式上传单个文件
-        /// 可接受IDictionary&lt;string,object&gt;,IEnumerable&lt;keyvaluePair&lt;string,object&gt;&gt;,
-        /// IEnumerable&lt;object&gt;,string(a=a1&amp;b=b1),object等类型参数
+        /// 执行UploadFile请求 以stream方式上传单个文件 可接受IDictionary&lt;string,object&gt;,IEnumerable&lt;keyvaluePair&lt;string,object&gt;&gt;, IEnumerable&lt;object&gt;,string(a=a1&amp;b=b1),object等类型参数
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="url">请求url</param>
@@ -555,9 +528,7 @@ namespace Jc
         }
 
         /// <summary>
-        /// 执行UploadFile请求 以stream方式上传单个文件
-        /// 可接受IDictionary&lt;string,object&gt;,IEnumerable&lt;keyvaluePair&lt;string,object&gt;&gt;,
-        /// IEnumerable&lt;object&gt;,string(a=a1&amp;b=b1),object等类型参数
+        /// 执行UploadFile请求 以stream方式上传单个文件 可接受IDictionary&lt;string,object&gt;,IEnumerable&lt;keyvaluePair&lt;string,object&gt;&gt;, IEnumerable&lt;object&gt;,string(a=a1&amp;b=b1),object等类型参数
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="url">请求url</param>
@@ -572,9 +543,7 @@ namespace Jc
         }
 
         /// <summary>
-        /// 执行UploadFile请求 以Byte[]上传单个文件
-        /// 可接受IDictionary&lt;string,object&gt;,IEnumerable&lt;keyvaluePair&lt;string,object&gt;&gt;,
-        /// IEnumerable&lt;object&gt;,string(a=a1&amp;b=b1),object等类型参数
+        /// 执行UploadFile请求 以Byte[]上传单个文件 可接受IDictionary&lt;string,object&gt;,IEnumerable&lt;keyvaluePair&lt;string,object&gt;&gt;, IEnumerable&lt;object&gt;,string(a=a1&amp;b=b1),object等类型参数
         /// </summary>
         /// <param name="url">请求url</param>
         /// <param name="requestParams">请求参数</param>
@@ -600,9 +569,7 @@ namespace Jc
         }
 
         /// <summary>
-        /// 执行UploadFile请求 以Byte[]上传单个文件
-        /// 可接受IDictionary&lt;string,object&gt;,IEnumerable&lt;keyvaluePair&lt;string,object&gt;&gt;,
-        /// IEnumerable&lt;object&gt;,string(a=a1&amp;b=b1),object等类型参数
+        /// 执行UploadFile请求 以Byte[]上传单个文件 可接受IDictionary&lt;string,object&gt;,IEnumerable&lt;keyvaluePair&lt;string,object&gt;&gt;, IEnumerable&lt;object&gt;,string(a=a1&amp;b=b1),object等类型参数
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="url">请求url</param>
@@ -667,7 +634,7 @@ namespace Jc
         }
 
         /// <summary>
-        ///  Post上传文件,并下载
+        /// Post上传文件,并下载
         /// </summary>
         /// <param name="url">请求Url</param>
         /// <param name="data">数据对象</param>
@@ -717,9 +684,7 @@ namespace Jc
         #region 创建请求
 
         /// <summary>
-        /// 创建GET方式的HTTP请求
-        /// 可接受IDictionary&lt;string,object&gt;,IEnumerable&lt;keyvaluePair&lt;string,object&gt;&gt;,
-        /// IEnumerable&lt;object&gt;,string(a=a1&amp;b=b1),object等类型参数
+        /// 创建GET方式的HTTP请求 可接受IDictionary&lt;string,object&gt;,IEnumerable&lt;keyvaluePair&lt;string,object&gt;&gt;, IEnumerable&lt;object&gt;,string(a=a1&amp;b=b1),object等类型参数
         /// </summary>
         /// <param name="url">请求URL</param>
         /// <param name="requestParams">请求参数</param>
@@ -772,9 +737,7 @@ namespace Jc
         }
 
         /// <summary>
-        /// 创建Post方式的HTTP请求
-        /// 可接受IDictionary&lt;string,object&gt;,IEnumerable&lt;keyvaluePair&lt;string,object&gt;&gt;,
-        /// IEnumerable&lt;object&gt;,string(a=a1&amp;b=b1),object等类型参数
+        /// 创建Post方式的HTTP请求 可接受IDictionary&lt;string,object&gt;,IEnumerable&lt;keyvaluePair&lt;string,object&gt;&gt;, IEnumerable&lt;object&gt;,string(a=a1&amp;b=b1),object等类型参数
         /// </summary>
         /// <param name="url">请求url</param>
         /// <param name="requestParams">请求参数</param>
@@ -804,7 +767,7 @@ namespace Jc
             }
             else if (contentType == HttpContentType.Form)
             {
-                request.ContentType = "application/x-www-form-urlencoded";
+                request.ContentType = "application/x-www-form-urlencoded;charset=utf-8;";
             }
 
             request.UserAgent = UserAgent;
@@ -851,9 +814,7 @@ namespace Jc
         }
 
         /// <summary>
-        /// 创建UploadFile请求 以stream方式上传单个文件
-        /// 可接受IDictionary&lt;string,object&gt;,IEnumerable&lt;keyvaluePair&lt;string,object&gt;&gt;,
-        /// IEnumerable&lt;object&gt;,string(a=a1&amp;b=b1),object等类型参数
+        /// 创建UploadFile请求 以stream方式上传单个文件 可接受IDictionary&lt;string,object&gt;,IEnumerable&lt;keyvaluePair&lt;string,object&gt;&gt;, IEnumerable&lt;object&gt;,string(a=a1&amp;b=b1),object等类型参数
         /// </summary>
         /// <param name="url">请求url</param>
         /// <param name="requestParams">请求参数</param>
@@ -865,9 +826,7 @@ namespace Jc
         }
 
         /// <summary>
-        /// 创建UploadFile请求 以stream方式上传单个文件
-        /// 可接受IDictionary&lt;string,object&gt;,IEnumerable&lt;keyvaluePair&lt;string,object&gt;&gt;,
-        /// IEnumerable&lt;object&gt;,string(a=a1&amp;b=b1),object等类型参数
+        /// 创建UploadFile请求 以stream方式上传单个文件 可接受IDictionary&lt;string,object&gt;,IEnumerable&lt;keyvaluePair&lt;string,object&gt;&gt;, IEnumerable&lt;object&gt;,string(a=a1&amp;b=b1),object等类型参数
         /// </summary>
         /// <param name="url">请求url</param>
         /// <param name="filePath">文件路径</param>
@@ -878,9 +837,7 @@ namespace Jc
         }
 
         /// <summary>
-        /// 创建UploadFile请求
-        /// 可接受IDictionary&lt;string,object&gt;,IEnumerable&lt;keyvaluePair&lt;string,object&gt;&gt;,
-        /// IEnumerable&lt;object&gt;,string(a=a1&amp;b=b1),object等类型参数
+        /// 创建UploadFile请求 可接受IDictionary&lt;string,object&gt;,IEnumerable&lt;keyvaluePair&lt;string,object&gt;&gt;, IEnumerable&lt;object&gt;,string(a=a1&amp;b=b1),object等类型参数
         /// </summary>
         /// <param name="url">请求url</param>
         /// <param name="requestParams">请求参数</param>
@@ -997,9 +954,7 @@ namespace Jc
         }
 
         /// <summary>
-        /// 创建UploadFile请求 以stream方式上传单个文件
-        /// 可接受IDictionary&lt;string,object&gt;,IEnumerable&lt;keyvaluePair&lt;string,object&gt;&gt;,
-        /// IEnumerable&lt;object&gt;,string(a=a1&amp;b=b1),object等类型参数
+        /// 创建UploadFile请求 以stream方式上传单个文件 可接受IDictionary&lt;string,object&gt;,IEnumerable&lt;keyvaluePair&lt;string,object&gt;&gt;, IEnumerable&lt;object&gt;,string(a=a1&amp;b=b1),object等类型参数
         /// </summary>
         /// <param name="url">请求url</param>
         /// <param name="requestParams">请求参数</param>
@@ -1122,8 +1077,7 @@ namespace Jc
         #endregion
 
         /// <summary>
-        /// 处理UnicodeString
-        /// 解决中文被Unicode编码问题
+        /// 处理UnicodeString 解决中文被Unicode编码问题
         /// </summary>
         /// <param name="result"></param>
         /// <returns></returns>
@@ -1139,9 +1093,7 @@ namespace Jc
         }
 
         /// <summary>
-        /// 构造Form请求参数String
-        /// 可接受IDictionary&lt;string,object&gt;,IEnumerable&lt;keyvaluePair&lt;string,object&gt;&gt;,
-        /// IEnumerable&lt;object&gt;,string(a=a1&amp;b=b1),object等类型参数
+        /// 构造Form请求参数String 可接受IDictionary&lt;string,object&gt;,IEnumerable&lt;keyvaluePair&lt;string,object&gt;&gt;, IEnumerable&lt;object&gt;,string(a=a1&amp;b=b1),object等类型参数
         /// </summary>
         /// <param name="requestParams">参数 IDictionary,IEnumerable,string,object</param>
         /// <returns>a=a1&amp;b=b1</returns>
@@ -1157,13 +1109,42 @@ namespace Jc
                     IDictionary<string, object> dic = requestParams as IDictionary<string, object>;
                     foreach (string key in dic.Keys)
                     {
+                        object value = dic[key];
+                        if (value == null)
+                        {
+                            continue;
+                        }
                         if (strBuilder.Length <= 0)
                         {
-                            strBuilder.AppendFormat("{0}={1}", key, FormatParameterValue(dic[key]));
+                            strBuilder.AppendFormat("{0}={1}", key, FormatParameterValue(value));
                         }
                         else
                         {
-                            strBuilder.AppendFormat("&{0}={1}", key, FormatParameterValue(dic[key]));
+                            strBuilder.AppendFormat("&{0}={1}", key, FormatParameterValue(value));
+                        }
+                    }
+
+                    #endregion
+                }
+                else if (requestParams is IDictionary<string, string>)
+                {
+                    #region 处理IDictionary<string, string>类型数据
+
+                    IDictionary<string, string> dic = requestParams as IDictionary<string, string>;
+                    foreach (string key in dic.Keys)
+                    {
+                        string value = dic[key];
+                        if (value == null)
+                        {
+                            continue;
+                        }
+                        if (strBuilder.Length <= 0)
+                        {
+                            strBuilder.AppendFormat("{0}={1}", key, FormatParameterValue(value));
+                        }
+                        else
+                        {
+                            strBuilder.AppendFormat("&{0}={1}", key, FormatParameterValue(value));
                         }
                     }
 
@@ -1183,11 +1164,16 @@ namespace Jc
 
                             foreach (KeyValuePair<string, object> kv in list)
                             {
+                                object value = kv.Value;
+                                if (value == null)
+                                {
+                                    continue;
+                                }
                                 if (strBuilder.Length > 0)
                                 {
                                     strBuilder.AppendFormat("&");
                                 }
-                                strBuilder.AppendFormat("{0}={1}", kv.Key, FormatParameterValue(kv.Value));
+                                strBuilder.AppendFormat("{0}={1}", kv.Key, FormatParameterValue(value));
                             }
 
                             #endregion
@@ -1243,9 +1229,7 @@ namespace Jc
         }
 
         /// <summary>
-        /// 构造请求参数IDictionary&lt;string,object&gt;
-        /// 可接受IDictionary&lt;string,object&gt;,IEnumerable&lt;keyvaluePair&lt;string,object&gt;&gt;,
-        /// IEnumerable&lt;object&gt;,string(a=a1&amp;b=b1),object等类型参数
+        /// 构造请求参数IDictionary&lt;string,object&gt; 可接受IDictionary&lt;string,object&gt;,IEnumerable&lt;keyvaluePair&lt;string,object&gt;&gt;, IEnumerable&lt;object&gt;,string(a=a1&amp;b=b1),object等类型参数
         /// </summary>
         /// <param name="requestParams">参数 IDictionary,IEnumerable,string,object</param>
         /// <returns></returns>
@@ -1259,7 +1243,23 @@ namespace Jc
                     IDictionary<string, object> requestDic = (IDictionary<string, object>)requestParams;
                     foreach (KeyValuePair<string, object> kv in requestDic)
                     {
-                        dic.Add(kv.Key, FormatParameterValue(kv.Value));
+                        if (kv.Value == null)
+                        {
+                            continue;
+                        }
+                        dic.Add(kv.Key, kv.Value.ToString());
+                    }
+                }
+                else if (requestParams is IDictionary<string, string>)
+                {   //处理IDictionary<string, object>类型数据
+                    IDictionary<string, string> requestDic = (IDictionary<string, string>)requestParams;
+                    foreach (KeyValuePair<string, string> kv in requestDic)
+                    {
+                        if (kv.Value == null)
+                        {
+                            continue;
+                        }
+                        dic.Add(kv.Key, kv.Value);
                     }
                 }
                 else if (requestParams is IEnumerable<object>)
@@ -1274,7 +1274,11 @@ namespace Jc
                         {   //处理List<KeyValuePair<string, object>> 类型数据
                             foreach (KeyValuePair<string, object> kv in list)
                             {
-                                dic.Add(kv.Key, FormatParameterValue(kv.Value));
+                                if (kv.Value == null)
+                                {
+                                    continue;
+                                }
+                                dic.Add(kv.Key, kv.Value.ToString());
                             }
                         }
                         else
@@ -1287,7 +1291,7 @@ namespace Jc
                 }
                 else if (requestParams is ValueType)
                 {
-                    dic.Add("params", FormatParameterValue(requestParams));
+                    dic.Add("params", requestParams.ToString());
                 }
                 else if (requestParams is string)
                 {
@@ -1310,13 +1314,16 @@ namespace Jc
                                 {   //=不是最后一个字符,返回数据;
                                     value = str.Substring(index + 1);
                                 }
-                                dic.Add(key, value);
+                                if (value != null)
+                                {
+                                    dic.Add(key, value);
+                                }
                             }
                         }
                     }
                     else
                     {
-                        dic.Add("params", FormatParameterValue(requestParams));
+                        dic.Add("params", requestParams.ToString());
                     }
                 }
                 else
@@ -1337,7 +1344,7 @@ namespace Jc
                             }
                             if (value is ValueType || value is string)
                             {
-                                valueStr = FormatParameterValue(value);
+                                valueStr = value.ToString();
                             }
                             else
                             {
