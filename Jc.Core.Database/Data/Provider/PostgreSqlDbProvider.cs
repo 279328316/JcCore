@@ -67,6 +67,27 @@ namespace Jc.Database.Provider
         }
 
         /// <summary>
+        /// override GetParameterValue Method
+        /// </summary>
+        /// <param name="piMap"></param>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        protected override object GetParameterValue(FieldMapping piMap, object dto)
+        {
+            object dbValue = base.GetParameterValue(piMap, dto);
+            if(dbValue != null)
+            {
+                // PostgreSql 日期处理为UTC格式
+                if (piMap.DbType == System.Data.DbType.DateTime)
+                {
+                    DateTime? dateTime = dbValue as DateTime?;
+                    dbValue = DateHelper.ToUniversalTime(dateTime);
+                }
+            }
+            return dbValue;
+        }
+
+        /// <summary>
         /// 获取分页查询DbCommand
         /// </summary>
         /// <typeparam name="T"></typeparam>

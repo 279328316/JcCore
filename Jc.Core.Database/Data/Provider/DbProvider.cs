@@ -868,7 +868,7 @@ namespace Jc.Database.Provider
         /// <param name="piMap"></param>
         /// <param name="dto"></param>
         /// <returns></returns>
-        private object GetParameterValue(FieldMapping piMap, object dto)
+        protected virtual object GetParameterValue(FieldMapping piMap, object dto)
         {
             object dbValue = DBNull.Value;
             object piValue = piMap.Pi.GetValue(dto);
@@ -882,14 +882,6 @@ namespace Jc.Database.Provider
                 else
                 {
                     dbValue = piValue;
-                    if(DbType == DatabaseType.PostgreSql)
-                    {   // PostgreSql 日期处理为UTC格式
-                        if(piMap.DbType == System.Data.DbType.DateTime)
-                        {
-                            DateTime? dateTime = dbValue as DateTime?;
-                            dbValue = DateHelper.ToUniversalTime(dateTime);
-                        }
-                    }
                 }
             }
             return dbValue;
