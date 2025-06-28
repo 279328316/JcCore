@@ -63,7 +63,7 @@ namespace Jc.Database.Provider
         public override DbCommand GetAutoIdDbCommand()
         {
             DbCommand dbCommand = CreateDbCommand();
-            dbCommand.CommandText = "select last_insert_rowid()";
+            dbCommand.CommandText = ";select last_insert_rowid()";
             return dbCommand;
         }
 

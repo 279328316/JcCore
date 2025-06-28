@@ -13,6 +13,33 @@ namespace Jc
     public class DateHelper
     {
         /// <summary>
+        /// 将任意 DateTime 转换为适合 UTC日期时间。
+        /// 对于 Unspecified 时间，将其视为本地时间并转换为 UTC。
+        /// </summary>
+        /// <param name="dateTime">原始 DateTime 值</param>
+        /// <returns>UTC日期时间格式（Kind = Utc）</returns>
+        public static DateTime? ToUniversalTime(DateTime? dateTime)
+        {
+            DateTime? result = dateTime;
+            if(dateTime != null)
+            {
+                switch(dateTime.Value.Kind)
+                {
+                    case DateTimeKind.Utc:
+                        result = dateTime;
+                        break;
+                    case DateTimeKind.Local:
+                        result = dateTime.Value.ToUniversalTime();
+                        break;
+                    case DateTimeKind.Unspecified:
+                        result = TimeZoneInfo.ConvertTimeToUtc(dateTime.Value, TimeZoneInfo.Local);
+                        break;
+                }
+            }
+            return result;
+        }
+
+        /// <summary>
         /// 计算日期时间差 d天 hh:mm:ss
         /// </summary>
         /// <param name="dt1">日期1</param>

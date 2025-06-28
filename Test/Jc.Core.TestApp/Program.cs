@@ -20,7 +20,8 @@ namespace Jc.Core.TestApp
 
             try
             {
-                AddTest.Test();
+                PgSqlQueryTest test = new PgSqlQueryTest();
+                test.Test();
             }
             catch (Exception ex)
             {

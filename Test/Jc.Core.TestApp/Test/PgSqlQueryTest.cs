@@ -47,18 +47,18 @@ namespace Jc.Core.TestApp.Test
 
             List<PgUserDto> list = null;
             list = Dbc.PgTestDb.GetList<PgUserDto>(a => a.UserName.Contains("a"));
-            list = Dbc.PgTestDb.GetList<PgUserDto>(a => a.UserName.ToLower().Contains("A".ToLower()) && a.IsActived);
+            list = Dbc.PgTestDb.GetList<PgUserDto>(a => a.UserName.ToLower().Contains("A".ToLower()) && !a.IsDelete);
             list = Dbc.PgTestDb.GetList<PgUserDto>(a => a.UserName.ToLower().Contains("A".ToLower()));
             list = Dbc.PgTestDb.GetList<PgUserDto>(a => a.UserName.ToLower() == "A".ToLower());
 
-            list = Dbc.PgTestDb.GetList<PgUserDto>(a => a.UserName.ToLower().Contains("a") && a.IsActived);
-            list = Dbc.PgTestDb.GetList<PgUserDto>(a => a.UserName.ToLower().Contains(queryObj.UserName) && a.IsActived);
-            list = Dbc.PgTestDb.GetList<PgUserDto>(a => a.UserName.ToLower().Contains(queryObj.UserName.ToLower()) && a.IsActived);
-            list = Dbc.PgTestDb.GetList<PgUserDto>(a => a.UserName.ToLower().Contains("ABC".ToLower()) && a.IsActived);
-            list = Dbc.PgTestDb.GetList<PgUserDto>(a => a.UserName.ToLower().Contains("ABC".ToLower().Substring(0, 1).ToUpper()) && a.IsActived);
-            list = Dbc.PgTestDb.GetList<PgUserDto>(a => a.UserName.ToLower().Contains("ABC".ToLower().Substring(0, 1)) && a.IsActived);
-            list = Dbc.PgTestDb.GetList<PgUserDto>(a => a.UserName.ToLower().Contains("ABC".Substring(0, 1).ToLower()) && a.IsActived);
-            list = Dbc.PgTestDb.GetList<PgUserDto>(a => a.UserName.ToLower().Contains(queryObj.UserName.Substring(0, 1).ToLower()) && a.IsActived);
+            list = Dbc.PgTestDb.GetList<PgUserDto>(a => a.UserName.ToLower().Contains("a") && !a.IsDelete);
+            list = Dbc.PgTestDb.GetList<PgUserDto>(a => a.UserName.ToLower().Contains(queryObj.UserName) && !a.IsDelete);
+            list = Dbc.PgTestDb.GetList<PgUserDto>(a => a.UserName.ToLower().Contains(queryObj.UserName.ToLower()) && !a.IsDelete);
+            list = Dbc.PgTestDb.GetList<PgUserDto>(a => a.UserName.ToLower().Contains("ABC".ToLower()) && !a.IsDelete);
+            list = Dbc.PgTestDb.GetList<PgUserDto>(a => a.UserName.ToLower().Contains("ABC".ToLower().Substring(0, 1).ToUpper()) && !a.IsDelete);
+            list = Dbc.PgTestDb.GetList<PgUserDto>(a => a.UserName.ToLower().Contains("ABC".ToLower().Substring(0, 1)) && !a.IsDelete);
+            list = Dbc.PgTestDb.GetList<PgUserDto>(a => a.UserName.ToLower().Contains("ABC".Substring(0, 1).ToLower()) && !a.IsDelete);
+            list = Dbc.PgTestDb.GetList<PgUserDto>(a => a.UserName.ToLower().Contains(queryObj.UserName.Substring(0, 1).ToLower()) && !a.IsDelete);
 
             List<int?> ids = new List<int?> { 1, 2, 3 };
             list = Dbc.PgTestDb.GetList<PgUserDto>(a => ids.Contains(a.Id));
@@ -76,11 +76,11 @@ namespace Jc.Core.TestApp.Test
             list = Dbc.PgTestDb.GetList<PgUserDto>(a => userNames.Contains(a.UserName.ToLower()));
 
             list = Dbc.PgTestDb.GetList<PgUserDto>(a => a.UserName.StartsWith("a"));
-            list = Dbc.PgTestDb.GetList<PgUserDto>(a => a.UserName.ToLower().StartsWith("A".ToLower()) && a.IsActived);
+            list = Dbc.PgTestDb.GetList<PgUserDto>(a => a.UserName.ToLower().StartsWith("A".ToLower()) && !a.IsDelete);
             list = Dbc.PgTestDb.GetList<PgUserDto>(a => a.UserName.ToLower().StartsWith("A".ToLower()));
 
             list = Dbc.PgTestDb.GetList<PgUserDto>(a => a.UserName.EndsWith("or"));
-            list = Dbc.PgTestDb.GetList<PgUserDto>(a => a.UserName.ToLower().EndsWith("oR".ToLower()) && a.IsActived);
+            list = Dbc.PgTestDb.GetList<PgUserDto>(a => a.UserName.ToLower().EndsWith("oR".ToLower()) && !a.IsDelete);
             list = Dbc.PgTestDb.GetList<PgUserDto>(a => a.UserName.ToLower().EndsWith("OR".ToLower()));
         }
 
@@ -96,7 +96,7 @@ namespace Jc.Core.TestApp.Test
             list = Dbc.PgTestDb.GetList<PgUserDto>(a => a.Id == 1);
             list = Dbc.PgTestDb.GetList<PgUserDto>(a => a.Id == queryObj.Id);
             list = Dbc.PgTestDb.GetList<PgUserDto>(a => queryObj.Ids.Contains(a.Id));
-            list = Dbc.PgTestDb.GetList<PgUserDto>(a => queryObj.Ids.Contains(a.Id) && a.IsActived
+            list = Dbc.PgTestDb.GetList<PgUserDto>(a => queryObj.Ids.Contains(a.Id) && !a.IsDelete
                                                                     && a.LastUpdateDate >= DateTime.Parse(DateTime.Now.ToString("yyyy-MM-01"))
                                                                     && a.LastUpdateDate >= queryObj.MinDt.AddDays(1));
 
@@ -124,28 +124,11 @@ namespace Jc.Core.TestApp.Test
             list = Dbc.PgTestDb.GetList<PgUserDto>(a => a.Id < 4 + 1);
             list = Dbc.PgTestDb.GetList<PgUserDto>(a => a.Id <= 4 + 1);
 
-            //list = Dbc.PgTestDb.GetList<PgUserDto>(a => 1 == a.Id);
-            //list = Dbc.PgTestDb.GetList<PgUserDto>(a => 1 < a.Id);
-            //list = Dbc.PgTestDb.GetList<PgUserDto>(a => 1 <= a.Id);
-            //list = Dbc.PgTestDb.GetList<PgUserDto>(a => 4 > a.Id);
-            //list = Dbc.PgTestDb.GetList<PgUserDto>(a => 4 >= a.Id);
-
-            //list = Dbc.PgTestDb.GetList<PgUserDto>(a => 1 + 1 == a.Id);
-            //list = Dbc.PgTestDb.GetList<PgUserDto>(a => 1 + 1 < a.Id);
-            //list = Dbc.PgTestDb.GetList<PgUserDto>(a => 1 + 1 <= a.Id);
-            //list = Dbc.PgTestDb.GetList<PgUserDto>(a => 4 + 1 > a.Id);
-            //list = Dbc.PgTestDb.GetList<PgUserDto>(a => 4 + 1 >= a.Id);
-
             list = Dbc.PgTestDb.GetList<PgUserDto>(a => a.Id == minId);
             list = Dbc.PgTestDb.GetList<PgUserDto>(a => a.Id > minId);
             list = Dbc.PgTestDb.GetList<PgUserDto>(a => a.Id >= minId);
             list = Dbc.PgTestDb.GetList<PgUserDto>(a => a.Id < maxId);
             list = Dbc.PgTestDb.GetList<PgUserDto>(a => a.Id <= maxId);
-            //list = Dbc.PgTestDb.GetList<PgUserDto>(a => minId == a.Id);
-            //list = Dbc.PgTestDb.GetList<PgUserDto>(a => minId < a.Id);
-            //list = Dbc.PgTestDb.GetList<PgUserDto>(a => minId <= a.Id);
-            //list = Dbc.PgTestDb.GetList<PgUserDto>(a => maxId > a.Id);
-            //list = Dbc.PgTestDb.GetList<PgUserDto>(a => maxId >= a.Id);
 
             list = Dbc.PgTestDb.GetList<PgUserDto>(a => a.Id == minId + 1);
             list = Dbc.PgTestDb.GetList<PgUserDto>(a => a.Id > minId + 1);
@@ -186,11 +169,6 @@ namespace Jc.Core.TestApp.Test
             list = Dbc.PgTestDb.GetList<PgUserDto>(a => a.LastUpdateDate >= DateTime.Now);
             list = Dbc.PgTestDb.GetList<PgUserDto>(a => a.LastUpdateDate < DateTime.Now);
             list = Dbc.PgTestDb.GetList<PgUserDto>(a => a.LastUpdateDate <= DateTime.Now);
-            //list = Dbc.PgTestDb.GetList<PgUserDto>(a => DateTime.Now == a.LastUpdateDate);
-            //list = Dbc.PgTestDb.GetList<PgUserDto>(a => DateTime.Now < a.LastUpdateDate);
-            //list = Dbc.PgTestDb.GetList<PgUserDto>(a => DateTime.Now <= a.LastUpdateDate);
-            //list = Dbc.PgTestDb.GetList<PgUserDto>(a => DateTime.Now > a.LastUpdateDate);
-            //list = Dbc.PgTestDb.GetList<PgUserDto>(a => DateTime.Now >= a.LastUpdateDate);
 
             list = Dbc.PgTestDb.GetList<PgUserDto>(a => a.LastUpdateDate == minDt);
             list = Dbc.PgTestDb.GetList<PgUserDto>(a => a.LastUpdateDate > minDt);
@@ -207,17 +185,6 @@ namespace Jc.Core.TestApp.Test
             list = Dbc.PgTestDb.GetList<PgUserDto>(a => a.LastUpdateDate >= queryObj.MinDt);
             list = Dbc.PgTestDb.GetList<PgUserDto>(a => a.LastUpdateDate < queryObj.MaxDt);
             list = Dbc.PgTestDb.GetList<PgUserDto>(a => a.LastUpdateDate <= queryObj.MaxDt);
-        }
-
-        private void FieldCompareTest()
-        {
-            var queryObj = new { UserName = "Abc", Ids = new List<int?> { 1, 2, 3 } };
-
-            List<PgUserDto> list;
-            list = Dbc.PgTestDb.GetList<PgUserDto>(a => a.UserName == a.FirstName);
-            list = Dbc.PgTestDb.GetList<PgUserDto>(a => a.UserName.ToLower() == a.FirstName);
-            list = Dbc.PgTestDb.GetList<PgUserDto>(a => a.UserName == a.FirstName.ToLower());
-            list = Dbc.PgTestDb.GetList<PgUserDto>(a => a.UserName.ToLower() == a.FirstName.ToLower());
         }
 
         public static void AddUserTest()
@@ -239,7 +206,7 @@ namespace Jc.Core.TestApp.Test
             {
                 UserName = $"UserName{i}",
                 UserPwd = $"UserPwd{i}",
-                LastUpdateDate = null
+                AddDate = DateTime.UtcNow
             };
             sw.Stop();
             Console.WriteLine("执行数据插入...");

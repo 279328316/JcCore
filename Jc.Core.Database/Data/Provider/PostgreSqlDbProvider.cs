@@ -62,7 +62,7 @@ namespace Jc.Database.Provider
         public override DbCommand GetAutoIdDbCommand()
         {
             DbCommand dbCommand = CreateDbCommand();
-            dbCommand.CommandText = " returning id;";
+            dbCommand.CommandText = " returning id;";   // 需要保留空格
             return dbCommand;
         }
 

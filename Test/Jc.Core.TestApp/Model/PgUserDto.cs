@@ -6,7 +6,7 @@ namespace Jc.Core.TestApp
     /// <summary>
     /// Pg User Dto
     /// </summary>
-    [Table(Name = "tbl_User")]
+    [Table(Name = "t_user")]
     public class PgUserDto
     {
         #region Properties
@@ -19,45 +19,92 @@ namespace Jc.Core.TestApp
         /// <summary>
         /// 用户名
         /// </summary>
-        [Field(Name = "user_name", FieldType = "varchar", Length = 50)]
+        [Field(Name = "username", FieldType = "varchar", Length = 50)]
         public string UserName { get; set; }
 
         /// <summary>
         /// 密码
         /// </summary>
-        [Field(Name = "password", DisplayText = "密码", FieldType = "varchar", Length = 50)]
+        [Field(Name = "userpwd", DisplayText = "密码", FieldType = "varchar", Length = 50)]
         public string UserPwd { get; set; }
 
         /// <summary>
         /// 昵称
         /// </summary>
-        [Field(Name = "first_name", DisplayText = "昵称", FieldType = "varchar", Length = 50)]
-        public string FirstName { get; set; }
+        [Field(Name = "nickname", DisplayText = "昵称", FieldType = "varchar", Length = 50)]
+        public string NickName { get; set; }
 
         /// <summary>
         /// 真实姓名
         /// </summary>
-        [Field(Name = "last_name", DisplayText = "真实姓名", FieldType = "varchar", Length = 50)]
-        public string LastName { get; set; }
+        [Field(Name = "realname", DisplayText = "真实姓名", FieldType = "varchar", Length = 50)]
+        public string RealName { get; set; }
 
         /// <summary>
-        /// 是否超级管理员
+        /// Email
         /// </summary>
-        [Field(Name = "is_super_user", DisplayText = "是否超级管理员", FieldType = "bit")]
-        public bool IsSuperUser { get; set; }
+        [Field(Name = "email")]
+        public string Email { get; set; }
 
         /// <summary>
-        /// 是否激活
+        /// 头像
         /// </summary>
-        [Field(Name = "is_actived", DisplayText = "是否激活", FieldType = "bit")]
-        public bool IsActived { get; set; }
+        [Field(Name = "avatar")]
+        public string Avatar { get; set; }
+
+        /// <summary>
+        /// 联系方式
+        /// </summary>
+        [Field(Name = "phoneno")]
+        public string PhoneNo { get; set; }
+
+        /// <summary>
+        /// 性别 0女 1男
+        /// </summary>
+        [Field(Name = "sex")]
+        public Sex? Sex { get; set; }
+
+        /// <summary>
+        /// 出生日期
+        /// </summary>
+        [Field(Name = "birthday")]
+        public DateTime? Birthday { get; set; }
+
+        /// <summary>
+        /// 是否删除
+        /// </summary>
+        [Field(Name = "isdelete")]
+        public bool IsDelete { get; set; }
+
+        /// <summary>
+        /// 状态 0停用 1启用
+        /// </summary>
+        [Field(Name = "userstatus")]
+        public UserStatus UserStatus { get; set; }
+
+        /// <summary>
+        /// 添加人
+        /// </summary>
+        [Field(Name = "adduser")]
+        public Guid? AddUser { get; set; }
+
+        /// <summary>
+        /// 添加日期
+        /// </summary>
+        [Field(Name = "adddate")]
+        public DateTime? AddDate { get; set; }
+
+        /// <summary>
+        /// 修改人
+        /// </summary>
+        [Field(Name = "lastupdateuser")]
+        public Guid? LastUpdateUser { get; set; }
 
         /// <summary>
         /// 修改时间
         /// </summary>
-        [Field(Name = "last_modified_date_time", DisplayText = "修改时间", FieldType = "datetime")]
+        [Field(Name = "lastupdatedate")]
         public DateTime? LastUpdateDate { get; set; }
-
         #endregion
     }
 }

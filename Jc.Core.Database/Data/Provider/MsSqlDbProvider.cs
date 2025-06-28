@@ -59,7 +59,7 @@ namespace Jc.Database.Provider
         public override DbCommand GetAutoIdDbCommand()
         {
             DbCommand dbCommand = CreateDbCommand();
-            dbCommand.CommandText = "Select SCOPE_IDENTITY()";
+            dbCommand.CommandText = ";Select SCOPE_IDENTITY()";
             return dbCommand;
         }
 

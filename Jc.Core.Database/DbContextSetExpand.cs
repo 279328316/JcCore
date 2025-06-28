@@ -196,7 +196,7 @@ namespace Jc.Database
                         || pkField.PropertyType == typeof(int?))
                         && (pkValue == null || (int)pkValue == 0))
                     {
-                        dbCommand.CommandText += ";" + dbProvider.GetAutoIdDbCommand().CommandText;
+                        dbCommand.CommandText += " " + dbProvider.GetAutoIdDbCommand().CommandText;
                         object valueObj = DbCommandExecuter.ExecuteScalar(dbCommand, logHelper);
                         if (valueObj == null || valueObj == DBNull.Value)
                         {
@@ -208,7 +208,7 @@ namespace Jc.Database
                         pkField.PropertyType == typeof(long?))
                         && (pkValue == null || (long)pkValue == 0))
                     {
-                        dbCommand.CommandText = $"{dbCommand.CommandText};{dbProvider.GetAutoIdDbCommand().CommandText}";
+                        dbCommand.CommandText = $"{dbCommand.CommandText} {dbProvider.GetAutoIdDbCommand().CommandText}";
                         object valueObj = DbCommandExecuter.ExecuteScalar(dbCommand, logHelper);
                         if (valueObj == null || valueObj == DBNull.Value)
                         {

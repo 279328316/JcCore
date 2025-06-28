@@ -13,7 +13,7 @@ namespace Jc.Tests
         /// <summary>
         /// Db
         /// </summary>
-        public static DbContext Db = DbContext.CreateDbContext("Test", DatabaseType.MsSql);
+        public static DbContext Db = DbContext.CreateDbContext("MsSqlTestDb", DatabaseType.MsSql);
 
         /// <summary>
         /// 获取DbIQuery
