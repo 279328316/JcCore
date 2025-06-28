@@ -395,11 +395,7 @@ namespace Jc.Database.Provider
                 }
                 for (int i = 0; i < filter.FilterParameters.Count; i++)
                 {
-                    DbParameter dbParameter = dbCommand.CreateParameter();
-                    dbParameter.Direction = ParameterDirection.Input;
-                    dbParameter.ParameterName = filter.FilterParameters[i].ParameterName;
-                    dbParameter.Value = filter.FilterParameters[i].ParameterValue;
-                    dbParameter.DbType = filter.FilterParameters[i].ParameterDbType;
+                    DbParameter dbParameter = GetQueryParameter(dbCommand, filter.FilterParameters[i]);
                     dbCommand.Parameters.Add(dbParameter);
                 }
             }
@@ -546,11 +542,7 @@ namespace Jc.Database.Provider
                 }
                 for (int i = 0; i < filter.FilterParameters.Count; i++)
                 {
-                    DbParameter dbParameter = dbCommand.CreateParameter();
-                    dbParameter.Direction = ParameterDirection.Input;
-                    dbParameter.ParameterName = filter.FilterParameters[i].ParameterName;
-                    dbParameter.Value = filter.FilterParameters[i].ParameterValue;
-                    dbParameter.DbType = filter.FilterParameters[i].ParameterDbType;
+                    DbParameter dbParameter = GetQueryParameter(dbCommand, filter.FilterParameters[i]);
                     dbCommand.Parameters.Add(dbParameter);
                 }
             }
@@ -621,11 +613,7 @@ namespace Jc.Database.Provider
                 }
                 for (int i = 0; i < filter.FilterParameters.Count; i++)
                 {
-                    DbParameter dbParameter = dbCommand.CreateParameter();
-                    dbParameter.Direction = ParameterDirection.Input;
-                    dbParameter.ParameterName = filter.FilterParameters[i].ParameterName;
-                    dbParameter.Value = filter.FilterParameters[i].ParameterValue;
-                    dbParameter.DbType = filter.FilterParameters[i].ParameterDbType;
+                    DbParameter dbParameter = GetQueryParameter(dbCommand, filter.FilterParameters[i]);
                     dbCommand.Parameters.Add(dbParameter);
                 }
             }
@@ -658,11 +646,7 @@ namespace Jc.Database.Provider
                 }
                 for (int i = 0; i < filter.FilterParameters.Count; i++)
                 {
-                    DbParameter dbParameter = dbCommand.CreateParameter();
-                    dbParameter.Direction = ParameterDirection.Input;
-                    dbParameter.ParameterName = filter.FilterParameters[i].ParameterName;
-                    dbParameter.Value = filter.FilterParameters[i].ParameterValue;
-                    dbParameter.DbType = filter.FilterParameters[i].ParameterDbType;
+                    DbParameter dbParameter = GetQueryParameter(dbCommand, filter.FilterParameters[i]);
                     dbCommand.Parameters.Add(dbParameter);
                 }
             }
@@ -728,17 +712,10 @@ namespace Jc.Database.Provider
                 {
                     sqlStr += filter.FilterSQLString;
                 }
-                if (filter.FilterParameters.Count > 0)
+                for (int i = 0; i < filter.FilterParameters.Count; i++)
                 {
-                    for (int i = 0; i < filter.FilterParameters.Count; i++)
-                    {
-                        DbParameter dbParameter = dbCommand.CreateParameter();
-                        dbParameter.Direction = ParameterDirection.Input;
-                        dbParameter.ParameterName = filter.FilterParameters[i].ParameterName;
-                        dbParameter.Value = filter.FilterParameters[i].ParameterValue;
-                        dbParameter.DbType = filter.FilterParameters[i].ParameterDbType;
-                        dbCommand.Parameters.Add(dbParameter);
-                    }
+                    DbParameter dbParameter = GetQueryParameter(dbCommand, filter.FilterParameters[i]);
+                    dbCommand.Parameters.Add(dbParameter);
                 }
             }
             dbCommand.CommandText = string.Format(sqlStr, dtoDbMapping.GetTableName(subTableArg), selectParams);
@@ -770,17 +747,11 @@ namespace Jc.Database.Provider
                 {
                     sqlStr += filter.FilterSQLString;
                 }
-                if (filter.FilterParameters.Count > 0)
+                
+                for (int i = 0; i < filter.FilterParameters.Count; i++)
                 {
-                    for (int i = 0; i < filter.FilterParameters.Count; i++)
-                    {
-                        DbParameter dbParameter = dbCommand.CreateParameter();
-                        dbParameter.Direction = ParameterDirection.Input;
-                        dbParameter.ParameterName = filter.FilterParameters[i].ParameterName;
-                        dbParameter.Value = filter.FilterParameters[i].ParameterValue;
-                        dbParameter.DbType = filter.FilterParameters[i].ParameterDbType;
-                        dbCommand.Parameters.Add(dbParameter);
-                    }
+                    DbParameter dbParameter = GetQueryParameter(dbCommand, filter.FilterParameters[i]);
+                    dbCommand.Parameters.Add(dbParameter);
                 }
             }
             dbCommand.CommandText = string.Format(sqlStr, dtoDbMapping.GetTableName(subTableArg), selectParams);
@@ -812,17 +783,11 @@ namespace Jc.Database.Provider
                 {
                     sqlStr += filter.FilterSQLString;
                 }
-                if (filter.FilterParameters.Count > 0)
+                
+                for (int i = 0; i < filter.FilterParameters.Count; i++)
                 {
-                    for (int i = 0; i < filter.FilterParameters.Count; i++)
-                    {
-                        DbParameter dbParameter = dbCommand.CreateParameter();
-                        dbParameter.Direction = ParameterDirection.Input;
-                        dbParameter.ParameterName = filter.FilterParameters[i].ParameterName;
-                        dbParameter.Value = filter.FilterParameters[i].ParameterValue;
-                        dbParameter.DbType = filter.FilterParameters[i].ParameterDbType;
-                        dbCommand.Parameters.Add(dbParameter);
-                    }
+                    DbParameter dbParameter = GetQueryParameter(dbCommand, filter.FilterParameters[i]);
+                    dbCommand.Parameters.Add(dbParameter);
                 }
             }
             dbCommand.CommandText = string.Format(sqlStr, dtoDbMapping.GetTableName(subTableArg), selectParams);
@@ -850,11 +815,7 @@ namespace Jc.Database.Provider
                 }
                 for (int i = 0; i < filter.FilterParameters.Count; i++)
                 {
-                    DbParameter dbParameter = dbCommand.CreateParameter();
-                    dbParameter.Direction = ParameterDirection.Input;
-                    dbParameter.ParameterName = filter.FilterParameters[i].ParameterName;
-                    dbParameter.Value = filter.FilterParameters[i].ParameterValue;
-                    dbParameter.DbType = filter.FilterParameters[i].ParameterDbType;
+                    DbParameter dbParameter = GetQueryParameter(dbCommand,filter.FilterParameters[i]);
                     dbCommand.Parameters.Add(dbParameter);
                 }
             }
@@ -885,6 +846,22 @@ namespace Jc.Database.Provider
                 }
             }
             return dbValue;
+        }
+
+        /// <summary>
+        /// Get Query DbParameter
+        /// </summary>
+        /// <param name="dbCommand"></param>
+        /// <param name="queryParameter"></param>
+        /// <returns></returns>
+        protected virtual DbParameter GetQueryParameter(DbCommand dbCommand, QueryParameter queryParameter)
+        {
+            DbParameter dbParameter = dbCommand.CreateParameter();
+            dbParameter.Direction = ParameterDirection.Input;
+            dbParameter.ParameterName = queryParameter.ParameterName;
+            dbParameter.Value = queryParameter.ParameterValue;
+            dbParameter.DbType = queryParameter.ParameterDbType;
+            return dbParameter;
         }
 
         /// <summary>

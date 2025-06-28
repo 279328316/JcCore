@@ -117,11 +117,7 @@ namespace Jc.Database.Provider
 
             for (int i = 0; i < filter.FilterParameters.Count; i++)
             {
-                DbParameter dbParameter = dbCommand.CreateParameter();
-                dbParameter.Direction = ParameterDirection.Input;
-                dbParameter.ParameterName = filter.FilterParameters[i].ParameterName;
-                dbParameter.Value = filter.FilterParameters[i].ParameterValue;
-                dbParameter.DbType = filter.FilterParameters[i].ParameterDbType;
+                DbParameter dbParameter = GetQueryParameter(dbCommand, filter.FilterParameters[i]);
                 dbCommand.Parameters.Add(dbParameter);
             }
             dbCommand.CommandText = string.Format(sqlStr, dtoDbMapping.GetTableName(subTableArg), selectParams);
@@ -178,11 +174,7 @@ namespace Jc.Database.Provider
             {
                 for (int i = 0; i < filter.FilterParameters.Count; i++)
                 {
-                    DbParameter dbParameter = dbCommand.CreateParameter();
-                    dbParameter.Direction = ParameterDirection.Input;
-                    dbParameter.ParameterName = filter.FilterParameters[i].ParameterName;
-                    dbParameter.Value = filter.FilterParameters[i].ParameterValue;
-                    dbParameter.DbType = filter.FilterParameters[i].ParameterDbType;
+                    DbParameter dbParameter = GetQueryParameter(dbCommand, filter.FilterParameters[i]);
                     dbCommand.Parameters.Add(dbParameter);
                 }
             }

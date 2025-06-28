@@ -7,6 +7,7 @@ using System.Reflection;
 using System.Data;
 using System.Linq;
 using Jc.Database.Query;
+using Newtonsoft.Json.Linq;
 
 namespace Jc.Database.Provider
 {
@@ -88,6 +89,24 @@ namespace Jc.Database.Provider
         }
 
         /// <summary>
+        /// 获取查询参数
+        /// </summary>
+        /// <param name="dbCommand"></param>
+        /// <param name="queryParameter"></param>
+        /// <returns></returns>
+        protected override DbParameter GetQueryParameter(DbCommand dbCommand, QueryParameter queryParameter)
+        {
+            DbParameter dbParameter = base.GetQueryParameter(dbCommand, queryParameter);
+
+            if (queryParameter.ParameterDbType == System.Data.DbType.DateTime)
+            {
+                DateTime? dateTime = dbParameter.Value as DateTime?;
+                dbParameter.Value = DateHelper.ToUniversalTime(dateTime);
+            }
+            return dbParameter;
+        }
+
+        /// <summary>
         /// 获取分页查询DbCommand
         /// </summary>
         /// <typeparam name="T"></typeparam>
@@ -129,11 +148,7 @@ namespace Jc.Database.Provider
 
             for (int i = 0; i < filter.FilterParameters.Count; i++)
             {
-                DbParameter dbParameter = dbCommand.CreateParameter();
-                dbParameter.Direction = ParameterDirection.Input;
-                dbParameter.ParameterName = filter.FilterParameters[i].ParameterName;
-                dbParameter.Value = filter.FilterParameters[i].ParameterValue;
-                dbParameter.DbType = filter.FilterParameters[i].ParameterDbType;
+                DbParameter dbParameter = GetQueryParameter(dbCommand, filter.FilterParameters[i]);
                 dbCommand.Parameters.Add(dbParameter);
             }
             dbCommand.CommandText = string.Format(sqlStr, dtoDbMapping.GetTableName(subTableArg), selectParams, dtoDbMapping.GetPkField().FieldName);
