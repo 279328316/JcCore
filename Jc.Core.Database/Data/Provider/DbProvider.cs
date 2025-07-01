@@ -845,6 +845,10 @@ namespace Jc.Database.Provider
                     dbValue = piValue;
                 }
             }
+            else
+            {
+                dbValue = DBNull.Value;
+            }
             return dbValue;
         }
 

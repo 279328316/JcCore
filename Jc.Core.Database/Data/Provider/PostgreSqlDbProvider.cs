@@ -76,7 +76,7 @@ namespace Jc.Database.Provider
         protected override object GetParameterValue(FieldMapping piMap, object dto)
         {
             object dbValue = base.GetParameterValue(piMap, dto);
-            if(dbValue != null)
+            if(dbValue != DBNull.Value)
             {
                 // PostgreSql 日期处理为UTC格式
                 if (piMap.DbType == System.Data.DbType.DateTime)

@@ -136,6 +136,10 @@ namespace Jc
                     result = JsonHelper.DeserializeObject<T>(setting);
                 }
             }
+            else if (type == typeof(string))
+            {   // 如果为string类型时,直接返回setting
+                result = (T)(object)setting;
+            }
             else
             {
                 result = JsonHelper.DeserializeObject<T>(setting);

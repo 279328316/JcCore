@@ -229,7 +229,7 @@ namespace Jc.Database
                 catch (Exception ex)
                 {
                     CloseDbConnection(dbCommand);
-                    throw ex;
+                    throw;
                 }
             }
             return rowCount;

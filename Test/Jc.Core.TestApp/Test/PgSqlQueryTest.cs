@@ -150,13 +150,13 @@ namespace Jc.Core.TestApp.Test
         private void DateTimeCompareTest()
         {
             int minId = 1;
-            int maxId = 4;
-            DateTime minDt = DateTime.Parse("2022-06-20");
-            DateTime maxDt = DateTime.Parse("2022-06-30");
+            int maxId = 9;
+            DateTime minDt = DateTime.Parse("2025-06-28 18:43:00");
+            DateTime maxDt = DateTime.Parse("2025-06-28 18:50:00");
             var queryObj = new QueryObj()
             {
-                UserName = "Abc",
-                Ids = new List<int?> { 1, 2, 3 },
+                UserName = "Up",
+                Ids = new List<int?> { 1, 2, 3,4,5 },
                 MinId = minId,
                 MaxId = maxId,
                 MinDt = minDt,
@@ -206,7 +206,8 @@ namespace Jc.Core.TestApp.Test
             {
                 UserName = $"UserName{i}",
                 UserPwd = $"UserPwd{i}",
-                AddDate = DateTime.UtcNow
+                AddDate = DateTime.Now,
+                LastUpdateDate = DateTime.UtcNow
             };
             sw.Stop();
             Console.WriteLine("执行数据插入...");
@@ -231,6 +232,7 @@ namespace Jc.Core.TestApp.Test
             {
                 users[i].UserName = $"UpUserName{i}";
                 users[i].UserPwd = $"UserPwd{i}";
+                users[i].Birthday = DateTime.UtcNow;
                 users[i].LastUpdateDate = DateTime.Now;
             }
             sw.Stop();
@@ -238,7 +240,7 @@ namespace Jc.Core.TestApp.Test
             sw.Reset();
             Console.WriteLine("执行数据更新...");
             sw.Start();
-            Dbc.PgTestDb.UpdateList(users, a => new { a.Id, a.UserName, a.LastUpdateDate });
+            Dbc.PgTestDb.UpdateList(users, a => new { a.Id, a.UserName,a.Birthday, a.LastUpdateDate });
             sw.Stop();
             Console.WriteLine($"Int更新{users.Count}条记录，共耗时{sw.ElapsedMilliseconds} Ms");
         }
