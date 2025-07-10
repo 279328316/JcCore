@@ -7,7 +7,6 @@ using System.Linq.Expressions;
 using System.Reflection;
 using System.Text;
 
-
 namespace Jc.Database.Query
 {
     /// <summary>
@@ -16,6 +15,7 @@ namespace Jc.Database.Query
     public class QueryFilterBuilder
     {
         EntityMapping dtoDbMapping = null;
+
         private QueryFilter filter = new QueryFilter();
 
         private QueryFilterBuilder()
@@ -114,7 +114,7 @@ namespace Jc.Database.Query
             switch (expType)
             {
                 case ExpressionType.Equal:
-                    operand = isFieldOp ? Operand.FieldEqual :Operand.Equal;
+                    operand = isFieldOp ? Operand.FieldEqual : Operand.Equal;
                     break;
                 case ExpressionType.GreaterThan:
                     operand = isFieldOp ? Operand.FieldGreaterThan : Operand.GreaterThan;
@@ -193,7 +193,7 @@ namespace Jc.Database.Query
             Expression right = binaryExpression.Right;
             ExpressionType expType = binaryExpression.NodeType;
 
-            if (!(left is BinaryExpression || left is MemberExpression 
+            if (!(left is BinaryExpression || left is MemberExpression
                 || left is ConstantExpression || left is MethodCallExpression
                  || left is UnaryExpression))
             {
@@ -207,24 +207,31 @@ namespace Jc.Database.Query
 
                 bool leftIsField = IsFieldExpression(left);
 
-                // 取消对表达式在右侧,不规范写法支持
-                //bool rightIsField = IsFieldExpression(right);
+                bool rightIsField = IsFieldExpression(right);
 
                 if (leftIsField)
                 {
                     param = AtomExpressionRouter(left);
                     paramValue = AtomExpressionRouter(right);
                 }
-                else
+                else if (!leftIsField && rightIsField)
                 {
-                    //paramValue = AtomExpressionRouter(left);
-                    //param = AtomExpressionRouter(right);
+                    paramValue = AtomExpressionRouter(left);
+                    param = AtomExpressionRouter(right);
 
                     //取消对表达式在右侧,不规范写法支持
+                    //throw new Exception("Unsupported non-standard expressions");
+                }
+                else if (!leftIsField && !rightIsField)
+                {
                     throw new Exception("Unsupported non-standard expressions");
                 }
-                //bool isFieldOp = leftIsField && rightIsField;   // 取消对与字段比较支持
-                Operand operand = GetOperand(expType);
+                bool isFieldOp = false;   // 取消对与字段比较支持
+                if (leftIsField && rightIsField)
+                {
+                    isFieldOp = true;
+                }
+                Operand operand = GetOperand(expType, isFieldOp);
                 if (paramValue == null)
                 {   //只有null时使用
                     if (operand == Operand.Equal)
@@ -263,10 +270,10 @@ namespace Jc.Database.Query
             result = (exp is MemberExpression
                     && ((MemberExpression)exp).Expression != null
                     && !((MemberExpression)exp).Expression.ToString().StartsWith("value"))
-                    || (exp is MethodCallExpression 
+                    || (exp is MethodCallExpression
                     && ((MethodCallExpression)exp).Object is MemberExpression
                     && ((MemberExpression)((MethodCallExpression)exp).Object).Expression != null
-                    && !((MemberExpression)((MethodCallExpression)exp).Object).Expression.ToString().StartsWith("value")) 
+                    && !((MemberExpression)((MethodCallExpression)exp).Object).Expression.ToString().StartsWith("value"))
                     || (exp is UnaryExpression
                     && ((UnaryExpression)exp).Operand is MemberExpression
                     && ((MemberExpression)((UnaryExpression)exp).Operand).Expression != null
@@ -285,7 +292,7 @@ namespace Jc.Database.Query
             {
                 return false;
             }
-            bool result = false;            
+            bool result = false;
             if (exp is MemberExpression)   //表示访问字段或属性
             {
                 MemberExpression me = exp as MemberExpression;
@@ -294,7 +301,7 @@ namespace Jc.Database.Query
             else if (exp is UnaryExpression) //表示创建一个新数组，并可能初始化该新数组的元素
             {   // a.Id = int? exp="Convert(a.Id, Nullable`1)"  Convert,Not
                 UnaryExpression unaryExp = exp as UnaryExpression;
-                if(unaryExp.Operand is MemberExpression)
+                if (unaryExp.Operand is MemberExpression)
                 {
                     MemberExpression me = unaryExp.Operand as MemberExpression;
                     result = me.Expression != null && !me.Expression.ToString().StartsWith("value");
@@ -408,7 +415,7 @@ namespace Jc.Database.Query
         /// <returns></returns>
         private object MemberExpressionProvider(Expression exp)
         {
-            if(! (exp is MemberExpression))
+            if (!(exp is MemberExpression))
             {
                 throw new Exception($"表达式{exp}不是MemberExpression类型.");
             }
@@ -467,7 +474,7 @@ namespace Jc.Database.Query
         /// <param name="exp"></param>
         /// <param name="isNotOprand"></param>
         /// <returns></returns>
-        private QueryParameter MethodCallExpressionProvider(Expression exp,bool isNotOprand = false)
+        private QueryParameter MethodCallExpressionProvider(Expression exp, bool isNotOprand = false)
         {
             QueryParameter qp = null;
             object name = null;
@@ -587,7 +594,7 @@ namespace Jc.Database.Query
             object value = AtomExpressionRouter(unaryExp.Operand);
             return value;
         }
-        
+
         /// <summary>
         /// 原子表达式 值计算
         /// </summary>
@@ -628,7 +635,7 @@ namespace Jc.Database.Query
                 {
                     string expStr = exp.ToString();
                     if (expStr.StartsWith("value"))
-                    {   //引用其它对象属性类型 如 list.contais(student.Name) , a.HospitalId == hospital.Id 
+                    {   //引用其它对象属性类型 如 list.contais(student.Name) , a.HospitalId == hospital.Id
                         result = Expression.Lambda(exp).Compile().DynamicInvoke();
                     }
                     else
@@ -715,7 +722,7 @@ namespace Jc.Database.Query
                 }
             }
         }
-        
+
         /// <summary>
         /// lambda表达式转换sql
         /// 支持的方法:
@@ -755,7 +762,7 @@ namespace Jc.Database.Query
         public static QueryFilter GetPageFilter<T>(
             Expression<Func<T, bool>> query = null,
             Expression<Func<T, object>> select = null,
-            List<OrderByClause> orderByClauseList = null, 
+            List<OrderByClause> orderByClauseList = null,
             Pager pager = null,
             Expression<Func<T, object>> unSelect = null) where T : class, new()
         {
@@ -765,7 +772,7 @@ namespace Jc.Database.Query
                 throw new Exception("Paging query must specify pagination information");
             }
             QueryFilterBuilder filterHelper = new QueryFilterBuilder();
-            filterHelper.FillFilter(query, select,  orderByClauseList, pager, unSelect);
+            filterHelper.FillFilter(query, select, orderByClauseList, pager, unSelect);
             return filterHelper.filter;
         }
 
@@ -785,7 +792,7 @@ namespace Jc.Database.Query
         private void FillFilter<T>(
             Expression<Func<T, bool>> query = null,
             Expression<Func<T, object>> select = null,
-            List<OrderByClause> orderByClauseList = null, 
+            List<OrderByClause> orderByClauseList = null,
             Pager pager = null,
             Expression<Func<T, object>> unSelect = null) where T : class, new()
         {
@@ -812,7 +819,7 @@ namespace Jc.Database.Query
             #region 处理分页
             if (pager != null)
             {
-                filter.InitPage(pager.PageIndex,pager.PageSize);
+                filter.InitPage(pager.PageIndex, pager.PageSize);
             }
             #endregion
 

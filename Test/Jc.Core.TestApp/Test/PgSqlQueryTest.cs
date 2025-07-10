@@ -37,7 +37,7 @@ namespace Jc.Core.TestApp.Test
             CommonCompareTest();
             DateTimeCompareTest();
             ContainsTest();
-            //FieldCompareTest();
+            FieldCompareTest();
         }
 
         public void ContainsTest()
@@ -86,7 +86,7 @@ namespace Jc.Core.TestApp.Test
 
         private void NTest()
         {
-            var queryObj = new QueryObj() { UserName = "Abc", Id = 1, Ids = new List<int?> { 1, 2, 3 }, MinDt = DateTime.Now };
+            var queryObj = new QueryObj() { UserName = "Abcdef", Id = 1, Ids = new List<int?> { 1, 2, 3 }, MinDt = DateTime.Now };
             queryObj.Query = queryObj;
 
             List<PgUserDto> list = null;
@@ -100,9 +100,9 @@ namespace Jc.Core.TestApp.Test
                                                                     && a.LastUpdateDate >= DateTime.Parse(DateTime.Now.ToString("yyyy-MM-01"))
                                                                     && a.LastUpdateDate >= queryObj.MinDt.AddDays(1));
 
-            //list = Dbc.PgTestDb.GetList<PgUserDto>(a => "Abc".ToLower() == a.UserName.ToLower());
-            //list = Dbc.PgTestDb.GetList<PgUserDto>(a => "Abcd".Substring(0, 3).ToLower() == a.UserName.ToLower());
-            //list = Dbc.PgTestDb.GetList<PgUserDto>(a => queryObj.UserName.Substring(0, 3).ToLower() == a.UserName.ToLower());
+            list = Dbc.PgTestDb.GetList<PgUserDto>(a => "Abc".ToLower() == a.UserName.ToLower());
+            list = Dbc.PgTestDb.GetList<PgUserDto>(a => "Abcd".Substring(0, 2).ToLower() == a.UserName.ToLower());
+            list = Dbc.PgTestDb.GetList<PgUserDto>(a => queryObj.UserName.Substring(0, 4).ToLower() == a.UserName.ToLower());
         }
 
         private void CommonCompareTest()
@@ -117,6 +117,18 @@ namespace Jc.Core.TestApp.Test
             list = Dbc.PgTestDb.GetList<PgUserDto>(a => a.Id >= 1);
             list = Dbc.PgTestDb.GetList<PgUserDto>(a => a.Id < 4);
             list = Dbc.PgTestDb.GetList<PgUserDto>(a => a.Id <= 4);
+
+            list = Dbc.PgTestDb.GetList<PgUserDto>(a => 1 == a.Id);
+            list = Dbc.PgTestDb.GetList<PgUserDto>(a => 1 < a.Id);
+            list = Dbc.PgTestDb.GetList<PgUserDto>(a => 1 <= a.Id);
+            list = Dbc.PgTestDb.GetList<PgUserDto>(a => 4 > a.Id);
+            list = Dbc.PgTestDb.GetList<PgUserDto>(a => 4 >= a.Id);
+
+            list = Dbc.PgTestDb.GetList<PgUserDto>(a => 1 + 1 == a.Id);
+            list = Dbc.PgTestDb.GetList<PgUserDto>(a => 1 + 1 < a.Id);
+            list = Dbc.PgTestDb.GetList<PgUserDto>(a => 1 + 1 <= a.Id);
+            list = Dbc.PgTestDb.GetList<PgUserDto>(a => 4 + 1 > a.Id);
+            list = Dbc.PgTestDb.GetList<PgUserDto>(a => 4 + 1 >= a.Id);
 
             list = Dbc.PgTestDb.GetList<PgUserDto>(a => a.Id == 1 + 1);
             list = Dbc.PgTestDb.GetList<PgUserDto>(a => a.Id > 1 + 1);
@@ -156,7 +168,7 @@ namespace Jc.Core.TestApp.Test
             var queryObj = new QueryObj()
             {
                 UserName = "Up",
-                Ids = new List<int?> { 1, 2, 3,4,5 },
+                Ids = new List<int?> { 1, 2, 3, 4, 5 },
                 MinId = minId,
                 MaxId = maxId,
                 MinDt = minDt,
@@ -174,17 +186,31 @@ namespace Jc.Core.TestApp.Test
             list = Dbc.PgTestDb.GetList<PgUserDto>(a => a.LastUpdateDate > minDt);
             list = Dbc.PgTestDb.GetList<PgUserDto>(a => a.LastUpdateDate >= minDt);
             list = Dbc.PgTestDb.GetList<PgUserDto>(a => a.LastUpdateDate < maxDt);
-            list = Dbc.PgTestDb.GetList<PgUserDto>(a => a.LastUpdateDate <= maxDt);
-            //list = Dbc.PgTestDb.GetList<PgUserDto>(a => minDt == a.LastUpdateDate);
-            //list = Dbc.PgTestDb.GetList<PgUserDto>(a => minDt < a.LastUpdateDate);
-            //list = Dbc.PgTestDb.GetList<PgUserDto>(a => minDt <= a.LastUpdateDate);
-            //list = Dbc.PgTestDb.GetList<PgUserDto>(a => maxDt > a.LastUpdateDate);
-            //list = Dbc.PgTestDb.GetList<PgUserDto>(a => maxDt >= a.LastUpdateDate);
+            list = Dbc.PgTestDb.GetList<PgUserDto>(a => a.LastUpdateDate <= DateTime.Now.AddMinutes((-1) * Consts.TaskRetryInterval));
+            list = Dbc.PgTestDb.GetList<PgUserDto>(a => a.LastUpdateDate <= DateTime.Now.AddDays(1));
+            list = Dbc.PgTestDb.GetList<PgUserDto>(a => minDt == a.LastUpdateDate);
+            list = Dbc.PgTestDb.GetList<PgUserDto>(a => minDt < a.LastUpdateDate);
+            list = Dbc.PgTestDb.GetList<PgUserDto>(a => minDt <= a.LastUpdateDate);
+            list = Dbc.PgTestDb.GetList<PgUserDto>(a => maxDt > a.LastUpdateDate);
+            list = Dbc.PgTestDb.GetList<PgUserDto>(a => maxDt >= a.LastUpdateDate);
+            list = Dbc.PgTestDb.GetList<PgUserDto>(a => DateTime.Now.AddDays(1) >= a.LastUpdateDate);
+            list = Dbc.PgTestDb.GetList<PgUserDto>(a => DateTime.Now >= a.LastUpdateDate);
 
             list = Dbc.PgTestDb.GetList<PgUserDto>(a => a.LastUpdateDate > queryObj.MinDt);
             list = Dbc.PgTestDb.GetList<PgUserDto>(a => a.LastUpdateDate >= queryObj.MinDt);
             list = Dbc.PgTestDb.GetList<PgUserDto>(a => a.LastUpdateDate < queryObj.MaxDt);
             list = Dbc.PgTestDb.GetList<PgUserDto>(a => a.LastUpdateDate <= queryObj.MaxDt);
+        }
+
+        private void FieldCompareTest()
+        {
+            var queryObj = new { UserName = "Abc", Ids = new List<int?> { 1, 2, 3 } };
+
+            List<PgUserDto> list;
+            list = Dbc.PgTestDb.GetList<PgUserDto>(a => a.UserName == a.NickName);
+            list = Dbc.PgTestDb.GetList<PgUserDto>(a => a.UserName.ToLower() == a.NickName);
+            list = Dbc.PgTestDb.GetList<PgUserDto>(a => a.UserName == a.NickName.ToLower());
+            list = Dbc.PgTestDb.GetList<PgUserDto>(a => a.UserName.ToLower() == a.NickName.ToLower());
         }
 
         public static void AddUserTest()
@@ -240,7 +266,7 @@ namespace Jc.Core.TestApp.Test
             sw.Reset();
             Console.WriteLine("执行数据更新...");
             sw.Start();
-            Dbc.PgTestDb.UpdateList(users, a => new { a.Id, a.UserName,a.Birthday, a.LastUpdateDate });
+            Dbc.PgTestDb.UpdateList(users, a => new { a.Id, a.UserName, a.Birthday, a.LastUpdateDate });
             sw.Stop();
             Console.WriteLine($"Int更新{users.Count}条记录，共耗时{sw.ElapsedMilliseconds} Ms");
         }

@@ -747,7 +747,7 @@ namespace Jc.Database.Provider
                 {
                     sqlStr += filter.FilterSQLString;
                 }
-                
+
                 for (int i = 0; i < filter.FilterParameters.Count; i++)
                 {
                     DbParameter dbParameter = GetQueryParameter(dbCommand, filter.FilterParameters[i]);
@@ -783,7 +783,7 @@ namespace Jc.Database.Provider
                 {
                     sqlStr += filter.FilterSQLString;
                 }
-                
+
                 for (int i = 0; i < filter.FilterParameters.Count; i++)
                 {
                     DbParameter dbParameter = GetQueryParameter(dbCommand, filter.FilterParameters[i]);
@@ -815,7 +815,7 @@ namespace Jc.Database.Provider
                 }
                 for (int i = 0; i < filter.FilterParameters.Count; i++)
                 {
-                    DbParameter dbParameter = GetQueryParameter(dbCommand,filter.FilterParameters[i]);
+                    DbParameter dbParameter = GetQueryParameter(dbCommand, filter.FilterParameters[i]);
                     dbCommand.Parameters.Add(dbParameter);
                 }
             }
@@ -837,7 +837,6 @@ namespace Jc.Database.Provider
             {
                 if (piMap.IsEnum)
                 {   //如果为枚举类型.转换为int
-                    //目前暂不支持 字段类型为枚举支持
                     dbValue = (int)piValue;
                 }
                 else

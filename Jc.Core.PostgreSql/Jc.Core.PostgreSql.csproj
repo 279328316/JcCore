@@ -3,7 +3,7 @@
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
-    <Version>1.2.1.13</Version>
+    <Version>1.2.1.14</Version>
     <Authors>Jc.Core</Authors>
     <Description>简单好用的.net开源Orm框架
 https://github.com/279328316/JcCore</Description>
