@@ -1,7 +1,6 @@
 ﻿using Microsoft.Extensions.Configuration;
 using System;
 using System.IO;
-using ConfigurationManager = System.Configuration.ConfigurationManager;
 
 namespace Jc
 {
@@ -41,13 +40,6 @@ namespace Jc
                 IConfigurationBuilder builder = new ConfigurationBuilder().AddJsonFile(filePath);
                 IConfiguration configuration = builder.Build();
                 value = configuration.GetConnectionString(key);
-            }
-            else
-            {   //兼容 .netFramework应用程序
-                if (ConfigurationManager.ConnectionStrings[key] != null)
-                {
-                    value = ConfigurationManager.ConnectionStrings[key].ConnectionString;
-                }
             }
             return value;
         }
@@ -180,10 +172,6 @@ namespace Jc
                 IConfigurationSection section = configuration.GetSection("appSettings");
                 value = section[key];
             }
-            else
-            {   //兼容 .netFramework应用程序
-                value = ConfigurationManager.AppSettings[key];
-            }
             return value;
         }
 
@@ -249,10 +237,6 @@ namespace Jc
                 {
                     value = configSection[key];
                 }
-            }
-            else
-            {   //兼容 .netFramework应用程序
-                value = ((IConfigurationSection)ConfigurationManager.GetSection(section))[key];
             }
             return value;
         }

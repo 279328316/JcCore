@@ -1218,7 +1218,7 @@ namespace Jc
                             {
                                 strBuilder.AppendFormat("&");
                             }
-                            strBuilder.AppendFormat("{0}={1}", piList[i].Name.ToLower(), valueStr);
+                            strBuilder.AppendFormat("{0}={1}", piList[i].Name, valueStr);
                         }
                     }
 
@@ -1350,7 +1350,7 @@ namespace Jc
                             {
                                 valueStr = JsonHelper.SerializeObject(value);
                             }
-                            dic.Add(piList[i].Name.ToLower(), valueStr);
+                            dic.Add(piList[i].Name, valueStr);
                         }
                     }
 
